@@ -1,0 +1,28 @@
+/* ilan-detay.css */
+.prose { /* Açıklama alanının düzgün görünmesi için */
+  line-height: 1.75;
+}
+
+.prose p {
+  margin-bottom: 1em;
+}
+
+.thumbnail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 0.5rem;
+}
+
+.thumbnail-image {
+  width: 100%;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.thumbnail-image:hover {
+  border-color: #3b82f6; /* Tailwind blue-500 */
+}

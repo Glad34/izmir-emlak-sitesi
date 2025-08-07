@@ -1,0 +1,82 @@
+<style>
+
+  /* Menü konteyneri */
+#mobile-menu {
+  transition: all 0.4s ease-in-out;
+  transform-origin: top right;
+  transform: scale(0.95);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Açıldığında */
+#mobile-menu.active {
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Menü stilleri */
+#mobile-menu {
+  background-color: #ffffff;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border-radius: 12px 0 0 12px;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  z-index: 9999;
+}
+
+/* Menü içindeki linkler */
+#mobile-menu a {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #e45a0a;
+  transition: color 0.3s ease;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+#mobile-menu a:last-child {
+  border-bottom: none;
+}
+
+#mobile-menu a:hover {
+  color: #ef4444; /* Kırmızımsı vurgulu bir hover */
+}
+
+</style>
+
+<header class="fixed top-0 left-0 w-full z-50 bg-transparent text-white custom-header">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-full">
+      
+      <!-- Logo -->
+      <a href="index.html">
+        <img src="images/logo beyaz.png" alt="Logo" class="h-16 logo-default block" />
+        <img src="images/logo siyah.png" alt="Logo" class="h-16 logo-scrolled hidden" />
+      </a>
+  
+      <!-- Hamburger Butonu -->
+      <div class="md:hidden">
+        <button id="menu-toggle" class="focus:outline-none">
+          <svg id="hamburger-icon" class="w-8 h-8 transition-colors duration-300 text-white" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+  
+      <!-- Menü -->
+      <nav id="mobile-menu" class="hidden absolute top-full right-0 w-full bg-white text-black flex-col md:flex md:static md:flex-row md:space-x-8 md:bg-transparent md:text-white text-lg">
+        <a href="index.html" class="block px-4 py-2 hover:bg-gray-100 md:hover:bg-transparent">Ana Sayfa</a>
+        <a href="cesme.html" class="block px-4 py-2 hover:bg-gray-100 md:hover:bg-transparent">Çeşme</a>
+        <a href="alacati.html" class="block px-4 py-2 hover:bg-gray-100 md:hover:bg-transparent">Alaçatı</a>
+        <a href="#iletisim" class="block px-4 py-2 hover:bg-gray-100 md:hover:bg-transparent">İletişim</a>
+      </nav>
+    </div>
+  </header>

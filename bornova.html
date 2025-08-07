@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bornova - Yatırım Rehberi</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Arapey&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    input[type=range]::-webkit-slider-thumb {
+      background: #b6c9d2;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      background: #18181a;
+      height: 6px;
+      border-radius: 5px;
+    }
+    .slider-container {
+      position: relative;
+    }
+    .slider-value {
+      position: absolute;
+      top: -30px;
+      background: #b6c9d2;
+      color: black;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 16px;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body class="text-gray-800 bg-gray-50">
+
+ <!-- Header -->
+ <div id="header-placeholder"></div>
+ <script>
+   fetch("header.html")
+     .then(res => res.text())
+     .then(data => {
+       document.getElementById("header-placeholder").innerHTML = data;
+       const menuToggle = document.getElementById("menu-toggle");
+       const mobileMenu = document.getElementById("mobile-menu");
+       if (menuToggle && mobileMenu) {
+         menuToggle.addEventListener("click", function () {
+           mobileMenu.classList.toggle("active");
+         });
+       }
+     });
+ </script>
+
+  <!-- Banner -->
+  <section class="relative h-screen bg-cover bg-center" style="background-image: url('images/banner/Bornova-Küçükpark.jpg');">
+    <div class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-white text-center px-4">
+      <h1 class="text-6xl md:text-5xl font-bold mb-2">Bornova</h1>
+      <p class="text-2xl md:text-xl">Eğitimin, kültürün ve dinamizmin merkezi</p>
+    </div>
+  </section>
+
+  <!-- Genel Bakış -->
+  <section class="py-12 bg-white">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-3xl font-semibold text-center mb-8">Genel Bakış</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+        <div>
+          <img src="images/ikonlar/nufus.png" class="mx-auto h-12 mb-2" alt="Nüfus">
+          <p class="font-semibold text-lg">Toplam Nüfus</p>
+          <p>455.000+</p>
+        </div>
+        <div>
+          <img src="images/ikonlar/gelir.png" class="mx-auto h-12 mb-2" alt="Gelir">
+          <p class="font-semibold text-lg">Sosy-Ekonomik Düzey</p>
+          <p>Orta-Üst</p>
+        </div>
+        <div>
+          <img src="images/ikonlar/yatirim.png" class="mx-auto h-12 mb-2" alt="Yatırım Potansiyeli">
+          <p class="font-semibold text-lg">Yatırım Geri Dönüş</p>
+          <p>17-22 Yıl</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bilgilendirme -->
+  <section class="premium-info-section">
+    <div class="premium-container">
+      <h2 class="premium-title">Bornova Hakkında Kısa Bilgiler</h2>
+      <div class="premium-grid">
+        <div class="premium-box">🎓 Türkiye'nin en köklü üniversitelerinden <strong>Ege Üniversitesi</strong> ve <strong>Yaşar Üniversitesi</strong>'ne ev sahipliği yapar.</div>
+        <div class="premium-box">🚇 Gelişmiş <strong>metro ağı</strong> ve otoyol bağlantılarıyla İzmir'in her yerine kolay ulaşım sağlar.</div>
+        <div class="premium-box">🛍️ <strong>Forum Bornova, Point Bornova</strong> gibi büyük alışveriş ve yaşam merkezleri bulunur.</div>
+        <div class="premium-box">🏥 <strong>Ege Üniversitesi Hastanesi</strong> başta olmak üzere önemli sağlık kuruluşlarına sahiptir.</div>
+        <div class="premium-box">📈 Yoğun öğrenci ve çalışan nüfusu sayesinde <strong>kiralık konut piyasası</strong> her zaman canlıdır.</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Yaş Dağılımı ve Demografi -->
+  <section class="bg-white py-12">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <h2 class="text-3xl font-semibold mb-6">Bornova – İzmir Demografik Yaş Karşılaştırması</h2>
+      <canvas id="yasKarsilastirma" height="300"></canvas>
+      <p class="text-sm text-gray-500 mt-2">Veri Kaynağı: TÜİK 2023</p>
+    </div>
+  </section>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const ctx = document.getElementById('yasKarsilastirma').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Erkek', 'Kadın'],
+          datasets: [
+            {
+              label: 'Bornova',
+              data: [33.5, 34.8], /* Bornova için güncellenmiş medyan yaş verisi (genç nüfus) */
+              backgroundColor: '#3b82f6',
+              borderRadius: 6
+            },
+            {
+              label: 'İzmir Geneli',
+              data: [37.5, 38],
+              backgroundColor: '#9ca3af',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          scales: {
+            x: {
+              beginAtZero: true,
+              suggestedMax: 60,
+              ticks: { font: { size: 16 } },
+              title: { display: true, text: 'Medyan Yaş', font: { size: 18, weight: 'bold' } }
+            },
+            y: { ticks: { font: { size: 16 } } }
+          },
+          plugins: {
+            legend: { display: true, position: 'bottom', labels: { font: { size: 16 } } },
+            tooltip: {
+              bodyFont: { size: 16 },
+              callbacks: {
+                label: function(context) {
+                  return context.dataset.label + ': ' + context.raw + ' yaş';
+                }
+              }
+            }
+          }
+        }
+      });
+    });
+  </script>
+
+  <!-- Eğitim Kurumları -->
+  <section class="edu-section">
+    <div class="edu-container">
+      <h2 class="edu-title">Eğitim Kurumları</h2>
+      <div class="edu-grid">
+        <div class="edu-box">🎓 <strong>Ege Üniversitesi</strong> (Kampüs)</div>
+        <div class="edu-box">🎓 <strong>Yaşar Üniversitesi</strong> (Kampüs)</div>
+        <div class="edu-box">🏫 <strong>Bornova Anadolu Lisesi (BAL)</strong></div>
+        <div class="edu-box">🏫 <strong>Suphi Koyuncuoğlu Anadolu Lisesi</strong></div>
+        <div class="edu-box">🏫 Çok sayıda nitelikli özel ve devlet okulu</div>
+      </div>
+    </div>
+  </section>
+
+ <!-- FİLTRE ALANI -->
+  <section class="bg-white py-8">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-3xl font-semibold mb-4 text-center">Bornova'daki Yatırımlık Evler</h2>
+      <div class="mb-6 grid md:grid-cols-2 gap-6 bg-gray-50 p-4 rounded shadow">
+        <div class="slider-container">
+          <label class="block mb-1 font-medium text-sm">Fiyat Aralığı (TL)</label>
+          <input id="fiyatAralik" type="range" min="0" max="100000000" step="500000" value="100000000" class="w-full">
+          <span id="fiyatDeger" class="slider-value">100.000.000</span>
+          <div class="text-sm flex justify-between"><span>0 TL</span><span>100 M+</span></div>
+        </div>
+        <div class="slider-container">
+          <label class="block mb-1 font-medium text-sm">Metrekare Aralığı</label>
+          <input id="m2Aralik" type="range" min="0" max="1000" step="10" value="1000" class="w-full">
+          <span id="m2Deger" class="slider-value">1000</span>
+          <div class="text-sm flex justify-between"><span>0 m²</span><span>1000+ m²</span></div>
+        </div>
+      </div>
+      <!-- FİLTRE ALANI'nın altındaki bu bölümü güncelleyin -->
+
+<div id="evListesi" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <!-- Yüklenme animasyonu başlangıcı -->
+  <div id="loading-indicator" class="col-span-1 md:col-span-2 text-center py-10">
+    <svg class="animate-spin h-8 w-8 text-gray-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <p class="mt-4 text-gray-700">İlanlar yükleniyor, lütfen bekleyin...</p>
+  </div>
+  <!-- Yüklenme animasyonu sonu -->
+</div>
+    </div>
+  </section>
+
+  <script>
+  const evler = [];
+  const evListesi = document.getElementById("evListesi");
+  const fiyatAralik = document.getElementById("fiyatAralik");
+  const m2Aralik = document.getElementById("m2Aralik");
+  const fiyatDeger = document.getElementById("fiyatDeger");
+  const m2Deger = document.getElementById("m2Deger");
+
+  // Her sayfa için sadece bu ilçe adı değişecek
+  const ilceAdi = "bornova";
+  // BURAYA KENDİ EN SON OLUŞTURDUĞUNUZ APPS SCRIPT URL'NİZİ YAPIŞTIRIN
+  const jsonURL = `https://script.google.com/macros/s/AKfycbw3Ye0dEXs5O4nmZ_PDQqJOGvEDM5hL1yP6EyO1lnpRh_Brj0kwJy6GP1ZSDrMPOi-5/exec?ilce=${ilceAdi}`;
+
+  async function evVerileriniCek() {
+    // Yükleniyor göstergesini ekle (opsiyonel ama önerilir)
+    evListesi.innerHTML = `
+      <div id="loading-indicator" class="col-span-1 md:col-span-2 text-center py-10">
+        <svg class="animate-spin h-8 w-8 text-gray-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="mt-4 text-gray-700">İlanlar yükleniyor...</p>
+      </div>`;
+
+    try {
+      const response = await fetch(jsonURL);
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      evler.length = 0;
+
+      data.forEach(row => {
+        const ilanID = row["İlan ID"]; 
+        const baslik = row.baslik || "";
+        const m2 = parseInt(row.m2);
+        const fiyat = parseInt(String(row.fiyat).replace(/[^\d]/g, ''));
+        const resim = row.resim || "images/placeholder.jpg";
+
+        if (ilanID && !isNaN(m2) && !isNaN(fiyat)) {
+          evler.push({
+            id: ilanID,
+            fiyat: fiyat,
+            m2: m2,
+            adres: baslik,
+            resim: resim
+          });
+        }
+      });
+
+      guncelleListe();
+    } catch (error) {
+      console.error("Veri çekilirken hata oluştu:", error);
+      evListesi.innerHTML = `<p class='col-span-1 md:col-span-2 text-center text-red-600'>Hata: İlanlar yüklenemedi. (${error.message})</p>`;
+    }
+  }
+
+  function updateSliderPosition(input, label) {
+    const value = ((input.value - input.min) / (input.max - input.min)) * 100;
+    label.style.left = `calc(${value}% + (${8 - value * 0.15}px))`;
+  }
+
+  function guncelleListe() {
+    evListesi.innerHTML = "";
+    const maxFiyat = parseInt(fiyatAralik.value);
+    const maxM2 = parseInt(m2Aralik.value);
+
+    fiyatDeger.textContent = maxFiyat.toLocaleString('tr-TR');
+    m2Deger.textContent = maxM2;
+
+    updateSliderPosition(fiyatAralik, fiyatDeger);
+    updateSliderPosition(m2Aralik, m2Deger);
+
+    const filtrelenmisEvler = evler.filter(ev => ev.fiyat <= maxFiyat && ev.m2 <= maxM2);
+    
+    if (filtrelenmisEvler.length === 0) {
+        evListesi.innerHTML = "<p class='col-span-1 md:col-span-2 text-center text-gray-500'>Bu kriterlere uygun ilan bulunamadı.</p>";
+        return;
+    }
+
+    filtrelenmisEvler.forEach(ev => {
+        // --- İŞTE EN ÖNEMLİ KISIM: Her bir kart artık bir link! ---
+        const kart = `
+          <a href="ilan-detay.html?id=${ev.id}" class="block bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out">
+            <img src="${ev.resim}" alt="${ev.adres}" class="w-full h-56 object-cover">
+            <div class="p-4">
+              <p class="font-bold text-xl text-blue-600 mb-2">${ev.fiyat.toLocaleString('tr-TR')} TL</p>
+              <p class="text-gray-800 text-base font-semibold leading-snug">${ev.adres}</p>
+              <p class="text-gray-600 text-sm mt-2">${ev.m2} m²</p>
+            </div>
+          </a>
+        `;
+        evListesi.innerHTML += kart;
+      });
+  }
+
+  fiyatAralik.addEventListener("input", guncelleListe);
+  m2Aralik.addEventListener("input", guncelleListe);
+
+  document.addEventListener("DOMContentLoaded", evVerileriniCek);
+</script>
+
+ <!-- Konut Kredisi Hesaplama Arayüzü -->
+ <section class="bg-white py-16 px-4">
+  <div class="max-w-3xl mx-auto text-center">
+    <div class="header-container">
+      <h2 class="text-3xl font-semibold mb-2">Konut Kredisi Hesaplama</h2>
+      <p class="text-gray-600 mb-6">
+        Konut kredisi hesaplama aracı ile tüm bankaların güncel faiz oranlarını karşılaştır ve sana en uygun konut kredisini gör.
+      </p>
+    </div>
+    <div class="form-container">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 w-full">
+        <div class="w-full md:w-1/3">
+          <label class="block text-sm text-gray-500 mb-1">Kredi Tutarı</label>
+          <div class="flex items-center border border-gray-300 rounded px-3 py-2">
+            <input id="tutar" type="text" class="w-full focus:outline-none" placeholder="1.000.000"/>
+            <span class="ml-2 text-gray-400 text-sm">TL</span>
+          </div>
+        </div>
+        <div class="w-full md:w-1/3">
+          <label class="block text-sm text-gray-500 mb-1">Vade</label>
+          <select id="vade" class="w-full border border-gray-300 rounded px-3 py-2">
+            <option value="60">5 Yıl (60 Ay)</option>
+            <option value="120">10 Yıl (120 Ay)</option>
+            <option value="168">14 Yıl (168 Ay)</option>
+            <option value="240">20 Yıl (240 Ay)</option>
+          </select>
+        </div>
+        <div class="w-full md:w-1/3">
+          <label class="block text-sm text-transparent mb-1">.</label>
+          <button onclick="hesaplaKredi()" class="kredi-hesapla-btn w-full">Konut Kredisi Hesapla</button>
+        </div>
+      </div>
+    </div>
+    <div id="sonuc" class="max-w-3xl mx-auto mt-10 space-y-4"></div>
+  </div>
+ </section>
+  
+  <script>
+  const bankalar = [
+    { ad: "Akbank", faiz: 2.89, logo: "akbank.webp" },
+    { ad: "Garanti", faiz: 3.10, logo: "garanti.jpg" },
+    { ad: "Vakıf Katılım", faiz: 3.10, logo: "vakifkatilim.jpg" },
+    { ad: "QNB", faiz: 3.09, logo: "qnbbank.png" },
+    { ad: "Ziraat", faiz: 3.19, logo: "ziraat.jpg" },
+    { ad: "İş Bankası", faiz: 3.10, logo: "isbankası.png" },
+    { ad: "Halkbank", faiz: 3.23, logo: "halkbankası.png" },
+    { ad: "ING", faiz: 3.74, logo: "ingbank.jpg" },
+    { ad: "Kuveyttürk", faiz: 3.20, logo: "kuveytturk.png" },
+    { ad: "TEB", faiz: 3.15, logo: "tebbanka.jpg" },
+    { ad: "Ziraat Katılım", faiz: 3.09, logo: "ziraatkatilim.jpg" }
+  ];
+  const tutarInput = document.getElementById("tutar");
+  tutarInput.addEventListener("input", function (e) {
+    let value = e.target.value.replace(/\D/g, "");
+    value = new Intl.NumberFormat("tr-TR").format(value);
+    e.target.value = value;
+  });
+  function temizleVeSayiyaCevir(str) {
+    return parseFloat(str.replace(/\./g, "").replace(",", "."));
+  }
+  function hesaplaKredi() {
+    const tutarDeger = temizleVeSayiyaCevir(document.getElementById("tutar").value);
+    const vade = parseInt(document.getElementById("vade").value);
+    const container = document.getElementById("sonuc");
+    container.innerHTML = "";
+    if (!tutarDeger || !vade) {
+      container.innerHTML = "<p class='text-center text-red-600'>Lütfen tutar ve vade bilgisi girin.</p>";
+      return;
+    }
+    bankalar.forEach(banka => {
+      const faizOraniAylik = banka.faiz / 100;
+      const aylikTaksit = (tutarDeger * faizOraniAylik) / (1 - Math.pow(1 + faizOraniAylik, -vade));
+      const toplamOdeme = aylikTaksit * vade;
+      const html = `
+        <div class="sonuc-karti">
+          <div class="logo-alani">
+            <img src="images/bankalar/${banka.logo}" alt="${banka.ad}" class="banka-logo" />
+          </div>
+          <div class="veri-grubu">
+            <div class="etiketler">
+              <span>Toplam</span>
+              <span>Faiz</span>
+              <span>Taksit</span>
+            </div>
+            <div class="degerler">
+              <span>${toplamOdeme.toLocaleString("tr-TR")} TL</span>
+              <span>%${banka.faiz.toFixed(2)}</span>
+              <span>${aylikTaksit.toLocaleString("tr-TR")} TL</span>
+            </div>
+          </div>
+        </div>
+      `;
+      container.innerHTML += html;
+    });
+  }
+  </script>
+
+<!-- Footer -->
+<div id="footer-placeholder"></div>
+<script>
+  fetch("footer.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("footer-placeholder").innerHTML = data;
+      const launcher = document.getElementById("iletisim-launcher");
+      const menu = document.getElementById("iletisim-menusu");
+      const openBtn = document.getElementById("openContact");
+      const closeBtn = document.getElementById("closeContact");
+      if (openBtn && closeBtn) {
+        openBtn.addEventListener("click", () => {
+          launcher.style.display = "none";
+          menu.classList.remove("hidden");
+        });
+        closeBtn.addEventListener("click", () => {
+          menu.classList.add("hidden");
+          launcher.style.display = "block";
+        });
+      }
+    });    
+</script>
+<script src="script.js"></script>
+
+</body>
+</html>

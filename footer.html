@@ -1,0 +1,534 @@
+
+   
+
+<!-- Ev Değerleme Bölümü-->
+
+<head> <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="style.css"></head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+ <style>
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9fafb;
+    color: #333;
+  }
+
+  h2 {
+    color: #1f2937;
+  }
+
+  .header-container {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 2rem auto;
+    padding: 0 1rem;
+  }
+
+
+ 
+   .section-title {
+     font-size: 2.25rem;
+     font-weight: 700;
+     color: #1f2937;
+     text-align: center;
+   }
+ 
+   .section-subtitle {
+     font-size: 1rem;
+     color: #6b7280;
+     max-width: 600px;
+     margin: 0 auto;
+     text-align: center;
+   }
+ 
+   .contact-box {
+     background: #fff;
+     border-radius: 1.25rem;
+     box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+     padding: 2rem;
+     text-align: center;
+   }
+ 
+   .contact-input {
+     border-radius: 0.75rem;
+     padding: 0.75rem 1rem;
+     border: 1px solid #d1d5db;
+     width: 100%;
+     transition: all 0.3s ease;
+   }
+ 
+   .contact-input:focus {
+     outline: none;
+     border-color: #ef4444;
+     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+   }
+ 
+   .contact-button {
+     background-color: #ef4444;
+     color: white;
+     font-weight: 600;
+     padding: 0.75rem 1.75rem;
+     border-radius: 0.75rem;
+     transition: all 0.3s ease;
+     box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+     white-space: nowrap;
+   }
+ 
+   .contact-button:hover {
+     background-color: #dc2626;
+     transform: translateY(-2px);
+     box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+   }
+ 
+   /* Grid düzeni: mobilde 1, masaüstünde 2 */
+   .grid-responsive {
+     display: grid;
+     grid-template-columns: 1fr;
+     gap: 1.5rem;
+     justify-items: center;
+   }
+ 
+   @media (min-width: 768px) {
+     .grid-responsive {
+       grid-template-columns: repeat(2, 1fr);
+     }
+   }
+ 
+   /* Form input + buton düzeni */
+   .form-flex {
+     display: flex;
+     flex-direction: column;
+     gap: 1rem;
+     align-items: stretch;
+   }
+ 
+   @media (min-width: 640px) {
+     .form-flex {
+       flex-direction: row;
+       align-items: center;
+       justify-content: center;
+     }
+ 
+     .contact-input {
+       max-width: 300px;
+     }
+   }
+
+
+   /* =======================
+   Footer Stil Kodları
+   ======================= */
+
+.site-footer {
+  background-color: #111827; /* Modern bir koyu gri */
+  color: #d1d5db; /* Okunabilirliği yüksek açık gri */
+  padding: 4rem 1rem;
+  font-family: 'Cormorant Garamond', serif; /* Ana fontunuzla uyumlu hale getirebilirsiniz */
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* Mobil için tek sütun */
+  gap: 2.5rem;
+}
+
+/* Tablet ve üzeri için 3 sütunlu yapı */
+@media (min-width: 768px) {
+  .footer-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.footer-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-logo {
+  width: 140px;
+  margin-bottom: 1rem;
+  filter: brightness(0) invert(1); /* Siyah logoyu beyaza çevirir */
+}
+
+.footer-description {
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.footer-heading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 1.25rem;
+  font-family: 'Arapey', serif;
+}
+
+/* Hızlı Erişim Linkleri */
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.footer-links a {
+  color: #d1d5db;
+  text-decoration: none;
+  transition: color 0.3s ease, padding-left 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #ffffff;
+  padding-left: 5px; /* Hover efekti */
+}
+
+/* İletişim Bilgileri */
+.contact-info {
+  margin-bottom: 0.75rem;
+  line-height: 1.7;
+}
+
+.contact-info a {
+  color: #d1d5db;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.contact-info a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.map-link {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #374151;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.map-link:hover {
+    background-color: #4b5563;
+    text-decoration: none;
+}
+
+
+/* Sosyal Medya İkonları */
+.social-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.social-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: #374151;
+  color: #ffffff;
+  border-radius: 50%;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.social-links a:hover {
+  background-color: #b6c9d2; /* Tema renginizle uyumlu */
+  color: #111827;
+  transform: translateY(-3px);
+}
+
+/* Telif Hakkı Bölümü */
+.footer-bottom {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #374151;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+ </style>
+
+ <!-- Bölgeler -->
+ <section class="py-16 px-4 bg-white">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="text-3xl font-serif mb-8 text-center">Bölgeler</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <a href="cesme.html" class="relative block group">
+        <img src="images/cesme_ic3.jpg" class="w-full h-full object-cover group-hover:opacity-80">
+        <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Çeşme</div>
+      </a>
+      <a href="alacati.html" class="relative block group">
+        <img src="images/263-alacati-hakkinda.webp">
+        <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Alaçatı</div>
+      </a>
+      <a href="foca.html" class="relative block group">
+        <img src="images/foca.webp">
+        <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Foça</div>
+      </a>
+      <a href="konak.html" class="relative block group">
+        <img src="images/68383,konakjpg.png">
+        <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Konak</div>
+      </a>
+      <a href="guzelbahce.html" class="relative block group">
+        <img src="images/guzelbahce3.jpeg">
+        <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Güzelbahçe</div>
+      </a>
+      <a href="karaburun.html" class="relative block group">
+        <img src="images/800px-Faik_Sarikaya_Karaburun_Bodrum_Koyu.jpg">
+        <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Karaburun</div>
+      </a>
+      <a href="mordogan.html" class="relative block group">
+        <img src="images/izmir-mordogan-768x614-1.webp">
+        <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Mordoğan</div>
+      </a>
+      <a href="seferihisar.html" class="relative block group">
+        <img src="images/seferihisar.jpg">
+        <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Seferihisar</div>
+      </a>
+      <a href="yelki.html" class="relative block group">
+        <img src="images/yelki.webp">
+        <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Yelki</div>
+      </a>
+      <a href="urla.html" class="relative block group">
+        <img src="images/urla.webp">
+        <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Urla</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+ 
+ <section class="bg-gray-50 py-16 px-4">
+   <div class="max-w-4xl mx-auto text-center mb-12">
+     <h2 class="section-title animate__animated animate__fadeInDown">Evinizi Nasıl Değerliyoruz?</h2>
+     <p class="section-subtitle animate__animated animate__fadeIn animate__delay-1s">5 temel adımla değerliyoruz, her detay bizim için önemli.</p>
+   </div>
+ 
+   <!-- Değerleme Kartları -->
+   <div class="grid-responsive max-w-4xl mx-auto">
+     <!-- 1. Adım -->
+     <div class="card-step p-6 animate__animated animate__fadeInUp">
+       <img src="images/emsal.jpg" alt="Emsal" class="w-56 h-56 mx-auto mb-4" />
+       <h3 class="font-semibold mb-2">Emsal Analizi</h3>
+       <p class="text-sm text-gray-500">Aynı bölgede satılan benzer evleri inceliyoruz.</p>
+     </div>
+     <!-- 2. Adım -->
+     <div class="card-step p-6 animate__animated animate__fadeInUp animate__delay-1s">
+       <img src="images/metrekare.webp" alt="m2" class="w-56 h-56 mx-auto mb-4" />
+       <h3 class="font-semibold mb-2">m² Değeri</h3>
+       <p class="text-sm text-gray-500">Ev büyüklüğünü, m² fiyatlarıyla eşleştiriyoruz.</p>
+     </div>
+     <!-- 3. Adım -->
+     <div class="card-step p-6 animate__animated animate__fadeInUp animate__delay-2s">
+       <img src="images/bina-yasi-nasil-ogrenilir-2.jpg" alt="Bina" class="w-56 h-56 mx-auto mb-4" />
+       <h3 class="font-semibold mb-2">Bina Durumu</h3>
+       <p class="text-sm text-gray-500">Yaşı, yapı kalitesi ve bakım durumu dikkate alınır.</p>
+     </div>
+     <!-- 4. Adım -->
+     <div class="card-step p-6 animate__animated animate__fadeInUp animate__delay-3s">
+       <img src="images/uzmanonayi.jpg" alt="Uzman" class="w-56 h-56 mx-auto mb-4" />
+       <h3 class="font-semibold mb-2">Uzman Onayı</h3>
+       <p class="text-sm text-gray-500">Gayrimenkul uzmanlarımız son kontrolü yapar.</p>
+     </div>
+     <!-- 5. Adım -->
+     <div class="card-step p-6 animate__animated animate__fadeInUp animate__delay-4s col-span-full">
+       <img src="images/sosyalolanaklar.webp" alt="Sosyal Alanlar" class="w-56 h-56 mx-auto mb-4" />
+       <h3 class="font-semibold mb-2">Sosyal Olanaklar</h3>
+       <p class="text-sm text-gray-500">Ulaşım, okul, AVM gibi çevresel değerler eklenir.</p>
+     </div>
+   </div>
+ 
+   <!-- Beni Arayın Formu -->
+   <div class="max-w-xl mx-auto mt-16 animate__animated animate__fadeInUp animate__delay-5s contact-box">
+     <h3 class="text-2xl font-semibold mb-2">Gayrimenkul Uzmanımız Sizi Hemen Arasın</h3>
+     <p class="text-gray-600 mb-6">Telefon numaranızı bırakın, size en kısa sürede ulaşalım.</p>
+ 
+     <div class="form-flex">
+       <input type="tel" placeholder="Telefon Numaranız" class="contact-input" />
+       <button class="contact-button">Beni Arayın</button>
+     </div>
+   </div>
+ </section>
+ 
+ 
+   <!-- Blog -->
+   <section class="bg-gray-100 py-16 px-4">
+     <div class="max-w-6xl mx-auto">
+       <h2 class="text-3xl font-serif mb-8 text-center">Fırsat Köşesi</h2>
+       <div class="grid md:grid-cols-3 gap-6">
+         <div class="bg-white shadow p-4">
+           <img src="images/gayrimenkulde-yeni-trendler-neler-768x575.jpg" alt="Blog">
+           <h3 class="font-semibold mt-2">Kısa Sürede Kazandıracak Mülkler</h3>
+           <p class="text-sm text-gray-600">Son gelişmeler ve tavsiyeler burada.</p>
+         </div>
+       </div>
+     </div>
+   </section>
+ 
+ <!-- İletişim -->
+ 
+ <!-- İletişim Butonu (Başlangıçta sadece bu görünecek) -->
+ <div id="iletisim-launcher" class="fixed bottom-6 right-6 z-50">
+   <button id="openContact"
+         style="background-color: #c8cac9;"
+         class="w-14 h-14 hover:bg-blue-700 rounded-full flex items-center justify-center shadow-xl transition duration-300">
+     <img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" class="w-6 h-6" alt="İletişim">
+   </button>
+ </div>
+ 
+ <!-- Açılır Menü (başlangıçta gizli) -->
+ <div id="iletisim-menusu"
+      class="hidden fixed bottom-0 left-0 w-full bg-white shadow-2xl border-t rounded-t-2xl z-50 animate__animated animate__fadeInUp">
+ 
+   <div class="max-w-md mx-auto py-4 px-6">
+     
+     <!-- WhatsApp -->
+     <a href="https://wa.me/905308775368" target="_blank" class="flex items-center gap-4 py-3">
+       <img src="images/ikonlar/whatsapp.png" class="w-8 h-8" alt="WhatsApp">
+       <span class="text-gray-800 font-medium">WhatsApp</span>
+     </a>
+     <hr>
+ 
+     <!-- Telefon -->
+     <a href="tel:05308775368" class="flex items-center gap-4 py-3">
+       <img src="images/ikonlar/phone.png" class="w-8 h-8" alt="Telefon">
+       <span class="text-gray-800 font-medium">Telefon</span>
+     </a>
+     <hr>
+ 
+     <!-- Messenger -->
+     <a href="https://www.facebook.com/barongayrimenkul" target="_blank" class="flex items-center gap-4 py-3">
+       <img src="images/ikonlar/messenger.png" class="w-8 h-8" alt="Messenger">
+       <span class="text-gray-800 font-medium">Messenger</span>
+     </a>
+     <hr>
+ 
+     <!-- Instagram -->
+     <a href="https://www.instagram.com/direct/t/17847243627442371" target="_blank" class="flex items-center gap-4 py-3">
+       <img src="images/ikonlar/instagram.png" class="w-8 h-8" alt="Instagram">
+       <span class="text-gray-800 font-medium">Instagram</span>
+     </a>
+     <hr class="mb-4">
+ 
+     <!-- İptal Butonu -->
+     <button id="closeContact"
+             class="w-full bg-gray-200 text-gray-800 py-2 rounded-lg hover:bg-gray-300 transition font-semibold">
+       İptal
+     </button>
+   </div>
+ </div>
+ 
+ <!-- JavaScript -->
+ <script>
+   const launcher = document.getElementById("iletisim-launcher");
+   const menu = document.getElementById("iletisim-menusu");
+   const openBtn = document.getElementById("openContact");
+   const closeBtn = document.getElementById("closeContact");
+ 
+   // Menü aç
+   openBtn.addEventListener("click", () => {
+     launcher.style.display = "none";
+     menu.classList.remove("hidden");
+   });
+ 
+   // Menü kapat
+   closeBtn.addEventListener("click", () => {
+     menu.classList.add("hidden");
+     launcher.style.display = "block";
+   });
+ </script>
+ 
+ 
+ 
+   <!-- Work With Us -->
+   <section class="bg-white py-16 px-4">
+     <div class="max-w-4xl mx-auto text-center">
+       <h2 class="text-3xl font-serif mb-6">Bizimle Çalışın</h2>
+       <p>Baron Gayrimenkul olarak yatırımcılarımız için sonuç odaklı çözümler üretiyoruz.</p>
+       <p>Profesyonel danışmanlık, analiz ve satış sonrası destekle, yatırım yolculuğunuzda sizinle birlikteyiz.</p>
+       <a href="tel:+905308775368">
+         <button class="mt-6 bg-black text-white px-6 py-2 rounded">
+           Yatırım İçin İletişim
+         </button>
+       </a>      
+     </div>
+   </section>
+ 
+<!-- =======================
+Footer Başlangıcı
+======================== -->
+<footer class="site-footer" id="iletisim">
+  <div class="footer-container">
+    <div class="footer-grid">
+
+      <!-- Sol Bölüm: Marka ve Sosyal Medya -->
+      <div class="footer-column">
+        <img src="images/remaxlogo2.png" alt="RE/MAX Logo" class="footer-logo">
+        <p class="footer-description">
+          İzmir genelinde dijital destekli modern gayrimenkul danışmanlığı hizmeti.
+        </p>
+        <div class="social-links">
+          <!-- Not: Buraya kendi sosyal medya linklerinizi ekleyin -->
+          <a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" target="_blank" aria-label="X (Twitter)"><i class="fab fa-twitter"></i></a>
+        </div>
+      </div>
+
+      <!-- Orta Bölüm: Hızlı Erişim Linkleri -->
+      <div class="footer-column">
+        <h3 class="footer-heading">Hızlı Erişim</h3>
+        <ul class="footer-links">
+          <li><a href="index.html">Anasayfa</a></li>
+          <li><a href="hakkimizda.html">Hakkımızda</a></li>
+          <li><a href="tum-ilceler.html">Tüm İlçeler</a></li>
+          <li><a href="#iletisim">İletişim</a></li>
+        </ul>
+      </div>
+
+      <!-- Sağ Bölüm: İletişim Bilgileri -->
+      <div class="footer-column">
+        <h3 class="footer-heading">İletişim</h3>
+        <p class="contact-info">
+          <strong>Adres:</strong> Fahrettin Altay Mahallesi, Karabağlar / İzmir
+        </p>
+        <p class="contact-info">
+          <strong>Telefon:</strong> <a href="tel:+905308775368">+90 530 877 53 68</a>
+        </p>
+        <p class="contact-info">
+          <strong>E-posta:</strong> <a href="mailto:onurglad34@gmail.com">onurglad34@gmail.com</a>
+        </p>
+        <p class="contact-info">
+            <a href="https://maps.app.goo.gl/UHh4NxBAKrPJWuBeA" target="_blank" class="map-link">📍 Yol Tarifi Al</a>
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Alt Kısım: Telif Hakkı -->
+    <div class="footer-bottom">
+      <p>© 2025 RE/MAX Gayrimenkul Danışmanlığı. Tüm hakları saklıdır.</p>
+    </div>
+  </div>
+</footer>
+<!-- =======================
+Footer Bitişi
+======================== -->
+
+   <script src="script.js"></script>
+

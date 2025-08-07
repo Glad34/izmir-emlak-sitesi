@@ -3,203 +3,509 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BARON GAYRİMENKUL</title>
+  <title>Onur Başaran / Remax Up</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Arapey&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+
 </head>
 <body class="text-gray-800">
+  
 
-  <!-- Hero Section -->
-  <section class="relative h-screen bg-cover bg-center" style="background-image: url('https://via.placeholder.com/1920x1080');">
-    <div class="absolute inset-0 bg-black bg-opacity-60 flex flex-col justify-center items-center text-white text-center px-4">
-      <h1 class="text-4xl md:text-6xl font-serif mb-4">BARON GAYRİMENKUL</h1>
-      <p class="text-lg md:text-xl mb-6">Montecito, Santa Barbara ve Santa Ynez Vadisi'nde Eşsiz Hizmet</p>
-      <div class="flex flex-col md:flex-row items-center w-full max-w-md">
-        <input type="text" placeholder="Bölge veya adres arayın..." class="w-full px-4 py-2 rounded-l-md text-black">
-        <button class="bg-white text-black px-4 py-2 mt-2 md:mt-0 md:rounded-r-md md:rounded-l-none">Ara</button>
-      </div>
-    </div>
-  </section>
+  <!-- Header -->
+  <header class="fixed top-0 left-0 w-full z-50 bg-transparent text-white custom-header">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-full">
+      
+  <!-- Logo -->
+<div>
+  <!-- Şeffaf arka plan için logo (ilk görünen) -->
+  <a href="#">
+    <img src="images/logo beyaz.png" alt="Logo" class="h-16 logo-default block" />
+    <img src="images/logo siyah.png" alt="Logo" class="h-16 logo-scrolled hidden" />
+  </a>
+</div>
 
-  <!-- Hakkımızda -->
-  <section class="py-16 bg-white px-4 max-w-6xl mx-auto">
-    <h2 class="text-3xl font-serif mb-4">Hakkımızda</h2>
-    <div class="grid md:grid-cols-2 gap-8">
-      <p>BARON GAYRİMENKUL olarak Santa Barbara ve çevresinde lüks gayrimenkul hizmetleri sunuyoruz. Yılların deneyimi ve güçlü pazarlama stratejilerimizle, müşterilerimize kusursuz bir hizmet sunmayı amaçlıyoruz.</p>
-      <img src="https://via.placeholder.com/600x400" alt="Ekip Fotoğrafı" class="rounded shadow">
+  
+      <!-- Hamburger Butonu (Mobilde Görünür) -->
+<div class="md:hidden">
+  <button id="menu-toggle" class="focus:outline-none">
+    <svg id="hamburger-icon" class="w-8 h-8 transition-colors duration-300 text-white" fill="none" stroke="currentColor" stroke-width="2"
+      viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+</div>
+
+  
+      <!-- Menü Bağlantıları -->
+      <nav id="mobile-menu" class="hidden absolute top-full right-0 w-full bg-white text-black flex-col md:flex md:static md:flex-row md:space-x-8 md:bg-transparent md:text-white text-lg">
+        <a href="#" class="block px-4 py-2 hover:bg-gray-100 md:hover:bg-transparent">Ana Sayfa</a>
+        <a href="#yatirimlik" class="block px-4 py-2 hover:bg-gray-100 md:hover:bg-transparent">Yatırımlık Evlerimiz</a>
+        <a href="#hakkimizda" class="block px-4 py-2 hover:bg-gray-100 md:hover:bg-transparent">Hakkımızda</a>
+        <a href="#iletisim" class="block px-4 py-2 hover:bg-gray-100 md:hover:bg-transparent">İletişim</a>
+      </nav>
     </div>
-  </section>
+  </header>
+  
+  
+
+<!-- Hero Section -->
+<section class="relative h-screen bg-cover bg-center pt-24" style="background-image: url('images/izmir-deniz.jpg');">
+  <div class="absolute inset-0 bg-black bg-opacity-60 flex flex-col justify-center items-center text-white text-center px-4">
+    
+    <!-- Typewriter Metni -->
+    <h1 id="typewriter" class="text-2xl sm:text-4xl md:text-6xl font-semibold max-w-2xl leading-snug px-2 typewriter-cursor"></h1>
+
+    <!-- Arama Giriş ve Dropdown -->
+    <div class="relative w-full max-w-md mt-6 px-2">
+      <input 
+        type="text" 
+        id="search-input" 
+        placeholder="📍 Yatırım yapılacak bölgeyi yazın örn: Urla, Balçova..." 
+        class="w-full px-4 py-2 rounded-md text-black relative z-10"
+        autocomplete="off"
+      >
+
+      <ul id="dropdown-options"
+    class="absolute top-full left-0 w-full max-h-60 overflow-y-auto bg-white bg-opacity-80 backdrop-blur border border-gray-200 rounded shadow-md mt-1 z-20 hidden rounded-xl">
+    <li data-url="alacati.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Alaçatı</li>
+    <li data-url="aliaga.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Aliağa</li>
+    <li data-url="balcova.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Balçova</li>
+    <li data-url="bayindir.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Bayındır</li>
+    <li data-url="bayrakli.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Bayraklı</li>
+    <li data-url="bergama.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Bergama</li>
+    <li data-url="beydag.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Beydağ</li>
+    <li data-url="bornova.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Bornova</li>
+    <li data-url="buca.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Buca</li>
+    <li data-url="cesme.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Çeşme</li>
+    <li data-url="cigli.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Çiğli</li>
+    <li data-url="dikili.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Dikili</li>
+    <li data-url="foca.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Foça</li>
+    <li data-url="gaziemir.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Gaziemir</li>
+    <li data-url="guzelbahce.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Güzelbahçe</li>
+    <li data-url="karabaglar.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Karabağlar</li>
+    <li data-url="karaburun.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Karaburun</li>
+    <li data-url="karsiyaka.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Karşıyaka</li>
+    <li data-url="kemalpasa.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Kemalpaşa</li>
+    <li data-url="kinik.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Kınık</li>
+    <li data-url="kiraz.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Kiraz</li>
+    <li data-url="konak.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Konak</li>
+    <li data-url="menderes.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Menderes</li>
+    <li data-url="menemen.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Menemen</li>
+    <li data-url="mordogan.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Mordoğan</li>
+    <li data-url="narlidere.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Narlıdere</li>
+    <li data-url="odemis.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Ödemiş</li>
+    <li data-url="seferihisar.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Seferihisar</li>
+    <li data-url="selcuk.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Selçuk</li>
+    <li data-url="tire.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Tire</li>
+    <li data-url="torbali.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Torbalı</li>
+    <li data-url="urla.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Urla</li>
+    <li data-url="yelki.html" class="px-4 py-2 hover:bg-gray-700 cursor-pointer text-black hover:text-white text-left">Yelki</li>
+</ul>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- Typewriter Script -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const text = "Hayalini kurduğun İzmir yaşamı, doğru gayrimenkul danışmanlığıyla başlar.";
+    const el = document.getElementById("typewriter");
+    let i = 0;
+
+    function type() {
+      if (i < text.length) {
+        el.textContent += text.charAt(i);
+        i++;
+        setTimeout(type, 50);
+      } else {
+        el.classList.remove("typewriter-cursor");
+      }
+    }
+
+    type();
+  });
+</script>
+
+<!-- Dropdown Çalışması -->
+<script>
+  const input = document.getElementById("search-input");
+  const dropdown = document.getElementById("dropdown-options");
+
+  input.addEventListener("focus", () => {
+    dropdown.classList.remove("hidden");
+  });
+
+  input.addEventListener("input", () => {
+    const filter = input.value.toLowerCase();
+    const options = dropdown.querySelectorAll("li");
+    options.forEach(option => {
+      const text = option.textContent.toLowerCase();
+      option.style.display = text.includes(filter) ? "block" : "none";
+    });
+  });
+
+  dropdown.querySelectorAll("li").forEach(li => {
+    li.addEventListener("click", () => {
+      const url = li.getAttribute("data-url");
+      window.location.href = url;
+    });
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.classList.add("hidden");
+    }
+  });
+</script>
+
+<!-- Typewriter Cursor CSS -->
+<style>
+  .typewriter-cursor {
+    border-right: 2px solid white;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    50% {
+      border-color: transparent;
+    }
+  }
+</style>
+
+
+ <!-- Hakkımda -->
+<!-- Google Font (Türkçe destekli) -->
+
+
+<!-- Hakkımda -->
+<section id="hakkimizda" class="py-16 bg-white px-4 max-w-6xl mx-auto font-['Nunito_Sans']">
+  <h2 class="text-3xl font-serif mb-6 text-center font-bold">Hakkımda</h2>
+  <div class="grid md:grid-cols-2 gap-8 items-center">
+    <div class="text-base leading-relaxed text-gray-800">
+      <p class="mb-4 font-normal">
+        Merhaba, ben <span class="font-semibold text-black">Onur Başaran</span>. 
+        Dijital pazarlama alanındaki 7 yıllık tecrübemi, <span class="font-semibold text-black">RE/MAX markasının global gücü</span> ile birleştirerek İzmir’de yatırım odaklı gayrimenkul danışmanlığı hizmeti sunuyorum. 
+        <span class="font-semibold text-black">Narlıdere</span>’de ikamet ediyor, 
+        <span class="font-semibold text-black">Balçova, Güzelbahçe</span> ve çevre ilçelerde aktif olarak sahada çalışıyorum.
+      </p>
+
+      <p class="mb-4 font-normal">
+        Hem dijital dünyada görünürlüğünüzü artırıyor hem de sahadaki doğru yatırımlara sizi yönlendiriyorum. 
+        İster ilk kez ev alıyor olun, ister lüks bir villa ya da yatırım amaçlı arsa arıyor olun — süreci sizin adınıza yönetiyorum.
+      </p>
+
+      <ul class="list-disc list-inside space-y-2 mb-4 font-normal">
+        <li>🏡 Satılık & kiralık daire, müstakil ev, villa ve arsa portföyleri</li>
+        <li>📢 Dijital pazarlama destekli hedef kitleye ulaşan ilan yönetimi</li>
+        <li>📊 Karşılaştırmalı piyasa analizi & doğru fiyatlandırma stratejileri</li>
+        <li>🚀 Gelişen bölgelerde yüksek değer artışı potansiyeli</li>
+        <li>🧭 Tüm süreçte şeffaf bilgi akışı ve uzman yönlendirme</li>
+      </ul>
+
+      <p class="font-normal">
+        İzmir’in gayrimenkul dünyasında güvenilir, modern ve analiz temelli hizmet sunuyorum. 
+        <span class="font-semibold text-black">RE/MAX güvencesi</span> ve dijital becerilerimle, yatırımınızı kazanca dönüştürmek için buradayım.
+      </p>
+    </div>
+
+    <div>
+      <img src="images/profil1.png" alt="Gayrimenkul Uzmanı Onur Başaran" class="rounded-[20px] shadow w-full max-w-sm mx-auto">
+    </div>
+  </div>
+</section>
+
+
+
 
   <!-- Ücretsiz Hizmetlerimiz -->
   <section class="py-16 bg-gray-100 px-4 max-w-6xl mx-auto">
     <h2 class="text-3xl font-serif mb-8 text-center">Ücretsiz Hizmetlerimiz</h2>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
       <div class="text-center">
-        <img src="https://via.placeholder.com/200x150" class="mx-auto mb-2">
-        <p>Ücretsiz Değerleme</p>
+        <img src="images/degerleme.png" class="mx-auto mb-2">
+        <p>🏠 Ücretsiz Gayrimenkul Değerleme</p>
       </div>
       <div class="text-center">
-        <img src="https://via.placeholder.com/200x150" class="mx-auto mb-2">
-        <p>Profesyonel Fotoğraf</p>
+        <img src="images/fotocekimi.png" class="mx-auto mb-2">
+        <p>📸 Profesyonel Fotoğraf Çekimi ile Hızlı Satış</p>
       </div>
       <div class="text-center">
-        <img src="https://via.placeholder.com/200x150" class="mx-auto mb-2">
-        <p>Drone Çekimi</p>
+        <img src="images/krediimkanları.png" class="mx-auto mb-2">
+        <p>💳 Uygun Kredi Seçenekleri Bilgilendirmesi</p>
       </div>
       <div class="text-center">
-        <img src="https://via.placeholder.com/200x150" class="mx-auto mb-2">
-        <p>Danışmanlık Hizmeti</p>
+        <img src="images/yatırımanalizi.png" class="mx-auto mb-2">
+        <p>📊 Yatırım Getiri Analizleri ve Bölge Karşılaştırmaları</p>
       </div>
     </div>
   </section>
 
-  <!-- Testimonial -->
-  <section class="py-16 bg-white px-4">
-    <div class="max-w-3xl mx-auto text-center">
-      <h2 class="text-3xl font-serif mb-6">Müşteri Yorumları</h2>
-      <blockquote class="italic">"BARON GAYRİMENKUL ile çalışmak harikaydı. Tüm süreç boyunca yanımızdaydılar ve evi en kısa sürede sattık."</blockquote>
-      <p class="mt-4 font-semibold">- Cemal T.</p>
-    </div>
-  </section>
+<!-- Müşteri Yorumları - Testimonial Slider -->
+<!-- Müşteri Yorumları - Testimonial Slider -->
+<section class="testimonial-section py-16 bg-white px-4 relative">
+  <div class="max-w-3xl mx-auto text-center relative z-10">
+      <h2 class="text-3xl font-serif mb-6 text-black">Müşteri Yorumları</h2>
+      <div class="relative">
+          <div id="testimonial-slider" class="overflow-hidden">
+              <div class="testimonial-item">
+                  <blockquote class="italic text-black">"Evimin gerçek değerini öğrenmek için aradım, inanılmaz hızlı geri dönüş yaptılar. 
+                      Meğersem düşündüğümden daha yüksek bir değeri varmış! İyi ki sizi seçmişim, çok teşekkür ederim."</blockquote>
+                  <p class="mt-4 font-semibold text-black">- Ayşe K.</p>
+                  <p class="text-sm text-black-300">12 Mart 2024</p>
+                  <p class="text-green-400 font-bold">✔ Doğrulanmış Yorum</p>
+                  <div class="mt-2 text-yellow-500">★★★★★</div>
+              </div>
+
+              <div class="testimonial-item">
+                  <blockquote class="italic text-black">"Evimi satmaya karar verdiğimde en büyük sorunum fotoğraflardı. 
+                      Baron Gayrimenkul ekibi öyle güzel çekimler yaptı ki, evim 1 hafta içinde satıldı! Harikasınız!"</blockquote>
+                  <p class="mt-4 font-semibold text-black">- Mehmet D.</p>
+                  <p class="text-sm text-black-300">5 Nisan 2024</p>
+                  <p class="text-green-400 font-bold">✔ Doğrulanmış Yorum</p>
+                  <div class="mt-2 text-yellow-500">★★★★★</div>
+              </div>
+
+              <div class="testimonial-item">
+                  <blockquote class="italic text-black">"Ev almak istiyordum ama kredi işleri gözümü korkutuyordu. 
+                      Sağ olsunlar, bütün süreci benim için yönlendirdiler, çok güvenilir ve profesyoneller!"</blockquote>
+                  <p class="mt-4 font-semibold text-black">- Zeynep T.</p>
+                  <p class="text-sm text-black-300">22 Mayıs 2024</p>
+                  <p class="text-green-400 font-bold">✔ Doğrulanmış Yorum</p>
+                  <div class="mt-2 text-yellow-500">★★★★★</div>
+              </div>
+
+              <div class="testimonial-item">
+                  <blockquote class="italic text-black">"Gayrimenkul yatırımı yapmayı düşünüyordum ama nereden başlayacağımı bilmiyordum. 
+                      Baron Gayrimenkul ekibi, en kârlı bölgeleri bana sundu, çok memnunum."</blockquote>
+                  <p class="mt-4 font-semibold text-black">- Emre B.</p>
+                  <p class="text-sm text-black-300">10 Haziran 2024</p>
+                  <p class="text-green-400 font-bold">✔ Doğrulanmış Yorum</p>
+                  <div class="mt-2 text-yellow-500">★★★★★</div>
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
+
+
 
   <!-- Öne Çıkan Gayrimenkuller -->
-  <section class="bg-gray-100 py-16 px-4">
+  <section id="yatirimlik" class="bg-gray-100 py-16 px-4">
     <div class="max-w-6xl mx-auto">
       <h2 class="text-3xl font-serif mb-8 text-center">Öne Çıkan Gayrimenkuller</h2>
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- 6 örnek gayrimenkul -->
-        <div class="bg-white shadow rounded overflow-hidden">
-          <img src="https://via.placeholder.com/400x250" alt="Gayrimenkul">
+        <a href="#" class="bg-white shadow rounded overflow-hidden block hover:shadow-lg transition">
+          <img src="images/cesme.png" alt="Gayrimenkul">
           <div class="p-4">
-            <h3 class="font-semibold">2685 Spyglass Ridge Yolu</h3>
-            <p class="text-sm text-gray-600">8.975.000 $</p>
+            <h3 class="font-semibold">Çeşme</h3>
+            <p class="text-sm text-gray-600">8.975.000 TL</p>
           </div>
-        </div>
-        <!-- Tekrarla -->
-        <div class="bg-white shadow rounded overflow-hidden">
-          <img src="https://via.placeholder.com/400x250">
+        </a>
+        <!-- 5 tane daha tıklanabilir kart -->
+        <a href="#" class="bg-white shadow rounded overflow-hidden block hover:shadow-lg transition">
+          <img src="images/konak.png">
           <div class="p-4">
-            <h3 class="font-semibold">1234 School House Road</h3>
-            <p class="text-sm text-gray-600">6.250.000 $</p>
+            <h3 class="font-semibold">Konak</h3>
+            <p class="text-sm text-gray-600">6.250.000 TL</p>
           </div>
-        </div>
-        <div class="bg-white shadow rounded overflow-hidden">
-          <img src="https://via.placeholder.com/400x250">
+        </a>
+        <a href="#" class="bg-white shadow rounded overflow-hidden block hover:shadow-lg transition">
+          <img src="images/urla.png">
           <div class="p-4">
-            <h3 class="font-semibold">1011 Rinconada Road</h3>
-            <p class="text-sm text-gray-600">4.500.000 $</p>
+            <h3 class="font-semibold">Urla</h3>
+            <p class="text-sm text-gray-600">4.500.000 TL</p>
           </div>
-        </div>
-        <div class="bg-white shadow rounded overflow-hidden">
-          <img src="https://via.placeholder.com/400x250">
+        </a>
+        <a href="#" class="bg-white shadow rounded overflow-hidden block hover:shadow-lg transition">
+          <img src="images/karaburun.png">
           <div class="p-4">
-            <h3 class="font-semibold">2620 Las Encinas</h3>
-            <p class="text-sm text-gray-600">3.800.000 $</p>
+            <h3 class="font-semibold">Karaburun</h3>
+            <p class="text-sm text-gray-600">3.800.000 TL</p>
           </div>
-        </div>
-        <div class="bg-white shadow rounded overflow-hidden">
-          <img src="https://via.placeholder.com/400x250">
+        </a>
+        <a href="#" class="bg-white shadow rounded overflow-hidden block hover:shadow-lg transition">
+          <img src="images/foca.png">
           <div class="p-4">
-            <h3 class="font-semibold">Altavista Caddesi</h3>
-            <p class="text-sm text-gray-600">5.100.000 $</p>
+            <h3 class="font-semibold">Foça</h3>
+            <p class="text-sm text-gray-600">5.100.000 TL</p>
           </div>
-        </div>
-        <div class="bg-white shadow rounded overflow-hidden">
-          <img src="https://via.placeholder.com/400x250">
+        </a>
+        <a href="#" class="bg-white shadow rounded overflow-hidden block hover:shadow-lg transition">
+          <img src="images/güzelbhace.png">
           <div class="p-4">
-            <h3 class="font-semibold">Vista Del Mar</h3>
-            <p class="text-sm text-gray-600">7.750.000 $</p>
+            <h3 class="font-semibold">Güzelbahçe</h3>
+            <p class="text-sm text-gray-600">7.750.000 TL</p>
           </div>
-        </div>
+        </a>
       </div>
     </div>
   </section>
 
-  <!-- Bölgeler -->
-  <section class="py-16 px-4 bg-white">
-    <div class="max-w-6xl mx-auto">
-      <h2 class="text-3xl font-serif mb-8 text-center">Bölgeler</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <!-- 8 bölge -->
-        <div class="relative">
-          <img src="https://via.placeholder.com/400x250" class="w-full h-full object-cover">
-          <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Montecito</div>
+
+  <!-- Konut Kredisi Hesaplama Arayüzü -->
+<section class="bg-white py-16 px-4">
+  <div class="max-w-3xl mx-auto text-center">
+    <!-- Başlık -->
+    <div class="header-container">
+      <h2 class="text-3xl font-semibold mb-2">Konut Kredisi Hesaplama</h2>
+      <p class="text-gray-600 mb-6">
+        Konut kredisi hesaplama aracı ile tüm bankaların güncel faiz oranlarını karşılaştır ve sana en uygun konut kredisini gör.
+      </p>
+    </div>
+  
+    <!-- Form -->
+    <div class="form-container">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 w-full">
+        <!-- Kredi Tutarı -->
+        <div class="w-full md:w-1/3">
+          <label class="block text-sm text-gray-500 mb-1">Kredi Tutarı</label>
+          <div class="flex items-center border border-gray-300 rounded px-3 py-2">
+            <input
+              id="tutar"
+              type="text"
+              class="w-full focus:outline-none"
+              placeholder="1.000.000"
+            />
+            <span class="ml-2 text-gray-400 text-sm">TL</span>
+          </div>
         </div>
-        <div class="relative">
-          <img src="https://via.placeholder.com/400x250">
-          <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Santa Barbara</div>
+  
+        <!-- Vade -->
+        <div class="w-full md:w-1/3">
+          <label class="block text-sm text-gray-500 mb-1">Vade</label>
+          <select
+            id="vade"
+            class="w-full border border-gray-300 rounded px-3 py-2"
+          >
+            <option value="60">5 Yıl (60 Ay)</option>
+            <option value="120">10 Yıl (120 Ay)</option>
+            <option value="168">14 Yıl (168 Ay)</option>
+            <option value="240">20 Yıl (240 Ay)</option>
+          </select>
         </div>
-        <div class="relative">
-          <img src="https://via.placeholder.com/400x250">
-          <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Santa Ynez Vadisi</div>
-        </div>
-        <div class="relative">
-          <img src="https://via.placeholder.com/400x250">
-          <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Hope Ranch</div>
-        </div>
-        <div class="relative">
-          <img src="https://via.placeholder.com/400x250">
-          <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Mesa</div>
-        </div>
-        <div class="relative">
-          <img src="https://via.placeholder.com/400x250">
-          <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Carpinteria</div>
-        </div>
-        <div class="relative">
-          <img src="https://via.placeholder.com/400x250">
-          <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Goleta</div>
-        </div>
-        <div class="relative">
-          <img src="https://via.placeholder.com/400x250">
-          <div class="absolute bottom-0 bg-black bg-opacity-50 text-white w-full p-2 text-center">Summerland</div>
+  
+        <!-- Hesapla Butonu -->
+        <div class="w-full md:w-1/3">
+          <label class="block text-sm text-transparent mb-1">.</label>
+          <button onclick="hesaplaKredi()" class="kredi-hesapla-btn w-full">
+            Konut Kredisi Hesapla
+          </button>
         </div>
       </div>
     </div>
+  
+    <!-- Sonuçlar -->
+    <div id="sonuc" class="max-w-3xl mx-auto mt-10 space-y-4"></div>
+  </div>
   </section>
-
-  <!-- Blog -->
-  <section class="bg-gray-100 py-16 px-4">
-    <div class="max-w-6xl mx-auto">
-      <h2 class="text-3xl font-serif mb-8 text-center">Blogumuz</h2>
-      <div class="grid md:grid-cols-3 gap-6">
-        <div class="bg-white shadow p-4">
-          <img src="https://via.placeholder.com/400x200" alt="Blog">
-          <h3 class="font-semibold mt-2">Gayrimenkulde Yeni Trendler</h3>
-          <p class="text-sm text-gray-600">Son gelişmeler ve tavsiyeler burada.</p>
+  
+  <!-- JavaScript -->
+  <script>
+  const bankalar = [
+    { ad: "Akbank", faiz: 2.89, logo: "akbank.webp" },
+    { ad: "Garanti", faiz: 3.10, logo: "garanti.jpg" },
+    { ad: "Vakıf Katılım", faiz: 3.10, logo: "vakifkatilim.jpg" },
+    { ad: "QNB", faiz: 3.09, logo: "qnbbank.png" },
+    { ad: "Ziraat", faiz: 3.19, logo: "ziraat.jpg" },
+    { ad: "İş Bankası", faiz: 3.10, logo: "isbankası.png" },
+    { ad: "Halkbank", faiz: 3.23, logo: "halkbankası.png" },
+    { ad: "ING", faiz: 3.74, logo: "ingbank.jpg" },
+    { ad: "Kuveyttürk", faiz: 3.20, logo: "kuveytturk.png" },
+    { ad: "TEB", faiz: 3.15, logo: "tebbanka.jpg" },
+    { ad: "Ziraat Katılım", faiz: 3.09, logo: "ziraatkatilim.jpg" }
+  ];
+  
+  
+  const tutarInput = document.getElementById("tutar");
+  
+  tutarInput.addEventListener("input", function (e) {
+  let value = e.target.value.replace(/\D/g, ""); // Sayı olmayanları sil
+  value = new Intl.NumberFormat("tr-TR").format(value); // Noktalı biçim
+  e.target.value = value;
+  });
+  
+  function temizleVeSayiyaCevir(str) {
+  return parseFloat(str.replace(/\./g, "").replace(",", "."));
+  }
+  
+  function hesaplaKredi() {
+  const tutarDeger = temizleVeSayiyaCevir(document.getElementById("tutar").value);
+  const vade = parseInt(document.getElementById("vade").value);
+  const container = document.getElementById("sonuc");
+  
+  container.innerHTML = "";
+  
+  if (!tutarDeger || !vade) {
+    container.innerHTML = "<p class='text-center text-red-600'>Lütfen tutar ve vade bilgisi girin.</p>";
+    return;
+  }
+  
+  bankalar.forEach(banka => {
+    const faizOraniAylik = banka.faiz / 100;
+    const aylikTaksit = (tutarDeger * faizOraniAylik) / (1 - Math.pow(1 + faizOraniAylik, -vade));
+    const toplamOdeme = aylikTaksit * vade;
+  
+    const html = `
+      <div class="sonuc-karti">
+        <div class="logo-alani">
+          <img src="images/bankalar/${banka.logo}" alt="${banka.ad}" class="banka-logo" />
         </div>
-        <!-- Devamı eklenebilir -->
+        <div class="veri-grubu">
+          <div class="etiketler">
+            <span>Toplam</span>
+            <span>Faiz</span>
+            <span>Taksit</span>
+          </div>
+          <div class="degerler">
+            <span>${toplamOdeme.toLocaleString("tr-TR")} TL</span>
+            <span>%${banka.faiz.toFixed(2)}</span>
+            <span>${aylikTaksit.toLocaleString("tr-TR")} TL</span>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    `;
+  
+    container.innerHTML += html;
+  });
+  }
+  </script>
 
-  <!-- Work With Us -->
-  <section class="bg-white py-16 px-4">
-    <div class="max-w-4xl mx-auto text-center">
-      <h2 class="text-3xl font-serif mb-6">Bizimle Çalışın</h2>
-      <p>BARON GAYRİMENKUL olarak sizin için en iyi sonuçları elde etmeye odaklıyız. Profesyonel ekibimiz ve deneyimimizle yanınızdayız.</p>
-      <button class="mt-6 bg-black text-white px-6 py-2 rounded">İletişime Geç</button>
-    </div>
-  </section>
 
-  <!-- Footer -->
-  <footer class="bg-black text-white py-12 px-4">
-    <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
-      <div>
-        <h4 class="font-bold mb-2">BARON GAYRİMENKUL</h4>
-        <p>Montecito, Santa Barbara ve çevresinde lüks konut uzmanlığı.</p>
-      </div>
-      <div>
-        <h4 class="font-bold mb-2">Adres</h4>
-        <p>Santa Barbara, Kaliforniya</p>
-        <p><a href="#" class="underline">Yol Tarifi Al</a></p>
-      </div>
-      <div>
-        <h4 class="font-bold mb-2">İletişim</h4>
-        <p>Telefon: (805) 456-1234</p>
-        <p>E-posta: bilgi@barongayrimenkul.com</p>
-      </div>
-    </div>
-    <div class="text-center mt-8 text-sm text-gray-400">&copy; 2025 BARON GAYRİMENKUL. Tüm hakları saklıdır.</div>
-  </footer>
+ 
 
+ <!-- Footer -->
+ <div id="footer-placeholder"></div>
+
+ <script>
+   fetch("footer.html")
+     .then(res => res.text())
+     .then(data => {
+       document.getElementById("footer-placeholder").innerHTML = data;
+
+       // footer yüklendikten sonra JS'i çalıştır:
+     const launcher = document.getElementById("iletisim-launcher");
+     const menu = document.getElementById("iletisim-menusu");
+     const openBtn = document.getElementById("openContact");
+     const closeBtn = document.getElementById("closeContact");
+
+     if (openBtn && closeBtn) {
+       openBtn.addEventListener("click", () => {
+         launcher.style.display = "none";
+         menu.classList.remove("hidden");
+       });
+
+       closeBtn.addEventListener("click", () => {
+         menu.classList.add("hidden");
+         launcher.style.display = "block";
+       });
+     }
+     });    
+ </script>
+
+  <script src="script.js"></script>
 </body>
 </html>

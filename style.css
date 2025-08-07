@@ -1,0 +1,382 @@
+body {
+    font-family: 'Cormorant Garamond', serif;
+    color: #4b5563;
+}
+
+/* Başlıklar (h1, h2, h3) */
+h1, h2, h3 {
+    font-family: 'Cormorant Garamond', serif;
+}
+
+/* Paragraflar, linkler, span'ler, diğer tüm gövde yazıları */
+body, p, a, span, li, td, th, input, button {
+    font-family: 'Arapey', serif;
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+
+
+.testimonial-section {
+    background: url('images/piclumen-1743697013176.png') no-repeat center center;
+    background-size: cover;
+    position: relative;
+}
+
+.testimonial-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(239, 239, 239, 0.9); /* Koyu bir katman ekleyerek okunabilirliği artırır */
+}
+
+.testimonial-item {
+    display: none;
+}
+
+.testimonial-item:first-child {
+    display: block;
+}
+.custom-header {
+    height: 80px;
+}
+.scrolled {
+    background-color: white !important;
+    color: black !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.scrolled a {
+    color: black !important;
+}
+/* Başta siyah logo gizli, hamburger beyaz */
+.logo-scrolled {
+    display: none;
+  }
+  .logo-default {
+    display: block;
+  }
+  
+  /* Scroll sonrası değişim */
+  .scrolled .logo-default {
+    display: none !important;
+  }
+  .scrolled .logo-scrolled {
+    display: block !important;
+  }
+  
+  .scrolled #hamburger-icon {
+    color: black !important;
+  }
+
+
+
+  .form-container {
+    max-width: 500px;
+    margin: 4rem auto;
+    padding: 1rem;
+  }
+
+  .form-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-subtitle {
+    color: #4B5563;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .form-btn {
+    background-color: #F97316; /* Turuncu */
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 9999px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .form-btn:hover {
+    background-color: #ea580c; /* Daha koyu turuncu */
+  }
+
+  @media (min-width: 768px) {
+    .form-group {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .form-input {
+      flex: 1;
+    }
+
+    .form-btn {
+      flex-shrink: 0;
+    }
+  }
+
+
+
+/* ürün sayfası bilgilendirme */
+
+.premium-info-section {
+  background-color: #f3f4f6;
+  padding: 4rem 1rem;
+}
+
+.premium-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.premium-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  text-align: center;
+  color: #1f2937;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.premium-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.premium-box {
+  background: white;
+  border-left: 6px solid #f97316;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.04);
+  font-size: 1.125rem;
+  color: #374151;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.premium-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.08);
+}
+
+@media (min-width: 768px) {
+  .premium-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+
+/* eğitim kurumları */
+
+  .edu-section {
+    background-color: #f9fafb;
+    padding: 4rem 1rem;
+  }
+
+  .edu-container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .edu-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    text-align: center;
+    color: #1f2937;
+    margin-bottom: 3rem;
+    position: relative;
+  }
+
+  .edu-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .edu-box {
+    background: white;
+    border-left: 5px solid #f97316;
+    padding: 1.25rem 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 16px rgba(0, 0, 0, 0.03);
+    font-size: 1.125rem;
+    color: #374151;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .edu-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.06);
+  }
+
+  .edu-box strong {
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .edu-note {
+    font-size: 0.95rem;
+    color: #6b7280;
+    font-style: italic;
+  }
+
+  @media (min-width: 768px) {
+    .edu-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+
+
+  /* kredi hesaplama */
+
+  .form-container {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease-in-out;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .form-container:hover {
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  input[type="number"],
+  select {
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    padding: 12px 16px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+
+  input[type="number"]:focus,
+  select:focus {
+    border-color: #ef4444;
+    outline: none;
+  }
+
+  .kredi-hesapla-btn {
+    background: linear-gradient(to right, #dc2626, #b91c1c);
+    color: white;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.25);
+    transition: background 0.3s ease, transform 0.2s ease;
+    text-align: center;
+    width: 100%;
+  }
+
+  .kredi-hesapla-btn:hover {
+    background: linear-gradient(to right, #b91c1c, #7f1d1d);
+    transform: scale(1.02);
+  }
+
+  .kredi-hesapla-btn:active {
+    transform: scale(0.98);
+  }
+
+  .sonuc-karti {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.logo-alani {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.banka-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #f3f4f6;
+  padding: 4px;
+}
+
+.veri-grubu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.etiketler,
+.degerler {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: nowrap;
+}
+
+.etiketler span {
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-weight: 500;
+  min-width: 80px;
+  text-align: left;
+}
+
+.degerler span {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #111827;
+  min-width: 80px;
+  text-align: left;
+}
+   .card-step {
+     transition: all 0.3s ease;
+     border: 1px solid #f3f4f6;
+     background-color: #fff;
+     border-radius: 1rem;
+     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+     text-align: center;
+   }
+ 
+   .card-step:hover {
+     transform: translateY(-6px);
+     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+   }
+ 
+   .card-step img {
+     border: 3px solid #f3f4f6;
+     border-radius: 9999px;
+     padding: 6px;
+     background-color: #fff;
+   }
+
+   
