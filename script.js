@@ -72,3 +72,48 @@ window.addEventListener("scroll", function () {
         hamburgerIcon?.classList.remove("text-black");
     }
 });
+
+
+
+
+
+// script.js dosyasının uygun bir yerine bu kodu ekleyin.
+// Bu fonksiyon tüm sayfa tamamen yüklendiğinde çalışır.
+window.addEventListener("load", function() {
+    
+    // Gerekli HTML elementlerini seç
+    const chatbotPopup = document.getElementById('chatbot-popup');
+    const kapatDugmesi = document.getElementById('chatbot-kapat-btn');
+    const canliSohbetAcDugmesi = document.getElementById('canli-sohbet-ac'); // Yeni linkimizi seçtik
+
+    // --- Otomatik Açılma Mantığı (5 Saniye Sonra) ---
+    if (chatbotPopup) {
+      setTimeout(() => {
+        // Eğer chatbot zaten başka bir şekilde açılmadıysa aç
+        if (chatbotPopup.classList.contains('chatbot-hidden')) {
+           chatbotPopup.classList.remove('chatbot-hidden');
+        }
+      }, 5000);
+    }
+    
+    // --- Kapatma Düğmesi Mantığı ---
+    if (kapatDugmesi) {
+      kapatDugmesi.addEventListener('click', () => {
+        if (chatbotPopup) {
+          chatbotPopup.classList.add('chatbot-hidden');
+        }
+      });
+    }
+
+    // --- "Canlı Sohbet" Linkine Tıklama Mantığı (YENİ EKLENDİ) ---
+    if (canliSohbetAcDugmesi) {
+      canliSohbetAcDugmesi.addEventListener('click', (event) => {
+        event.preventDefault(); // Linkin sayfanın başına gitmesini engelle
+
+        if (chatbotPopup) {
+          // Chatbot'u görünür yap
+          chatbotPopup.classList.remove('chatbot-hidden');
+        }
+      });
+    }
+});

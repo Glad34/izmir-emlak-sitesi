@@ -1,0 +1,213 @@
+/* chatbot/chatbot.css dosyanıza bu stilleri ekleyin veya güncelleyin */
+
+/* Başlangıçta pop-up'ı gizler */
+.chatbot-hidden {
+  display: none !important; /* !important, diğer stilleri ezmesini garantiler */
+}
+
+/* Pop-up'ın ana kapsayıcısı için konumlandırma ve katman stilleri */
+#chatbot-popup {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  /* Gölge, geçiş gibi ek görsel efektler ekleyebilirsiniz */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  border-radius: 10px; /* Kenarları yumuşatmak için */
+}
+
+/* Chatbot'unuzun iç yapısı için stiller (bunlar sizde zaten olabilir) */
+#chat-widget {
+  width: 350px;
+  max-width: 90vw;
+  /* ... diğer stil tanımlarınız ... */
+}
+
+#chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Kapatma düğmesini sağa yaslamak için */
+    /* ... diğer stil tanımlarınız ... */
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+#chat-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 370px;
+    max-width: 90%;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+}
+
+#chat-header {
+    background: #f7f7f7;
+    padding: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#chat-header img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+#chat-header h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+#chat-header span {
+    font-size: 12px;
+    color: #4caf50;
+}
+
+#chat-messages {
+    flex-grow: 1;
+    height: 400px;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.message {
+    padding: 10px 15px;
+    border-radius: 18px;
+    max-width: 85%;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.user-message {
+    background-color: #007bff;
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+
+.ai-message {
+    background-color: #f1f0f0;
+    color: #333;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+}
+
+#chat-input-form {
+    display: flex;
+    border-top: 1px solid #e0e0e0;
+    padding: 10px;
+}
+
+#user-input {
+    flex-grow: 1;
+    border: none;
+    padding: 10px;
+    font-size: 14px;
+    background: #f7f7f7;
+    border-radius: 20px;
+}
+
+#user-input:focus {
+    outline: none;
+}
+
+#chat-input-form button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+#chat-input-form button:hover {
+    background-color: #0056b3;
+}
+/* style.css */
+
+/* Bu bölüm, ilanların gösterildiği slider'ın genel yapısını düzenler. */
+.ilan-slider-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+.ilan-slider {
+    display: flex;
+    padding: 10px 15px;
+    gap: 15px; /* Kartlar arasındaki boşluğu artırdık */
+}
+
+/* İLAN KARTININ ANA STİLİ (İstediğiniz tüm özellikler burada) */
+.ilan-card {
+    flex: 0 0 140px; /* Kartların genişliği */
+    border-radius: 12px; /* Köşeleri yuvarlatma */
+    overflow: hidden; /* Taşan resim köşelerini gizler */
+    background-color: #ffffff; /* Kartın arka plan rengi */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12); /* Gölgelendirme efekti */
+    transition: transform 0.2s ease-in-out;
+    border: 1px solid #eee; /* İnce bir çerçeve */
+}
+
+.ilan-card:hover {
+    transform: translateY(-5px); /* Üzerine gelince hafifçe yukarı kalkma efekti */
+}
+
+.ilan-card img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+}
+
+/* FİYAT BÖLÜMÜNÜN STİLİ */
+.ilan-card .fiyat {
+    font-size: 15px;
+    font-weight: 600;
+    padding: 12px 10px;
+    color: #333;
+    text-align: left;
+}
+
+/* "Fiyat:" ETİKETİNİ OLUŞTURMA (JavaScript'e dokunmadan) */
+.ilan-card .fiyat::before {
+    content: "Fiyat:"; /* Fiyatın önüne bu metni ekler */
+    display: block; /* Bir üst satırda görünmesini sağlar */
+    font-weight: normal;
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 2px;
+}
+
+/* Artık flu yapmaya gerek kalmadığı için .blurred sınıfı kaldırılmıştır. */
+
+
+/* style.css'e eklenecek yeni ve geliştirilmiş form stilleri */
+
+/* Formun bulunduğu ana mesaj balonunu düzenler */
+.slider-message .slider-cta {
+    font-size: 14px;
+    padding: 15px !important;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 10px;
+    background-color: #f9f9f9;
+}

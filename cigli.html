@@ -6,6 +6,7 @@
   <title>Çiğli - Yatırım Rehberi</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="chatbot/chatbot.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Arapey&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -407,6 +408,31 @@
 
 <!-- Footer -->
 <div id="footer-placeholder"></div>
+
+<div id="chatbot-popup" class="chatbot-hidden"> 
+  
+  <!-- Bu sizin mevcut chatbot yapınız -->
+  <div id="chat-widget"> 
+    <div id="chat-header">
+      <img src="images/REMAX LOGO 2.png" alt="Danışman">
+      <div>
+        <h1>Onur Başaran</h1>
+        <h2>Gayrimenkul Danışmanı</h2>
+        <span>Çevrimiçi</span>
+      </div>
+      <!-- Kapatma Düğmesini ekleyelim -->
+      <button id="chatbot-kapat-btn" style="background:none; border:none; font-size: 24px; cursor:pointer; color: #555;">&times;</button>
+    </div>
+    <div id="chat-messages">
+      <div class="message ai-message">Merhaba! Hayalinizdeki evi bulmanıza yardımcı olmak için buradayım. Lütfen isteklerinizi yazın.</div>
+    </div>
+    <form id="chat-input-form">
+      <input type="text" id="user-input" placeholder="Mesajınızı yazın..." autocomplete="off" required>
+      <button type="submit">Gönder</button>
+    </form>
+  </div>
+  
+</div>
 <script>
   fetch("footer.html")
     .then(res => res.text())
@@ -429,6 +455,6 @@
     });    
 </script>
 <script src="script.js"></script>
-
+<script src="chatbot/chatbot.js"></script>
 </body>
 </html>
