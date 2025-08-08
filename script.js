@@ -75,45 +75,55 @@ window.addEventListener("scroll", function () {
 
 
 
-
-
 // script.js dosyasının uygun bir yerine bu kodu ekleyin.
+
+
+// ===============================================
+// CHATBOT KONTROL MERKEZİ - NİHAİ VERSİYON
+// ===============================================
+
+/**
+ * Bu fonksiyon, chatbot.js tarafından çağrılabilmesi için
+ * global alanda (window) tanımlanmıştır.
+ */
+function openChatbotPopup() {
+    const chatbotPopup = document.getElementById('chatbot-popup');
+    if (chatbotPopup) {
+        chatbotPopup.classList.remove('chatbot-hidden');
+    }
+}
+
 // Bu fonksiyon tüm sayfa tamamen yüklendiğinde çalışır.
+// script.js içindeki kodun en sade hali
+
 window.addEventListener("load", function() {
     
-    // Gerekli HTML elementlerini seç
+    // Sadece bu dosyanın kontrol ettiği elementleri seç
     const chatbotPopup = document.getElementById('chatbot-popup');
     const kapatDugmesi = document.getElementById('chatbot-kapat-btn');
-    const canliSohbetAcDugmesi = document.getElementById('canli-sohbet-ac'); // Yeni linkimizi seçtik
+    const canliSohbetAcDugmesi = document.getElementById('canli-sohbet-ac');
 
-    // --- Otomatik Açılma Mantığı (5 Saniye Sonra) ---
+    // --- OLAY DİNLEYİCİLERİ ---
+    
+    // 5 saniye sonra otomatik aç
     if (chatbotPopup) {
-      setTimeout(() => {
-        // Eğer chatbot zaten başka bir şekilde açılmadıysa aç
-        if (chatbotPopup.classList.contains('chatbot-hidden')) {
-           chatbotPopup.classList.remove('chatbot-hidden');
-        }
-      }, 5000);
+        setTimeout(() => { chatbotPopup.classList.remove('chatbot-hidden'); }, 5000);
     }
     
-    // --- Kapatma Düğmesi Mantığı ---
+    // Kapatma düğmesine tıklandığında
     if (kapatDugmesi) {
-      kapatDugmesi.addEventListener('click', () => {
-        if (chatbotPopup) {
-          chatbotPopup.classList.add('chatbot-hidden');
-        }
+      kapatDugmesi.addEventListener('click', () => { 
+          if(chatbotPopup) chatbotPopup.classList.add('chatbot-hidden'); 
       });
     }
 
-    // --- "Canlı Sohbet" Linkine Tıklama Mantığı (YENİ EKLENDİ) ---
+    // Canlı Sohbet linkine tıklandığında
     if (canliSohbetAcDugmesi) {
       canliSohbetAcDugmesi.addEventListener('click', (event) => {
-        event.preventDefault(); // Linkin sayfanın başına gitmesini engelle
-
-        if (chatbotPopup) {
-          // Chatbot'u görünür yap
-          chatbotPopup.classList.remove('chatbot-hidden');
-        }
+        event.preventDefault();
+        if(chatbotPopup) chatbotPopup.classList.remove('chatbot-hidden');
       });
     }
+
+    // Artık 'aiMessageReceived' dinleyicisi yok.
 });

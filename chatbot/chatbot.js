@@ -3,10 +3,14 @@ const MAKE_DIALOG_WEBHOOK_URL = 'https://hook.eu2.make.com/c5dt1cwtpat7kk6i6oxil
 const MAKE_STATUS_CHECK_URL = 'https://hook.eu2.make.com/jwfmybzglr2gjbgynuyeep7163nldzzj';
 
 
+
+
 // --- 2. HTML ELEMENTLERİNİN SEÇİLMESİ ---
 const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-input-form');
 const userInput = document.getElementById('user-input');
+
+
 
 
 // --- 3. KONUŞMA KİMLİĞİ (CONVERSATION ID) YÖNETİMİ ---
@@ -21,8 +25,12 @@ function getOrCreateConversationId() {
 const conversationId = getOrCreateConversationId();
 
 
+
+
 // --- 4. OLAY DİNLEYİCİ ---
 chatForm.addEventListener('submit', handleFormSubmit);
+
+
 
 
 // --- 5. ANA FONKSİYONLAR ---
@@ -32,11 +40,17 @@ async function handleFormSubmit(event) {
     if (messageText === '') return;
 
 
+
+
     addMessageToUI(messageText, 'user', false);
     userInput.value = '';
 
 
+
+
     const loadingIndicator = addMessageToUI('...', 'ai', false);
+
+
 
 
     try {
@@ -53,6 +67,8 @@ async function handleFormSubmit(event) {
 }
 
 
+
+
 async function sendMessageToMake(text) {
     const payload = { text: text, conversation_id: conversationId };
     const response = await fetch(MAKE_DIALOG_WEBHOOK_URL, {
@@ -66,6 +82,13 @@ async function sendMessageToMake(text) {
 }
 
 
+
+
+// chatbot.js içindeki fonksiyonun güncellenmiş hali
+
+
+// chatbot.js içindeki fonksiyonun en direkt hali
+
 function addMessageToUI(content, sender, isHTML) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('message', `${sender}-message`);
@@ -76,6 +99,18 @@ function addMessageToUI(content, sender, isHTML) {
     }
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // --- EN DİREKT AÇMA YÖNTEMİ ---
+    // Eğer mesaj AI'dan geldiyse, HİÇBİR ŞEYE BAĞLI OLMADAN,
+    // doğrudan pop-up elementini bul ve gizli sınıfını kaldır.
+    if (sender === 'ai') {
+        const chatbotPopup = document.getElementById('chatbot-popup');
+        if (chatbotPopup) {
+            chatbotPopup.classList.remove('chatbot-hidden');
+        }
+    }
+    // --- BİTİŞ ---
+
     return messageElement;
 }
 
@@ -84,6 +119,8 @@ function addMessageToUI(content, sender, isHTML) {
 function startPollingForResults() {
     let pollCount = 0;
     const maxPolls = 24;
+
+
 
 
     const intervalId = setInterval(async () => {
@@ -114,6 +151,8 @@ function startPollingForResults() {
 }
 
 
+
+
 // SADECE BU FONKSİYON, "2 İLAN GÖSTER" MANTIĞI İÇİN GÜNCELLENDİ
 function renderIlanSlider(ilanSunumuBase64) {
     if (!ilanSunumuBase64) {
@@ -124,6 +163,8 @@ function renderIlanSlider(ilanSunumuBase64) {
         const ilanSunumuJSON = atob(ilanSunumuBase64);
         const veriObjesi = JSON.parse(ilanSunumuJSON);
         const ilanlarDizisi = veriObjesi.ilanlar;
+
+
 
 
         if (!Array.isArray(ilanlarDizisi) || ilanlarDizisi.length === 0) {
@@ -162,6 +203,8 @@ function renderIlanSlider(ilanSunumuBase64) {
         `;
        
         addMessageToUI(htmlContent, 'ai', true);
+
+
 
 
     } catch (error) {
