@@ -398,8 +398,8 @@ body, p, a, span, li, td, th, input, button {
 
 /* Ana Buton: Sizin resminizi içeren yuvarlak kısım */
 .cta-button {
-  width: 64px;  /* 16 -> 4rem */
-  height: 64px;
+  width: 94px;  /* 16 -> 4rem */
+  height: 94px;
   border-radius: 9999px; /* Tam yuvarlak yapar */
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.2), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   display: flex;

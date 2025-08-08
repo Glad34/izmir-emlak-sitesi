@@ -64,8 +64,8 @@
 
 
 #chat-header img {
-  width: 40px; /* Boyut küçültüldü */
-  height: 40px;
+  width: 80px; /* Boyut küçültüldü */
+  height: 80px;
   border-radius: 50%;
   object-fit: cover;
 }
