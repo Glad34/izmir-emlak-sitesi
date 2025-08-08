@@ -1,3 +1,5 @@
+console.log("✅ script.js YÜKLENDİ VE ÇALIŞIYOR.");
+
 document.addEventListener("DOMContentLoaded", function () {
     // Testimonial Slider
     const slider = document.getElementById("testimonial-slider");
@@ -78,52 +80,61 @@ window.addEventListener("scroll", function () {
 // script.js dosyasının uygun bir yerine bu kodu ekleyin.
 
 
-// ===============================================
-// CHATBOT KONTROL MERKEZİ - NİHAİ VERSİYON
-// ===============================================
+// ==========================================================
+// CHATBOT KONTROL MERKEZİ - SORGULAMA MEKANİZMALI (NİHAİ VERSİYON)
+// ==========================================================
 
-/**
- * Bu fonksiyon, chatbot.js tarafından çağrılabilmesi için
- * global alanda (window) tanımlanmıştır.
- */
-function openChatbotPopup() {
-    const chatbotPopup = document.getElementById('chatbot-popup');
-    if (chatbotPopup) {
-        chatbotPopup.classList.remove('chatbot-hidden');
-    }
-}
-
-// Bu fonksiyon tüm sayfa tamamen yüklendiğinde çalışır.
-// script.js içindeki kodun en sade hali
-
+// Bu fonksiyon, tüm sayfa tamamen yüklendiğinde çalışır.
 window.addEventListener("load", function() {
-    
-    // Sadece bu dosyanın kontrol ettiği elementleri seç
-    const chatbotPopup = document.getElementById('chatbot-popup');
-    const kapatDugmesi = document.getElementById('chatbot-kapat-btn');
-    const canliSohbetAcDugmesi = document.getElementById('canli-sohbet-ac');
 
-    // --- OLAY DİNLEYİCİLERİ ---
-    
-    // 5 saniye sonra otomatik aç
+  // Gerekli HTML elementlerini seç
+  const chatbotPopup = document.getElementById('chatbot-popup');
+  const kapatDugmesi = document.getElementById('chatbot-kapat-btn');
+  const canliSohbetAcDugmesi = document.getElementById('canli-sohbet-ac');
+
+  // Pop-up'ı açma ve kapama için merkezi fonksiyonlar
+  function openChatbot() {
     if (chatbotPopup) {
-        setTimeout(() => { chatbotPopup.classList.remove('chatbot-hidden'); }, 5000);
+      chatbotPopup.classList.remove('chatbot-hidden');
     }
-    
-    // Kapatma düğmesine tıklandığında
-    if (kapatDugmesi) {
-      kapatDugmesi.addEventListener('click', () => { 
-          if(chatbotPopup) chatbotPopup.classList.add('chatbot-hidden'); 
-      });
+  }
+  function closeChatbot() {
+    if (chatbotPopup) {
+      chatbotPopup.classList.add('chatbot-hidden');
     }
+  }
 
-    // Canlı Sohbet linkine tıklandığında
-    if (canliSohbetAcDugmesi) {
-      canliSohbetAcDugmesi.addEventListener('click', (event) => {
-        event.preventDefault();
-        if(chatbotPopup) chatbotPopup.classList.remove('chatbot-hidden');
-      });
-    }
+  // --- OLAY DİNLEYİCİLERİ ---
+  
+  // 5 saniye sonra otomatik aç
+  setTimeout(openChatbot, 5000);
+  
+  // Kapatma düğmesine tıklandığında
+  if (kapatDugmesi) {
+    kapatDugmesi.addEventListener('click', closeChatbot);
+  }
 
-    // Artık 'aiMessageReceived' dinleyicisi yok.
+  // Canlı Sohbet linkine tıklandığında
+  if (canliSohbetAcDugmesi) {
+    canliSohbetAcDugmesi.addEventListener('click', (event) => {
+      event.preventDefault();
+      openChatbot();
+    });
+  }
+
+  // --- YENİ MESAJ KONTROL MEKANİZMASI ---
+  // Her saniye, chatbot.js'in yeni bir mesaj bırakıp bırakmadığını kontrol et.
+  setInterval(() => {
+    // Tarayıcı hafızasındaki bayrağı kontrol et
+    const newAiMessageFlag = localStorage.getItem('newAiMessageFlag');
+
+    // Eğer bayrak varsa VE chatbot şu an kapalıysa
+    if (newAiMessageFlag && chatbotPopup && chatbotPopup.classList.contains('chatbot-hidden')) {
+      // Pop-up'ı aç
+      openChatbot();
+      
+      // Bayrağı, tekrar tekrar açılmasını önlemek için hemen temizle
+      localStorage.removeItem('newAiMessageFlag');
+    }
+  }, 1000); // Kontrol sıklığı: 1 saniye
 });

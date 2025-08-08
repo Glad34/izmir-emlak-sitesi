@@ -182,9 +182,12 @@
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 50%; /* Butonu yuvarlak yapar */
-  width: 38px;
-  height: 38px;
+  /* border-radius: 50%; KALDIRILDI */
+  border-radius: 20px; /* Daha modern bir kapsül şekli için */
+  /* width: 38px; SABİT GENİŞLİK KALDIRILDI */
+  /* height: 38px; SABİT YÜKSEKLİK KALDIRILDI */
+  padding: 8px 20px; /* İç boşluk eklendi (dikey ve yatay) */
+  height: 38px; /* Yüksekliği textarea ile aynı hizada tutmak için */
   flex-shrink: 0;
   cursor: pointer;
   font-weight: 600;
@@ -192,6 +195,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 14px; /* Yazı boyutu eklendi */
 }
 
 
@@ -273,3 +277,4 @@
   border-top: 1px solid #e9e9e9;
   border-radius: 0 0 12px 12px;
 }
+

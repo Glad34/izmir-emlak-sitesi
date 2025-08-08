@@ -1,3 +1,5 @@
+console.log("🔥 chatbot.js YÜKLENDİ VE ÇALIŞIYOR.");
+
 // --- 1. AYARLAR ---
 const MAKE_DIALOG_WEBHOOK_URL = 'https://hook.eu2.make.com/c5dt1cwtpat7kk6i6oxilacno0yxnuif';
 const MAKE_STATUS_CHECK_URL = 'https://hook.eu2.make.com/jwfmybzglr2gjbgynuyeep7163nldzzj';
@@ -39,22 +41,23 @@ async function handleFormSubmit(event) {
     const messageText = userInput.value.trim();
     if (messageText === '') return;
 
-
-
-
     addMessageToUI(messageText, 'user', false);
     userInput.value = '';
 
-
-
-
     const loadingIndicator = addMessageToUI('...', 'ai', false);
-
-
-
 
     try {
         const aiResponse = await sendMessageToMake(messageText);
+        
+        // --- YENİ EKLENEN KISIM ---
+        // Gelen cevabın ne olduğuna bakmaksızın, AI'dan bir cevap geldiyse
+        // ve pop-up kapalıysa, onu aç.
+        const chatbotPopup = document.getElementById('chatbot-popup');
+        if (chatbotPopup && chatbotPopup.classList.contains('chatbot-hidden')) {
+            chatbotPopup.classList.remove('chatbot-hidden');
+        }
+        // --- BİTİŞ ---
+
         loadingIndicator.textContent = aiResponse.cevap;
        
         if (aiResponse.status === 'tamamlandi') {
@@ -65,6 +68,7 @@ async function handleFormSubmit(event) {
         loadingIndicator.textContent = 'Üzgünüm, bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
     }
 }
+
 
 
 
@@ -99,18 +103,6 @@ function addMessageToUI(content, sender, isHTML) {
     }
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // --- EN DİREKT AÇMA YÖNTEMİ ---
-    // Eğer mesaj AI'dan geldiyse, HİÇBİR ŞEYE BAĞLI OLMADAN,
-    // doğrudan pop-up elementini bul ve gizli sınıfını kaldır.
-    if (sender === 'ai') {
-        const chatbotPopup = document.getElementById('chatbot-popup');
-        if (chatbotPopup) {
-            chatbotPopup.classList.remove('chatbot-hidden');
-        }
-    }
-    // --- BİTİŞ ---
-
     return messageElement;
 }
 
@@ -154,7 +146,12 @@ function startPollingForResults() {
 
 
 // SADECE BU FONKSİYON, "2 İLAN GÖSTER" MANTIĞI İÇİN GÜNCELLENDİ
+/**
+ * Make.com'dan gelen ilan verilerini işleyip ekrana slider olarak çizer.
+ * İşlem bittikten sonra, pop-up'ın açılması için bir sinyal gönderir.
+ */
 function renderIlanSlider(ilanSunumuBase64) {
+    // console.log("🚀 renderIlanSlider fonksiyonu ÇAĞRILDI!"); // Test için
     if (!ilanSunumuBase64) {
         addMessageToUI("Size uygun ilan bulunamadı.", 'ai', false);
         return;
@@ -164,15 +161,11 @@ function renderIlanSlider(ilanSunumuBase64) {
         const veriObjesi = JSON.parse(ilanSunumuJSON);
         const ilanlarDizisi = veriObjesi.ilanlar;
 
-
-
-
         if (!Array.isArray(ilanlarDizisi) || ilanlarDizisi.length === 0) {
             addMessageToUI("Taleplerinize uygun bir ilan bulunamadı.", 'ai', false);
             return;
         }
        
-        // Gösterilecek ilan sayısını ve gösterilecek ilanlar dizisini belirle
         const gosterilecekAdet = 2;
         const gosterilecekIlanlar = ilanlarDizisi.slice(0, gosterilecekAdet);
        
@@ -183,11 +176,8 @@ function renderIlanSlider(ilanSunumuBase64) {
                     <div class="ilan-slider">
         `;
        
-        // Sadece gösterilecek ilanlar üzerinde döngü yap
         gosterilecekIlanlar.forEach((ilan) => {
             const formatliFiyat = new Intl.NumberFormat('tr-TR').format(ilan.fiyat);
-           
-            // HTML yapısı, CSS ile stil verilecek şekilde sade bırakıldı.
             htmlContent += `
                 <div class="ilan-card">
                     <img src="${ilan.gorsel}" alt="İlan Resmi">
@@ -201,11 +191,12 @@ function renderIlanSlider(ilanSunumuBase64) {
                 <p class="slider-cta">Tüm ilanları görmek ve uzman desteği almak için lütfen <strong>telefon numaranızı</strong> yazın.</p>
             </div>
         `;
-       
+               // Önce mesajı UI'a ekle
         addMessageToUI(htmlContent, 'ai', true);
 
-
-
+        // --- EN ÖNEMLİ KISIM ---
+        // Yeni bir AI cevabı geldiğini belirtmek için tarayıcının hafızasına bir işaret bırak.
+        localStorage.setItem('newAiMessageFlag', Date.now());
 
     } catch (error) {
         console.error("İlan slider'ı oluşturulurken hata:", error);

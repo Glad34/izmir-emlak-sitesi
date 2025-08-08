@@ -382,13 +382,21 @@ body {
  <!-- İletişim -->
  
  <!-- İletişim Butonu (Başlangıçta sadece bu görünecek) -->
- <div id="iletisim-launcher" class="fixed bottom-6 right-6 z-50">
-   <button id="openContact"
-         style="background-color: #c8cac9;"
-         class="w-14 h-14 hover:bg-blue-700 rounded-full flex items-center justify-center shadow-xl transition duration-300">
-     <img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" class="w-6 h-6" alt="İletişim">
-   </button>
- </div>
+ <!-- ======================================= -->
+<!-- YENİ HAREKETE GEÇİRİCİ İLETİŞİM BUTONU -->
+<!-- ======================================= -->
+<div id="iletisim-launcher" class="cta-launcher">
+  <!-- Mesaj Balonu -->
+  <div class="cta-bubble">
+    Size özel evi bulalım!
+    <div class="cta-bubble-arrow"></div>
+  </div>
+  
+  <!-- Ana Buton (Sizin Resminizle) -->
+  <button id="openContact" class="cta-button">
+    <img src="images/danisman.png" alt="Onur Başaran - Gayrimenkul Danışmanı">
+  </button>
+</div>
  
  <!-- Açılır Menü (başlangıçta gizli) -->
  <div id="iletisim-menusu"

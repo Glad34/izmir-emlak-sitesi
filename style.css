@@ -380,3 +380,110 @@ body, p, a, span, li, td, th, input, button {
    }
 
    
+
+   /* ======================================= */
+/* HAREKETE GEÇİRİCİ İLETİŞİM BUTONU STİLLERİ */
+/* ======================================= */
+
+/* Ana Kapsayıcı: Balon ve butonu bir arada tutar */
+.cta-launcher {
+  position: fixed;
+  bottom: 24px; /* 1.5rem */
+  right: 24px; /* 1.5rem */
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Buton ile balon arasındaki boşluk */
+}
+
+/* Ana Buton: Sizin resminizi içeren yuvarlak kısım */
+.cta-button {
+  width: 64px;  /* 16 -> 4rem */
+  height: 64px;
+  border-radius: 9999px; /* Tam yuvarlak yapar */
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.2), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 3px solid white; /* Resmin etrafına beyaz bir çerçeve */
+  transition: transform 0.3s ease;
+  
+  /* Kalp Atışı Animasyonu */
+  animation: heartbeat 1.5s ease-in-out infinite both;
+}
+
+.cta-button:hover {
+  transform: scale(1.1); /* Üzerine gelince hafifçe büyür */
+}
+
+.cta-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 9999px; /* Resmin de tam yuvarlak olmasını sağlar */
+}
+
+/* Mesaj Balonu */
+.cta-bubble {
+  position: relative;
+  background-color: white;
+  color: #1f2937; /* Koyu gri */
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  /* Başlangıçta gizli, animasyonla gelecek */
+  opacity: 0;
+  transform: translateX(10px);
+  animation: slide-in 0.5s forwards;
+  animation-delay: 1s; /* Sayfa yüklendikten 1 saniye sonra belirir */
+  white-space: nowrap; /* Mesajın tek satırda kalmasını sağlar */
+}
+
+/* Balonun oku */
+.cta-bubble-arrow {
+  position: absolute;
+  top: 50%;
+  right: -8px; /* Balonun sağına yapışık */
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+
+/* --- ANİMASYONLAR --- */
+
+/* Kalp Atışı Animasyonu */
+@keyframes heartbeat {
+  from {
+    transform: scale(1);
+    animation-timing-function: ease-out;
+  }
+  10% {
+    transform: scale(0.91);
+    animation-timing-function: ease-in;
+  }
+  17% {
+    transform: scale(0.98);
+    animation-timing-function: ease-out;
+  }
+  33% {
+    transform: scale(0.87);
+    animation-timing-function: ease-in;
+  }
+  45% {
+    transform: scale(1);
+    animation-timing-function: ease-out;
+  }
+}
+
+/* Mesaj Balonunun Yandan Gelme Animasyonu */
+@keyframes slide-in {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
