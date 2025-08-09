@@ -6,15 +6,15 @@
   <title>İlan Detayları</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css"> <!-- Ana stil dosyanız -->
-  <link rel="stylesheet" href="ilan-detay.css"> <!-- Sadece bu sayfaya özel stiller için -->
+  <!-- Swiper.js CSS'i eklendi -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="ilan-detay.css">
 </head>
 <body class="bg-gray-100">
 
-  <!-- Header -->
   <div id="header-placeholder"></div>
 
-  <!-- Ana İçerik -->
   <main class="max-w-6xl mx-auto py-8 px-4">
     <div id="loading-spinner" class="text-center py-20">
       <i class="fas fa-spinner fa-spin fa-3x text-gray-500"></i>
@@ -22,49 +22,83 @@
     </div>
 
     <div id="ilan-icerik" class="hidden">
-      <!-- Başlık ve Konum -->
       <section class="mb-6">
         <h1 id="ilan-baslik" class="text-3xl font-bold text-gray-800"></h1>
         <p id="ilan-konum" class="text-gray-600 mt-1 flex items-center gap-2"><i class="fas fa-map-marker-alt"></i></p>
       </section>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Sol Taraf: Galeri ve Açıklama -->
+        <!-- Sol Taraf: Galeri ve Yeni Sekmeli Yapı -->
         <div class="lg:col-span-2">
-          <!-- Resim Galerisi -->
+          
+          <!-- YENİ SWIPER RESİM GALERİSİ -->
           <section id="resim-galerisi" class="mb-8">
-            <div class="main-image-container mb-2">
-              <img id="ana-resim" src="" alt="İlan Ana Resmi" class="w-full h-auto object-cover rounded-lg shadow-lg">
+            <!-- Ana Resim Slider'ı -->
+            <div class="swiper main-swiper">
+              <div class="swiper-wrapper" id="main-swiper-wrapper">
+                <!-- Ana resimler JS ile buraya eklenecek -->
+              </div>
+              <div class="swiper-button-next"></div>
+              <div class="swiper-button-prev"></div>
+              <div class="swiper-pagination"></div>
             </div>
-            <div id="thumbnail-galeri" class="thumbnail-grid">
-              <!-- Küçük resimler buraya JS ile eklenecek -->
+
+            <!-- Küçük Resimler (Thumbnails) Slider'ı -->
+            <div class="swiper thumbs-swiper">
+              <div class="swiper-wrapper" id="thumbs-swiper-wrapper">
+                <!-- Küçük resimler JS ile buraya eklenecek -->
+              </div>
             </div>
           </section>
 
-          <!-- Açıklama Bölümü -->
-          <section class="bg-white p-6 rounded-lg shadow">
-            <h2 class="text-2xl font-semibold border-b pb-3 mb-4">İlan Açıklaması</h2>
-            <div id="ilan-aciklama" class="prose max-w-none text-gray-700 leading-relaxed"></div>
+          <!-- YENİ SEKMELİ YAPI (TABS) -->
+          <section class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="tab-buttons">
+              <button class="tab-button active" data-tab="tab-aciklama">İlan Açıklaması</button>
+              <button class="tab-button" data-tab="tab-ozellikler">Özellikler</button>
+              <button class="tab-button" data-tab="tab-konum">Konum</button>
+            </div>
+            <div class="tab-content">
+              <!-- Açıklama Sekmesi -->
+              <div id="tab-aciklama" class="tab-pane active">
+                <div id="ilan-aciklama" class="prose max-w-none"></div>
+              </div>
+              <!-- Özellikler Sekmesi -->
+              <div id="tab-ozellikler" class="tab-pane">
+                <ul id="ilan-ozellikler-tab" class="space-y-3"></ul>
+              </div>
+              <!-- Konum Sekmesi -->
+              <div id="tab-konum" class="tab-pane">
+                <iframe id="harita-iframe"
+                  width="100%"
+                  height="450"
+                  style="border:0;"
+                  allowfullscreen=""
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+              </div>
+            </div>
           </section>
         </div>
 
-        <!-- Sağ Taraf: Fiyat, Özellikler ve Danışman -->
+        <!-- Sağ Taraf: Fiyat ve Danışman (Özellikler buradan taşındı) -->
         <div class="lg:col-span-1 space-y-8">
-          <!-- Fiyat Bilgisi -->
-          <section class="bg-white p-6 rounded-lg shadow text-center">
-            <p class="text-gray-600">Satış Fiyatı</p>
-            <p id="ilan-fiyat" class="text-4xl font-bold text-blue-600 my-2"></p>
-          </section>
+          <section class="price-box">
+  <div class="price-header">
+    <i class="fas fa-tags price-icon"></i>
+    <span>İlan Fiyatı</span>
+  </div>
+  <div class="price-amount" id="ilan-fiyat">
+    <!-- Fiyat JS ile buraya eklenecek -->
+  </div>
+  <!-- İsteğe bağlı olarak fiyatla ilgili ek bilgi eklenebilir -->
+  <div class="price-footer">
+    Krediye uygunluk durumu için bilgi alınız.
+  </div>
+</section>
+          
 
-          <!-- İlan Özellikleri -->
-          <section class="bg-white p-6 rounded-lg shadow">
-            <h2 class="text-xl font-semibold border-b pb-3 mb-4">Özellikler</h2>
-            <ul id="ilan-ozellikler" class="space-y-3">
-              <!-- Özellikler buraya JS ile eklenecek -->
-            </ul>
-          </section>
-
-          <!-- Danışman Bilgileri -->
           <section class="bg-white p-6 rounded-lg shadow">
             <h2 class="text-xl font-semibold mb-4">Danışman Bilgileri</h2>
             <div class="flex items-center gap-4">
@@ -74,8 +108,8 @@
                 <p class="text-gray-600">Gayrimenkul Danışmanı</p>
               </div>
             </div>
-            <a id="danisman-tel" href="" class="bg-green-500 text-white w-full mt-4 inline-block text-center py-3 rounded-lg hover:bg-green-600 transition duration-300">
-              <i class="fab fa-whatsapp mr-2"></i>WhatsApp'tan Ulaş
+            <a id="danisman-tel" href="" class="bg-green-500 text-white w-full mt-4 inline-block text-center py-3 rounded-lg hover:bg-green-600 transition">
+              <i class="fab fa-whatsapp mr-2"></i>Canlı Whatsapp Hattı
             </a>
           </section>
         </div>
@@ -83,9 +117,10 @@
     </div>
   </main>
 
-  <!-- Footer -->
   <div id="footer-placeholder"></div>
 
+  <!-- Swiper.js eklendi -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script src="ilan-detay.js"></script>
 </body>
 </html>

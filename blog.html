@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog - Gayrimenkul Yatırım Rehberi</title>
+
+  <!-- Gerekli İkon ve Stil Dosyaları -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f9fafb; /* Header ve Footer ile uyumlu nötr arka plan */
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    /* Sayfanın ana bölümü için sarmalayıcı */
+    .blog-page-wrapper {
+        min-height: 80vh; /* Sayfanın en azından ekranı doldurmasını sağlar */
+    }
+    
+    /* Sayfa başlığı (Hero Alanı) */
+    .blog-hero {
+        background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('images/emsal.jpg'); /* BURAYA KENDİ RESMİNİZİ EKLEYİN */
+        background-size: cover;
+        background-position: center;
+        padding: 5rem 1rem;
+        text-align: center;
+        color: white;
+    }
+    .blog-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+    }
+    .blog-hero p {
+        font-size: 1.125rem;
+        max-width: 600px;
+        margin: 1rem auto 0;
+        opacity: 0.9;
+    }
+    
+    /* Blog içeriğinin ana konteyneri */
+    .blog-container {
+      max-width: 1100px;
+      margin: 2.5rem auto;
+      padding: 0 1.25rem;
+    }
+    
+    /* Kategori Butonları */
+    .blog-categories {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+    }
+    .blog-categories a {
+        background-color: #fff;
+        color: #374151;
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
+        text-decoration: none;
+        font-weight: 500;
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
+    }
+    .blog-categories a:hover, .blog-categories a.active {
+        background-color: #111827;
+        color: white;
+        border-color: #111827;
+    }
+    
+    /* Yazıların listelendiği grid yapısı */
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    /* Her bir blog yazısı kartı */
+    .blog-card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+      color: #1f2937;
+      display: flex;
+      flex-direction: column;
+    }
+    .blog-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+    .blog-card__image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    .blog-card__content {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    .blog-card__category {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      align-self: flex-start;
+      margin-bottom: 0.75rem;
+    }
+    .blog-card__title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+    }
+    .blog-card__excerpt {
+      font-size: 0.9rem;
+      color: #6b7280;
+      line-height: 1.6;
+      flex-grow: 1;
+    }
+    .blog-card__readmore {
+        display: inline-block;
+        margin-top: 1rem;
+        font-weight: 600;
+        color: #2563eb;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="header-placeholder"></div>
+
+  <div class="blog-page-wrapper">
+    <section class="blog-hero">
+      <h1>Blog & Gayrimenkul Haberleri</h1>
+      <p>İzmir emlak piyasasındaki en son trendler, yatırım tavsiyeleri ve satış stratejileri üzerine güncel yazılar.</p>
+    </section>
+
+    <main class="blog-container">
+      <div class="blog-categories">
+        <a href="#" class="active">Tümü</a>
+        <a href="#">Yatırım Rehberi</a>
+        <a href="#">Satıcı İpuçları</a>
+        <a href="#">Bölge Analizi</a>
+        <a href="#">Piyasa Haberleri</a>
+      </div>
+
+      <div class="blog-grid">
+        <!-- Blog Yazısı 1 -->
+        <a href="blog-yazi-1.html" class="blog-card">
+          <img src="images/fotocekimi.png" alt="Satışa hazırlanan bir evin salonu" class="blog-card__image">
+          <div class="blog-card__content">
+            <span class="blog-card__category">Satıcı İpuçları</span>
+            <h3 class="blog-card__title">Evinizi Satışa Hazırlamanın 5 Altın Kuralı</h3>
+            <p class="blog-card__excerpt">Mülkünüzü en iyi fiyata ve en kısa sürede satmak için profesyonel bir hazırlık süreci kritik öneme sahiptir. İşte dikkat etmeniz gerekenler...</p>
+            <span class="blog-card__readmore">Devamını Oku &rarr;</span>
+          </div>
+        </a>
+
+        <!-- Blog Yazısı 2 -->
+        <a href="blog-yazi-2.html" class="blog-card">
+          <img src="images/urla.png" alt="Urla'dan bir manzara" class="blog-card__image">
+          <div class="blog-card__content">
+            <span class="blog-card__category">Yatırım Rehberi</span>
+            <h3 class="blog-card__title">İzmir'in Yükselen Değeri: Urla'da Yatırım Yapmak İçin 3 Neden</h3>
+            <p class="blog-card__excerpt">Doğası, gastronomisi ve artan popülaritesiyle Urla, yatırımcılar için neden İzmir'in en cazip bölgelerinden biri haline geldi? İşte cevapları...</p>
+            <span class="blog-card__readmore">Devamını Oku &rarr;</span>
+          </div>
+        </a>
+        
+        <!-- YENİ YAZILARINIZI BURAYA KOPYALAYIP EKLEYEBİLİRSİNİZ -->
+
+      </div>
+    </main>
+  </div>
+
+  <div id="footer-placeholder"></div>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      fetch("header.html").then(res => res.text()).then(data => { document.getElementById("header-placeholder").innerHTML = data; });
+      fetch("footer.html").then(res => res.text()).then(data => { document.getElementById("footer-placeholder").innerHTML = data; });
+    });
+  </script>
+  <script src="script.js"></script> <!-- Ana script dosyanız -->
+
+</body>
+</html>

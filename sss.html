@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sıkça Sorulan Sorular</title>
+
+  <!-- Gerekli İkon ve Stil Dosyaları -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <style>
+    /* 1. ADIM: Body stilini, header/footer ile uyumlu olması için nötr bırakıyoruz. */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa; /* Sayfanın genel, açık renkli arka planı */
+      margin: 0;
+    }
+
+    /* 2. ADIM: Sayfanın ana içeriğini bu sarmalayıcıya alıyoruz */
+    .faq-page-wrapper {
+      padding: 40px 20px; /* Header ve footer ile arasında boşluk */
+    }
+
+    /* Geri kalan tüm orijinal SSS stilleri burada */
+    .faq-container {
+      max-width: 800px;
+      margin: auto;
+    }
+    .faq-container h2 {
+      text-align: center;
+      color: #111828;
+      margin-bottom: 20px;
+      font-size: 2rem; /* Boyutu biraz büyüttük */
+      font-weight: bold;
+    }
+    .faq-item {
+      border-radius: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      border: 1px solid #ddd;
+      transition: box-shadow 0.2s ease-in-out;
+    }
+    .faq-item:hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+    }
+    .faq-question {
+      padding: 15px 20px;
+      background: #111828;
+      color: #fff;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .faq-question:hover {
+      background: #1e293b;
+    }
+    /* Artı/Eksi ikonu için */
+    .faq-question::after {
+        content: '+';
+        font-size: 22px;
+        transition: transform 0.2s ease;
+    }
+    .faq-question.active::after {
+        transform: rotate(45deg);
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      padding: 0 20px; /* Dikey padding animasyon için sıfırlandı */
+      background: #fff;
+      color: #333;
+      line-height: 1.6;
+      transition: max-height 0.4s ease-out, padding 0.4s ease-out; /* Animasyon eklendi */
+    }
+    .faq-answer p {
+        padding: 15px 0; /* İçeriğin padding'i p elementine verildi */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======================== HEADER BÖLÜMÜ ======================== -->
+  <div id="header-placeholder"></div>
+  <!-- ====================== HEADER BÖLÜMÜ SONU ====================== -->
+
+  <!-- Sayfanın ana içeriği bu sarmalayıcının içinde -->
+  <div class="faq-page-wrapper">
+    <main class="faq-container">
+      <h2>Gayrimenkul & Yatırım - Sıkça Sorulan Sorular</h2>
+
+      <div class="faq-item">
+        <div class="faq-question">2025 yılında gayrimenkul yatırımında en kârlı bölgeler hangileri?</div>
+        <div class="faq-answer">
+          <p>2025’te İzmir’in Urla, Güzelbahçe ve Çeşme bölgeleri ile İstanbul’un Anadolu Yakası’ndaki bazı semtleri yüksek değer artışı potansiyeline sahip. Ayrıca gelişen ulaşım projeleri olan bölgeler yatırım açısından cazip hale geliyor.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">Ev alırken tapu işlemlerinde nelere dikkat etmeliyim?</div>
+        <div class="faq-answer">
+          <p>Tapu kayıtlarında ipotek, haciz veya şerh olup olmadığını kontrol edin. Kat mülkiyeti veya kat irtifakı durumunu öğrenin. Ekspertiz raporu ve belediye imar durumu belgelerini inceleyin.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">Kira getirisi nedir ve nasıl hesaplanır?</div>
+        <div class="faq-answer">
+          <p>Kira getirisi, bir gayrimenkulün yıllık kira gelirinin satış fiyatına oranıdır. Formül: <strong>(Yıllık Kira Geliri / Satış Fiyatı) x 100</strong>. %4-%6 arası getiriler genelde normal kabul edilir.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">Gayrimenkul alımında kredi mi peşin ödeme mi avantajlıdır?</div>
+        <div class="faq-answer">
+          <p>Eğer faiz oranları düşükse kredi ile almak nakit akışınızı korumanızı sağlar. Ancak yüksek faiz dönemlerinde peşin alım genellikle daha avantajlıdır.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">Ev fiyatlarını etkileyen başlıca faktörler nelerdir?</div>
+        <div class="faq-answer">
+          <p>Konum, ulaşım olanakları, bölgedeki altyapı projeleri, arz-talep dengesi, ekonomik durum ve gayrimenkulün fiziksel özellikleri fiyatları etkileyen temel unsurlardır.</p>
+        </div>
+      </div>
+    </main>
+  </div> <!-- .faq-page-wrapper sonu -->
+
+
+  <!-- ======================== FOOTER BÖLÜMÜ ======================== -->
+  <div id="footer-placeholder"></div>
+  <!-- ====================== FOOTER BÖLÜMÜ SONU ====================== -->
+
+
+  <!-- ======================== TÜM SCRIPTLER ======================== -->
+  <script>
+    // --- SAYFA TAMAMEN YÜKLENDİKTEN SONRA ÇALIŞACAK KODLAR ---
+    document.addEventListener("DOMContentLoaded", function() {
+
+      // --- HEADER VE FOOTER'I YÜKLEME ---
+      fetch("header.html")
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("header-placeholder").innerHTML = data;
+          // Not: Mobil menü ve scroll efektleri için ana script.js dosyasını
+          // sayfanıza eklemeyi unutmayın.
+          const menuToggle = document.getElementById("menu-toggle");
+          const mobileMenu = document.getElementById("mobile-menu");
+          if (menuToggle && mobileMenu) {
+            menuToggle.addEventListener("click", function () {
+              mobileMenu.classList.toggle("active");
+            });
+          }
+        });
+
+      fetch("footer.html")
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("footer-placeholder").innerHTML = data;
+          // Footer'dan gelen iletişim menüsü için gerekli script
+          const launcher = document.getElementById("iletisim-launcher");
+          const menu = document.getElementById("iletisim-menusu");
+          const openBtn = document.getElementById("openContact");
+          const closeBtn = document.getElementById("closeContact");
+          if (launcher && menu && openBtn && closeBtn) {
+            openBtn.addEventListener("click", () => {
+              launcher.style.display = "none";
+              menu.classList.remove("hidden");
+            });
+            closeBtn.addEventListener("click", () => {
+              menu.classList.add("hidden");
+              launcher.style.display = "block";
+            });
+          }
+        });
+
+      // --- SSS SAYFASINA ÖZEL AKORDİYON MENÜ SCRIPT'İ ---
+      document.querySelectorAll(".faq-question").forEach(q => {
+        q.addEventListener("click", () => {
+          const answer = q.nextElementSibling;
+          q.classList.toggle('active'); // "active" sınıfı ekleyip çıkarır (ikon için)
+
+          // Cevap kısmını açıp kapatma animasyonu
+          if (answer.style.maxHeight) {
+            answer.style.maxHeight = null;
+            answer.style.padding = "0 20px"; // Dikey padding'i kapat
+          } else {
+            answer.style.maxHeight = answer.scrollHeight + "px";
+            answer.style.padding = "0 20px"; // Padding'i koru
+          }
+        });
+      });
+    });
+  </script>
+  
+  <!-- Ana script dosyanızı buraya ekleyin (scroll efekti için gerekli) -->
+  <script src="script.js"></script>
+
+</body>
+</html>

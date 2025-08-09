@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>İzmir'in Yükselen Değeri: Urla'da Yatırım Yapmak İçin 3 Neden</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <!-- Önceki blog yazısı sayfasıyla aynı stilleri kullanıyoruz -->
+  <style>
+    body { background-color: #f9fafb; margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .blog-post-wrapper { padding: 40px 20px; }
+    .blog-post { max-width: 800px; margin: auto; background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+    .blog-post__header { text-align: center; margin-bottom: 2rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 1.5rem; }
+    .blog-post__category { display: inline-block; background-color: #dbeafe; color: #1e40af; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.875rem; font-weight: 500; margin-bottom: 1rem; } /* Kategori rengi değişti */
+    .blog-post__title { font-size: 2.25rem; font-weight: 700; color: #111827; margin: 0; line-height: 1.2; }
+    .blog-post__meta { font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem; }
+    .blog-post__image { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem; }
+    .blog-post__content { color: #374151; line-height: 1.8; font-size: 1.1rem; }
+    .blog-post__content h2 { font-size: 1.75rem; font-weight: 600; color: #1f2937; margin-top: 2.5rem; margin-bottom: 1rem; }
+    .blog-post__content p, .blog-post__content ul { margin-bottom: 1rem; }
+    .blog-post__content ul { list-style-type: disc; padding-left: 1.5rem; }
+    .blog-post__back-link { display: inline-block; margin-top: 3rem; color: #2563eb; text-decoration: none; font-weight: 500; }
+  </style>
+</head>
+<body>
+
+  <div id="header-placeholder"></div>
+
+  <div class="blog-post-wrapper">
+    <article class="blog-post">
+      <header class="blog-post__header">
+        <span class="blog-post__category">Yatırım Rehberi</span>
+        <h1 class="blog-post__title">İzmir'in Yükselen Değeri: Urla'da Yatırım Yapmak İçin 3 Neden</h1>
+        <p class="blog-post__meta">Yayınlanma Tarihi: 22 Mayıs 2024 | Yazar: Onur Başaran</p>
+      </header>
+
+      <img src="images/urla.png" alt="Urla'da deniz kenarında bir kasaba manzarası" class="blog-post__image">
+
+      <div class="blog-post__content">
+        <p>Son yıllarda İzmir'in parlayan yıldızı haline gelen Urla, sadece yaşamak için değil, aynı zamanda kârlı bir gayrimenkul yatırımı yapmak için de en gözde bölgelerden biri. Peki Urla'yı bu kadar özel kılan ne? İşte yatırımcılar için en önemli 3 neden:</p>
+
+        <h2>1. Stratejik Konum ve Ulaşım Kolaylığı</h2>
+        <p>Urla, İzmir şehir merkezi ile Çeşme gibi popüler bir tatil destinasyonunun tam ortasında yer alıyor. İzmir-Çeşme otoyolu sayesinde hem şehir hayatına hem de tatil beldelerine 30 dakika gibi kısa bir sürede ulaşım imkanı sunuyor. Bu stratejik konum, bölgeyi hem sürekli yaşamak isteyenler hem de yazlıkçılar için cazip kılıyor, bu da kira potansiyelini ve mülk değerini sürekli artırıyor.</p>
+
+        <h2>2. Gelişen Sosyal ve Kültürel Yaşam</h2>
+        <p>Urla, artık sadece bir sahil kasabası değil. Bağları, şarap üreticileri, gurme restoranları, sanat sokakları ve yıl boyunca düzenlenen festivalleri ile zengin bir kültürel yaşam sunuyor. Bu nitelikli sosyal çevre, bölgeye olan talebi artırıyor ve gayrimenkul fiyatlarının istikrarlı bir şekilde yükselmesini sağlıyor.</p>
+
+        <h2>3. Korunan Doğa ve Artan Talep</h2>
+        <p>Urla'nın büyük bir kısmının doğal sit alanı olması, bölgedeki yapılaşmayı sınırlıyor. Sınırlı arsa arzı, mevcut ve yeni yapılan nitelikli konut projelerine olan talebi her geçen gün artırıyor. Doğayla iç içe, sakin ama aynı zamanda sosyal bir yaşam arayanlar için Urla, alternatifsiz bir seçenek haline geliyor. Bu durum, uzun vadede mülk değerlerinin artmaya devam edeceğinin en büyük garantisidir.</p>
+
+        <p>Sonuç olarak, Urla; konumu, sosyal dokusu ve sınırlı arzıyla İzmir'de gayrimenkul yatırımı düşünenler için hem güvenli bir liman hem de yüksek getiri potansiyeli sunan bir bölge olarak öne çıkıyor.</p>
+        
+        <a href="blog.html" class="blog-post__back-link">&larr; Tüm Yazılara Geri Dön</a>
+      </div>
+    </article>
+  </div>
+
+  <div id="footer-placeholder"></div>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      fetch("header.html").then(res => res.text()).then(data => { document.getElementById("header-placeholder").innerHTML = data; });
+      fetch("footer.html").then(res => res.text()).then(data => { document.getElementById("footer-placeholder").innerHTML = data; });
+    });
+  </script>
+  <script src="script.js"></script>
+
+</body>
+</html>

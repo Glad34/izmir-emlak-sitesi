@@ -138,3 +138,6 @@ window.addEventListener("load", function() {
     }
   }, 1000); // Kontrol sıklığı: 1 saniye
 });
+
+
+

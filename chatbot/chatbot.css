@@ -30,9 +30,6 @@
   display: none;
 }
 
-
-
-
 /* ======================================= */
 /* CHATBOT İÇ YAPISI                       */
 /* ======================================= */
@@ -46,8 +43,8 @@
   border: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
-  height: 60vh; /* Yüksekliği ekranın %60'ı kadar yap */
-  max-height: 550px; /* Çok uzamasını engelle */
+  height: 70vh; /* Yüksekliği ekranın %60'ı kadar yap */
+  max-height: 700px; /* Çok uzamasını engelle */
 }
 
 

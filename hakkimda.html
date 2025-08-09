@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gaziemir - Yatırım Rehberi</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="chatbot/chatbot.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Arapey&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+<body class="text-gray-800 bg-gray-50"></body>
+<style>
+  .about-onur__container{max-width:1100px;margin:40px auto;padding:0 20px;font-family:Inter,system-ui,Arial,sans-serif;color:#1f2937}
+  .about-onur__head{text-align:center;margin-bottom:24px}
+  .about-onur__title{font-size:clamp(22px,4.2vw,32px);line-height:1.2;margin:0 0 6px;font-weight:800}
+  .about-onur__subtitle{font-size:clamp(13px,2.8vw,16px);color:#6b7280;margin:0}
+  .about-onur__img{width:100%;height:auto;border-radius:14px;box-shadow:0 10px 25px rgba(0,0,0,.12);object-fit:cover}
+  .about-onur__cap{font-size:12px;color:#9ca3af;margin-top:8px}
+  .about-onur__article p{line-height:1.8;margin:0 0 12px}
+  .about-onur__h2{font-size:clamp(18px,3.5vw,22px);margin:18px 0 10px;font-weight:700}
+  .about-onur__h3{font-size:clamp(16px,3.2vw,18px);margin:16px 0 8px;font-weight:700}
+  .about-onur__list{margin:0 0 12px;padding-left:18px;line-height:1.9}
+  .about-onur__info-card{background:#0f172a;border:1px solid #0b1222;border-radius:14px;padding:16px;color:#e5e7eb;margin-top:18px}
+  .about-onur__info-card a{color:#93c5fd;text-decoration:none}
+  .about-onur__info-grid{display:grid;grid-template-columns:1fr;gap:8px;list-style:none;padding:0;margin:0 0 12px;line-height:1.9}
+  .about-onur__btns{display:flex;gap:10px;flex-wrap:wrap}
+  .about-onur__btn{flex:1 1 140px;text-align:center;border-radius:10px;padding:10px 12px;text-decoration:none;font-weight:700;color:#fff}
+  .about-onur__btn--wa{background:#22c55e}
+  .about-onur__btn--rdv{background:#2563eb}
+  @media (min-width: 900px){
+    .about-onur__info-grid{grid-template-columns:1fr 1fr}
+  }
+</style>
+
+ <!-- Header -->
+ <div id="header-placeholder"></div>
+ <script>
+   fetch("header.html")
+     .then(res => res.text())
+     .then(data => {
+       document.getElementById("header-placeholder").innerHTML = data;
+       const menuToggle = document.getElementById("menu-toggle");
+       const mobileMenu = document.getElementById("mobile-menu");
+       if (menuToggle && mobileMenu) {
+         menuToggle.addEventListener("click", function () {
+           mobileMenu.classList.toggle("active");
+         });
+       }
+     });
+ </script>
+
+<section class="about-onur__container">
+  <header class="about-onur__head">
+    <h1 class="about-onur__title">Onur Başaran Hakkında</h1>
+    <p class="about-onur__subtitle">İzmir genelinde dijital destekli modern gayrimenkul danışmanlığı</p>
+  </header>
+
+  <figure style="margin:0 0 20px">
+    <img class="about-onur__img" src="images/profil1.png" alt="Onur Başaran - RE/MAX UP Gayrimenkul Danışmanı" loading="lazy">
+    <figcaption class="about-onur__cap">Danışmanlıkta teknoloji, şeffaflık ve veriye dayalı yaklaşım.</figcaption>
+  </figure>
+
+  <!-- ÖZGEÇMİŞ -->
+  <article class="about-onur__article">
+    <h2 class="about-onur__h2">Kısa Özgeçmişim</h2>
+    <p>Uçak mühendisiyim; kariyerimin ilk yıllarında <strong>dijital pazarlama, e-ticaret ve sosyal medya yönetimi</strong> alanlarında çalıştım. Birçok firmada <strong>ürün satış liderliği</strong> ve <strong>ekip yöneticiliği</strong> yaptım. Telefon, yüz yüze ve online kanallarda binlerce satış tecrübesi edindim. Bu sayede bir ürünü veya hizmeti <strong>nasıl konumlandıracağımı, nasıl pazarlayacağımı ve nasıl sonuç alacağımı</strong> çok iyi biliyorum.</p>
+    <p>Bugün bu birikimi, RE/MAX UP bünyesinde <strong>gayrimenkul alım-satım ve yatırım</strong> süreçlerine aktarıyorum. İzmir’in dinamik pazarında, <strong>veri odaklı analiz</strong>, <strong>doğru fiyatlama</strong> ve <strong>etkili dijital görünürlük</strong> ile müşterilerime maksimum fayda sağlamayı hedefliyorum.</p>
+
+    <h3 class="about-onur__h3">Deneyim & Uzmanlık</h3>
+    <ul class="about-onur__list">
+      <li>Performans odaklı pazarlama ve e-ticaret yönetimi</li>
+      <li>Satış ekipleri kurma, hedef & süreç yönetimi</li>
+      <li>Telefon, yüz yüze ve online satış teknikleri</li>
+      <li>Gayrimenkulde dijital pazarlama (Google/Meta), profesyonel sunum & fotoğraf</li>
+      <li>Veri temelli fiyatlama, talep analizi ve bölge raporları</li>
+    </ul>
+
+    <h3 class="about-onur__h3">Gayrimenkulde Yaklaşımım</h3>
+    <p><strong>Şeffaflık:</strong> Tüm süreci açık ve ölçülebilir metriklerle yönetirim.</p>
+    <p><strong>Veri:</strong> Bölge karşılaştırmaları, m² fiyat trendleri ve benzer satış analizleri ile karar veririz.</p>
+    <p><strong>Tanıtım:</strong> Doğru hedef kitleye erişen, profesyonel ve kreatif bir pazarlama planı uygularım. Amaç, en iyi değerde ve planlanan zamanda sonuç almaktır.</p>
+  </article>
+
+  <!-- BİLGİLER (Özgeçmişin ALTINDA) -->
+  <section class="about-onur__info-card">
+    <h3 class="about-onur__h3" style="margin-top:0">Bilgiler</h3>
+    <ul class="about-onur__info-grid">
+      <li><strong>Bağlı Ofis:</strong> RE/MAX UP</li>
+      <li><strong>Konum:</strong> İzmir / Narlıdere</li>
+      <li><strong>Hizmet Bölgeleri:</strong> Narlıdere, Balçova, Güzelbahçe ve İzmir geneli</li>
+      <li><strong>Lisans No:</strong> YB0271/17UY0333-5/00/3516</li>
+      <li><strong>E-posta:</strong> <a href="mailto:onurbasaran@remaxup.com.tr">onurbasaran@remaxup.com.tr</a></li>
+      <li><strong>Telefon:</strong> <a href="tel:+905308775368">+90 530 877 53 68</a></li>
+    </ul>
+
+    <h4 style="font-size:14px;margin:8px 0 6px;font-weight:700">Kişisel</h4>
+    <p style="line-height:1.8;margin:0 0 12px">Evliyim ve 1 kız çocuğu babasıyım. Boş zamanlarımda teknoloji, veri analizi ve içerik üretimiyle ilgilenirim.</p>
+
+    <div class="about-onur__btns">
+      <a class="about-onur__btn about-onur__btn--wa" href="https://wa.me/905308775368" target="_blank">WhatsApp</a>
+      <a class="about-onur__btn about-onur__btn--rdv" href="/iletisim">Randevu Al</a>
+    </div>
+  </section>
+</section>
+
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"RealEstateAgent",
+  "name":"Onur Başaran",
+  "image":"/assets/img/about-cover.jpg",
+  "telephone":"+905308775368",
+  "email":"onurbasaran@remaxup.com.tr",
+  "areaServed":"İzmir",
+  "address":{"@type":"PostalAddress","addressLocality":"Narlıdere","addressRegion":"İzmir","addressCountry":"TR"},
+  "memberOf":"RE/MAX UP",
+  "description":"İzmir genelinde dijital destekli modern gayrimenkul danışmanlığı. Veri odaklı fiyatlama, etkili dijital pazarlama ve şeffaf süreç yönetimi."
+}
+</script>
+<!-- Footer -->
+<div id="footer-placeholder"></div>
+
+<div id="chatbot-popup" class="chatbot-hidden"> 
+  
+  <!-- Bu sizin mevcut chatbot yapınız -->
+  <div id="chat-widget"> 
+    <div id="chat-header">
+      <img src="images/REMAX LOGO 2.png" alt="Danışman">
+      <div>
+        <h1>Onur Başaran</h1>
+        <h2>Gayrimenkul Danışmanı</h2>
+        <span>Çevrimiçi</span>
+      </div>
+      <!-- Kapatma Düğmesini ekleyelim -->
+      <button id="chatbot-kapat-btn" style="background:none; border:none; font-size: 24px; cursor:pointer; color: #555;">&times;</button>
+    </div>
+    <div id="chat-messages">
+      <div class="message ai-message">Merhaba! Hayalinizdeki evi bulmanıza yardımcı olmak için buradayım. Lütfen isteklerinizi yazın.</div>
+    </div>
+    <form id="chat-input-form">
+      <input type="text" id="user-input" placeholder="Mesajınızı yazın..." autocomplete="off" required>
+      <button type="submit">Gönder</button>
+    </form>
+  </div>
+  
+</div>
+<script>
+  fetch("footer.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("footer-placeholder").innerHTML = data;
+      const launcher = document.getElementById("iletisim-launcher");
+      const menu = document.getElementById("iletisim-menusu");
+      const openBtn = document.getElementById("openContact");
+      const closeBtn = document.getElementById("closeContact");
+      if (openBtn && closeBtn) {
+        openBtn.addEventListener("click", () => {
+          launcher.style.display = "none";
+          menu.classList.remove("hidden");
+        });
+        closeBtn.addEventListener("click", () => {
+          menu.classList.add("hidden");
+          launcher.style.display = "block";
+        });
+      }
+    });    
+</script>
+<script src="script.js"></script>
+<script src="chatbot/chatbot.js"></script>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>İletişim — Onur Başaran | RE/MAX UP</title>
+
+  <!-- Font & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Bu sayfanın Tailwind CSS'e ihtiyacı yok ama header/footer için ekliyoruz -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <!-- Leaflet (Harita) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root{
+      --bg:#0b1222; --card:#0f172a; --muted:#9ca3af; --text:#e5e7eb; --brand:#2563eb; --ok:#22c55e;
+      --accent:#e11d48;
+    }
+
+    /* 1. ADIM: Body stilini, header/footer ile uyumlu olması için nötr bırakıyoruz. */
+    body{
+      margin:0;
+      font-family: Inter, system-ui, Arial, sans-serif;
+      background-color: #f9fafb; /* Footer'dan gelen renkle uyumlu hale getirdik */
+    }
+
+    /* 2. ADIM: Tüm koyu içeriği bu sarmalayıcıya alıyoruz ve stilleri buraya taşıyoruz */
+    .page-wrapper--dark {
+      background: var(--bg);
+      color: var(--text);
+      padding: 40px 0; /* Header ve footer ile arasında boşluk bırakmak için */
+    }
+
+    .contact-onur__container{max-width:1200px;margin:0 auto;padding:0 16px;}
+    .contact-onur__head{text-align:center;margin-bottom:22px}
+    .contact-onur__title{font-size:clamp(22px,4vw,32px);font-weight:800;margin:0 0 6px}
+    .contact-onur__subtitle{color:var(--muted);font-size:clamp(13px,2.6vw,16px);margin:0}
+    .contact-onur__grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media (min-width: 980px){
+      .contact-onur__grid{grid-template-columns:480px 1fr;gap:22px}
+    }
+    .contact-onur__card{background:var(--card);border:1px solid #0b1222;border-radius:14px;padding:16px}
+    .contact-onur__card h3{margin:0 0 10px;font-size:18px}
+    .contact-onur__line{line-height:1.9;margin:6px 0}
+    .contact-onur__line a{color:var(--text);text-decoration:none}
+    .contact-onur__line a:hover{text-decoration:underline}
+    .contact-onur__social{display:flex;gap:12px;font-size:20px;margin-top:10px}
+    .contact-onur__social a{color:var(--text);opacity:.9}
+    .contact-onur__social a:hover{opacity:1}
+    .contact-onur__field{display:flex;flex-direction:column;margin-bottom:12px}
+    .contact-onur__label{font-size:13px;color:var(--muted);margin-bottom:6px}
+    .contact-onur__select{appearance:none;background:#0b1222;color:var(--text);border:1px solid #1f2937;border-radius:10px;padding:12px 14px;font-size:14px;cursor:pointer;}
+    .contact-onur__count{color:var(--muted);font-size:13px;margin:6px 0 10px}
+    .contact-onur__office{border-top:1px dashed #1f2937;padding:12px 0;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start}
+    .contact-onur__office:first-child{border-top:none;padding-top:0;}
+    .contact-onur__office h4{margin:0;font-size:16px}
+    .contact-onur__office small{color:var(--muted)}
+    .contact-onur__office a {color: var(--text); text-decoration: none;}
+    .contact-onur__office a:hover {text-decoration: underline;}
+    .contact-onur__office .contact-onur__actions{display:flex;gap:8px}
+    .contact-onur__btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:10px;padding:8px 10px;font-weight:700;font-size:13px;color:#fff;cursor:pointer;text-decoration:none;white-space:nowrap}
+    .contact-onur__btn .contact-onur__btn-text{display:block;}
+    @media (max-width: 380px) { .contact-onur__btn .contact-onur__btn-text{display:none;} }
+    .contact-onur__btn--route{background:var(--brand)}
+    .contact-onur__btn--call{background:var(--ok)}
+    #map{width:100%;height:100%;min-height: 560px;border-radius:14px;overflow:hidden;background:var(--card);}
+    .contact-onur__muted{color:var(--muted)}
+    .contact-onur__badge{display:inline-block;background:#111827;border:1px solid #1f2937;border-radius:999px;padding:4px 10px;font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+
+  <!-- ======================== HEADER BÖLÜMÜ ======================== -->
+  <div id="header-placeholder"></div>
+  <!-- ====================== HEADER BÖLÜMÜ SONU ====================== -->
+
+
+  <!-- Sayfanın koyu renkli ana içeriği bu sarmalayıcının içinde -->
+  <div class="page-wrapper--dark">
+    <main class="contact-onur__container">
+      <header class="contact-onur__head">
+        <h1 class="contact-onur__title">İletişim</h1>
+        <p class="contact-onur__subtitle">İzmir genelinde dijital destekli modern gayrimenkul danışmanlığı</p>
+      </header>
+
+      <div class="contact-onur__grid">
+        <section class="contact-onur__left">
+          <div class="contact-onur__card" style="margin-bottom:16px">
+            <h3>Onur Başaran</h3>
+            <div class="contact-onur__line"><i class="fa-solid fa-id-badge"></i> <span class="contact-onur__badge">Sorumlu Emlak Danışmanı Lisans No: YB0271/17UY0333-5/00/3516</span></div>
+            <div class="contact-onur__line"><i class="fa-solid fa-phone"></i> <a href="tel:+905308775368">+90 530 877 53 68</a></div>
+            <div class="contact-onur__line"><i class="fa-solid fa-envelope"></i> <a href="mailto:onurbasaran@remaxup.com.tr">onurbasaran@remaxup.com.tr</a></div>
+            <div class="contact-onur__line"><i class="fa-solid fa-location-dot"></i> <span>Fahrettin Altay, Mithatpaşa Cd. No:1201, Karabağlar / İzmir</span></div>
+            <div class="contact-onur__social">
+              <a href="https://www.instagram.com/remaxup_izmir" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+              <a href="https://www.facebook.com" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+              <a href="https://www.linkedin.com" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+              <a href="https://www.youtube.com" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+              <a href="https://wa.me/905308775368" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            </div>
+          </div>
+
+          <div class="contact-onur__card">
+            <h3>İzmir’de RE/MAX Ofisi Bul</h3>
+            <div class="contact-onur__field">
+              <label class="contact-onur__label">İl *</label>
+              <select class="contact-onur__select" id="citySelect" disabled>
+                <option value="İzmir">İzmir</option>
+              </select>
+            </div>
+            <div class="contact-onur__field">
+              <label class="contact-onur__label">İlçe</label>
+              <select class="contact-onur__select" id="districtSelect"></select>
+            </div>
+            <div id="officeCount" class="contact-onur__count">Toplam 0 ofis</div>
+            <div id="officeList"></div>
+            <p class="contact-onur__muted" style="margin-top:10px;font-size:12px;">* Ofis koordinatları ilk açılışta adreslerinden otomatik getiriliyor ve tarayıcınızda saklanıyor.</p>
+          </div>
+        </section>
+
+        <section class="contact-onur__card">
+          <div id="map" aria-label="İzmir RE/MAX ofisleri haritası"></div>
+        </section>
+      </div>
+    </main>
+  </div> <!-- .page-wrapper--dark sonu -->
+
+
+  <!-- ======================== FOOTER BÖLÜMÜ ======================== -->
+  <div id="footer-placeholder"></div>
+  <!-- ====================== FOOTER BÖLÜMÜ SONU ====================== -->
+
+
+  <!-- ======================== TÜM SCRIPTLER ======================== -->
+  <script>
+    // --- OFİS VERİLERİ ---
+    const OFFICES = [
+      { name: "RE/MAX Adres", district: "Karşıyaka", address: "Cengiz Topel Cd. No:36 K:1 D:1, Bostanlı Mah., Karşıyaka / İzmir", phone: "+90 232 362 18 18", website: "", mapsQuery: "Cengiz Topel Cd No:36 Bostanlı Karşıyaka İzmir" },
+      { name: "RE/MAX Arma", district: "Buca", address: "Buca Koop Mah., Ahmet Piriştina Bul. No:2A, Buca / İzmir", phone: "+90 232 448 32 32", website: "", mapsQuery: "Buca Koop Mah Ahmet Piriştina Bul No:2A Buca İzmir" },
+      { name: "RE/MAX Best", district: "Buca", address: "Buca Koop Mah., Ahmet Piriştina Bul. No:2A, Buca / İzmir", phone: "+90 232 448 32 32", website: "", mapsQuery: "Buca Koop Mah Ahmet Piriştina Bul No:2A Buca İzmir" },
+      { name: "RE/MAX Capella", district: "Urla", address: "Yenice Mah., Manzara Cad. No:1, Urla / İzmir", phone: "+90 232 761 04 01", website: "", mapsQuery: "Yenice Mah Manzara Cad No:1 Urla İzmir" },
+      { name: "RE/MAX Fi", district: "Urla", address: "Çamlıçay Mah., Mareşal Fevzi Çakmak Blv. No:118/1 İç Kapi No:1, Urla / İzmir", phone: "+90 232 203 00 35", website: "", mapsQuery: "Çamlıçay Mah Mareşal Fevzi Çakmak Blv No:118 Urla İzmir" },
+      { name: "RE/MAX Flex", district: "Urla", address: "Yenikent Mah., 75. Yıl Cumhuriyet Cd. No:144/A, Urla / İzmir", phone: "+90 232 754 55 50", website: "", mapsQuery: "Yenikent Mah 75. Yıl Cumhuriyet Cd No:144/A Urla İzmir" },
+      { name: "RE/MAX Galaksi", district: "Karşıyaka", address: "Bostanlı Mah., Cengiz Topel Cd. No:5 İç Kapı No:2, Karşıyaka / İzmir", phone: "+90 232 369 33 69", website: "", mapsQuery: "Bostanlı Mah Cengiz Topel Cd No:5 Karşıyaka İzmir" },
+      { name: "RE/MAX Gündem", district: "Menemen", address: "30 Ağustos Mah., 7202 Sk. No:11 J, Menemen / İzmir", phone: "+90 232 361 33 33", website: "", mapsQuery: "30 Ağustos Mah 7202 Sk No:11 Menemen İzmir" },
+      { name: "RE/MAX Gündem 2", district: "Karşıyaka", address: "Bostanlı Mah., Cemal Gürsel Cd. No:109 D:1, Karşıyaka / İzmir", phone: "+90 232 361 33 33", website: "", mapsQuery: "Bostanlı Mah Cemal Gürsel Cd No:109 Karşıyaka İzmir" },
+      { name: "RE/MAX İlyada", district: "Dikili", address: "Gazipaşa Mah., 31. Sok. No:2-A, Dikili / İzmir", phone: "+90 232 700 00 19", website: "", mapsQuery: "Gazipaşa Mah 31. Sok No:2-A Dikili İzmir" },
+      { name: "RE/MAX İlyada 2", district: "Dikili", address: "Çandarlı Mah., Namık Kemal Cd. No:36D, Dikili / İzmir", phone: "+90 232 700 00 19", website: "", mapsQuery: "Çandarlı Mah Namık Kemal Cd No:36D Dikili İzmir" },
+      { name: "RE/MAX Jolly", district: "Bayraklı", address: "Osmangazi Mah., 574/7 Sok. No:3/A, Bayraklı / İzmir", phone: "+90 232 503 33 33", website: "", mapsQuery: "Osmangazi Mah 574/7 Sok No:3/A Bayraklı İzmir" },
+      { name: "RE/MAX Kare", district: "Çiğli", address: "Ataşehir Mah., 8211/8 Sk. No:23 İç Kapı No:2, Çiğli / İzmir", phone: "+90 232 700 03 20", website: "", mapsQuery: "Ataşehir Mah 8211/8 Sk No:23 Çiğli İzmir" },
+      { name: "RE/MAX Kuvars", district: "Urla", address: "Atatürk Mah., Neyzen Tevfik Cd. No:112A, Urla / İzmir", phone: "+90 232 362 19 19", website: "", mapsQuery: "Atatürk Mah Neyzen Tevfik Cd No:112A Urla İzmir" },
+      { name: "RE/MAX Kuvars 2", district: "Çeşme", address: "Ilıca Mah., 5074 Sk. No:24/1, Çeşme / İzmir", phone: "+90 232 362 19 19", website: "", mapsQuery: "Ilıca Mah 5074 Sk No:24/1 Çeşme İzmir" },
+      { name: "RE/MAX Model", district: "Karşıyaka", address: "Donanmacı Mah., Yalı Blv. No:336/B, Karşıyaka / İzmir", phone: "+90 232 364 64 94", website: "", mapsQuery: "Donanmacı Mah Yalı Blv No:336/B Karşıyaka İzmir" },
+      { name: "RE/MAX Nota", district: "Gaziemir", address: "Irmak Mah., Hasan Güven Cd. No:105/A, Gaziemir / İzmir", phone: "+90 232 251 17 17", website: "", mapsQuery: "Irmak Mah Hasan Güven Cd No:105/A Gaziemir İzmir" },
+      { name: "RE/MAX Plaza", district: "Aliağa", address: "Kültür Mah., Onat Kutlar Sk. No:24 B, Aliağa / İzmir", phone: "+90 232 616 35 55", website: "", mapsQuery: "Kültür Mah Onat Kutlar Sk No:24B Aliağa İzmir" },
+      { name: "RE/MAX Sembol", district: "Konak", address: "Mithatpaşa Cd. No:804/6-A, Köprü (Çankaya) Mah., Konak / İzmir", phone: "+90 232 232 33 66", website: "", mapsQuery: "Mithatpaşa Cd No:804/6-A Köprü Mah Konak İzmir" },
+      { name: "RE/MAX Target", district: "Karşıyaka", address: "Bostanlı Mah., Yalı Blv. Güneş No:452 İç Kapı No:1, Karşıyaka / İzmir", phone: "+90 232 260 66 66", website: "", mapsQuery: "Bostanlı Mah Yalı Blv Güneş No:452 Karşıyaka İzmir" },
+      { name: "RE/MAX UP", district: "Karabağlar", address: "Fahrettin Altay Mah., Mithatpaşa Cd. No:1201, Karabağlar / İzmir", phone: "+90 232 731 23 30", website: "", mapsQuery: "Fahrettin Altay Mah Mithatpaşa Cd No:1201 Karabağlar İzmir" },
+      { name: "RE/MAX UP 2", district: "Karaburun", address: "Merkez Mah., Başkomutan Atatürk Cd. No:26, Karaburun / İzmir", phone: "+90 232 731 23 30", website: "", mapsQuery: "Merkez Mah Başkomutan Atatürk Cd No:26 Karaburun İzmir" },
+      { name: "RE/MAX West", district: "Karşıyaka", address: "Yalı Mah., 6436 Sk. Çağlı No:119 İç Kapı No:1, Karşıyaka / İzmir", phone: "+90 232 337 12 22", website: "", mapsQuery: "Yalı Mah 6436 Sk No:119 Karşıyaka İzmir" },
+      { name: "RE/MAX Yarımada", district: "Güzelbahçe", address: "Yelki Mah., 2732 Sokak No:92/A, Güzelbahçe / İzmir", phone: "+90 232 234 64 00", website: "", mapsQuery: "Yelki Mah 2732 Sokak No:92/A Güzelbahçe İzmir" },
+      { name: "RE/MAX Yelken", district: "Seferihisar", address: "Camikebir Mah., İzmir Cd. No:133-135A, Seferihisar / İzmir", phone: "+90 232 683 06 83", website: "", mapsQuery: "Camikebir Mah İzmir Cd No:133 Seferihisar İzmir" },
+      { name: "RE/MAX Zeta", district: "Bornova", address: "Kazımdirik Mah., 372/14 Sok. No:26, Bornova / İzmir", phone: "+90 232 374 22 00", website: "", mapsQuery: "Kazımdirik Mah 372/14 Sok No:26 Bornova İzmir" },
+      { name: "RE/MAX Zeta 2", district: "Konak", address: "Kültür Mah., Şehit Nevres Blv., Evcimen No:15, Kat:1 D:2, Konak / İzmir", phone: "+90 232 202 40 40", website: "", mapsQuery: "Kültür Mah Şehit Nevres Blv Evcimen No:15 Konak İzmir" }
+    ];
+
+    // --- SAYFA TAMAMEN YÜKLENDİKTEN SONRA ÇALIŞACAK KODLAR ---
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // --- HEADER VE FOOTER'I YÜKLE ---
+      fetch("header.html")
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("header-placeholder").innerHTML = data;
+          // Not: Header'ın kendi script'i (mobil menü, scroll efekti vb.)
+          // ana bir script.js dosyasından yönetilmelidir.
+          const menuToggle = document.getElementById("menu-toggle");
+          const mobileMenu = document.getElementById("mobile-menu");
+          if (menuToggle && mobileMenu) {
+            menuToggle.addEventListener("click", function () {
+              mobileMenu.classList.toggle("active");
+            });
+          }
+        });
+
+      fetch("footer.html")
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("footer-placeholder").innerHTML = data;
+          // Footer'dan gelen menü için script'i yeniden tanımla
+          const launcher = document.getElementById("iletisim-launcher");
+          const menu = document.getElementById("iletisim-menusu");
+          const openBtn = document.getElementById("openContact");
+          const closeBtn = document.getElementById("closeContact");
+          if (launcher && menu && openBtn && closeBtn) {
+            openBtn.addEventListener("click", () => {
+              launcher.style.display = "none";
+              menu.classList.remove("hidden");
+            });
+            closeBtn.addEventListener("click", () => {
+              menu.classList.add("hidden");
+              launcher.style.display = "block";
+            });
+          }
+        });
+
+      // --- İLETİŞİM SAYFASINA ÖZEL HARİTA VE FİLTRELEME FONKSİYONLARI ---
+      const mapElement = document.getElementById('map');
+      if (mapElement) {
+        const map = L.map('map', { scrollWheelZoom: true });
+        const layerGroup = L.layerGroup().addTo(map);
+        const districtSelect = document.getElementById('districtSelect');
+        const officeList = document.getElementById('officeList');
+        const officeCount = document.getElementById('officeCount');
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19, attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        const districts = [...new Set(OFFICES.map(o => o.district))].sort((a, b) => a.localeCompare(b, 'tr'));
+        districtSelect.innerHTML = `<option value="">Tüm İlçeler</option>` + districts.map(d => `<option value="${d}">${d}</option>`).join('');
+
+        async function geocode(query) {
+          const key = 'geocode:' + query;
+          try { const cached = localStorage.getItem(key); if (cached) return JSON.parse(cached); }
+          catch (e) { console.warn("Cache okuma hatası:", e); }
+
+          const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`;
+          try {
+            const res = await fetch(url, { headers: { 'Accept-Language': 'tr' } });
+            if (!res.ok) throw new Error(`Network response was not ok: ${res.statusText}`);
+            const data = await res.json();
+            const first = data && data[0] ? { lat: +data[0].lat, lon: +data[0].lon } : null;
+            if (first) localStorage.setItem(key, JSON.stringify(first));
+            return first;
+          } catch (error) {
+            console.error('Geocoding başarısız:', query, error);
+            return null;
+          }
+        }
+
+        async function renderListAndMap(filterDistrict) {
+          layerGroup.clearLayers();
+          while (officeList.firstChild) {
+            officeList.removeChild(officeList.firstChild);
+          }
+          
+          let items = filterDistrict ? OFFICES.filter(o => o.district === filterDistrict) : OFFICES;
+          
+          officeCount.textContent = `Toplam ${items.length} ofis bulundu`;
+
+          const bounds = [];
+          for (const office of items) {
+            const div = document.createElement('div');
+            div.className = 'contact-onur__office';
+            const destURL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(office.mapsQuery)}`;
+            const telLink = office.phone ? office.phone.replace(/\s|\(|\)|-/g, '') : '';
+            
+            div.innerHTML = `
+              <div>
+                <h4>${office.name}</h4>
+                <div class="contact-onur__muted">${office.address}</div>
+                ${office.phone ? `<div class="contact-onur__muted"><a href="tel:${telLink}">${office.phone}</a></div>` : ''}
+              </div>
+              <div class="contact-onur__actions">
+                ${office.phone ? `<a class="contact-onur__btn contact-onur__btn--call" href="tel:${telLink}"><i class="fa-solid fa-phone"></i><span class="contact-onur__btn-text"> Ara</span></a>` : ''}
+                <a class="contact-onur__btn contact-onur__btn--route" href="${destURL}" target="_blank" rel="noopener"><i class="fa-solid fa-route"></i><span class="contact-onur__btn-text"> Yol Tarifi</span></a>
+              </div>`;
+            officeList.appendChild(div);
+
+            const geo = await geocode(office.mapsQuery);
+            if (geo) {
+              L.marker([geo.lat, geo.lon]).addTo(layerGroup)
+                .bindPopup(`<strong>${office.name}</strong><br><a href="${destURL}" target="_blank">Yol tarifi al</a>`);
+              bounds.push([geo.lat, geo.lon]);
+            }
+          }
+
+          if (bounds.length > 1) {
+            map.fitBounds(bounds, { padding: [50, 50] });
+          } else if (bounds.length === 1) {
+            map.setView(bounds[0], 15);
+          } else {
+            map.setView([38.423734, 27.142826], 10);
+          }
+        }
+
+        districtSelect.addEventListener('change', (e) => renderListAndMap(e.target.value));
+        renderListAndMap(districtSelect.value);
+      }
+    });
+  </script>
+</body>
+</html>
