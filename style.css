@@ -505,8 +505,10 @@ body, p, a, span, li, td, th, input, button {
 }
 
 /* Üzerine gelinceki efekt */
-.btn-auth:hover {
-  background-color: white;
-  color: #111828; /* Koyu tema renginiz */
+/* style.css sonuna eklenecek */
+
+/* Sadece Auth butonlarını gizlemek için özel bir sınıf */
+.auth-hidden {
+  display: none !important;
 }
 

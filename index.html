@@ -44,18 +44,21 @@
       <!-- ============================================== -->
       <!-- MASAÜSTÜ GİRİŞ/ÇIKIŞ BUTONLARI (YENİ EKLENDİ) -->
       <!-- ============================================== -->
-      <div id="auth-container" class="hidden md:flex items-center">
-        <button id="btn-login" class="btn-auth">Giriş Yap</button>
-        <button id="btn-logout" class="btn-auth hidden">Çıkış Yap</button>
-      </div>
+      <!-- header.html içindeki ilgili bölümler -->
 
-      <!-- ============================================== -->
-      <!-- MOBİL GİRİŞ/ÇIKIŞ BUTONLARI (YENİ EKLENDİ)    -->
-      <!-- ============================================== -->
-      <div id="auth-container-mobil" class="md:hidden w-full p-4 mt-2 border-t border-gray-200">
-        <button id="btn-login-mobil" class="btn-auth-mobil w-full">Giriş Yap</button>
-        <button id="btn-logout-mobil" class="btn-auth-mobil w-full hidden">Çıkış Yap</button>
-      </div>
+<!-- MASAÜSTÜ -->
+<div id="auth-container" class="hidden md:flex items-center">
+  <button id="btn-login" class="btn-auth">Giriş Yap</button>
+  <!-- 'hidden' yerine 'auth-hidden' kullanıyoruz -->
+  <button id="btn-logout" class="btn-auth auth-hidden">Çıkış Yap</button>
+</div>
+
+<!-- MOBİL -->
+<div id="auth-container-mobil" class="md:hidden w-full p-4 mt-2 border-t border-gray-200">
+  <button id="btn-login-mobil" class="btn-auth-mobil w-full">Giriş Yap</button>
+  <!-- 'hidden' yerine 'auth-hidden' kullanıyoruz -->
+  <button id="btn-logout-mobil" class="btn-auth-mobil w-full auth-hidden">Çıkış Yap</button>
+</div>
     </nav>
   </div>
 </header>

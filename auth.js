@@ -37,15 +37,15 @@ const configureClient = async () => {
   }
 };
 
+// auth.js içindeki updateUI fonksiyonu
+
 const updateUI = async () => { 
-    if (!auth0Client) {
-        console.warn("updateUI çağrıldı ama auth0Client henüz hazır değil.");
-        return;
-    }
-    console.log("UI güncelleniyor...");
+    if (!auth0Client) return;
     const isAuthenticated = await auth0Client.isAuthenticated();
-    document.querySelectorAll("#btn-logout, #btn-logout-mobil").forEach(btn => btn.classList.toggle("hidden", !isAuthenticated));
-    document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(btn => btn.classList.toggle("hidden", isAuthenticated));
+    
+    // 'hidden' yerine 'auth-hidden' sınıfını değiştiriyoruz
+    document.querySelectorAll("#btn-logout, #btn-logout-mobil").forEach(btn => btn.classList.toggle("auth-hidden", !isAuthenticated));
+    document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(btn => btn.classList.toggle("auth-hidden", isAuthenticated));
 };
 
 async function initializeAuth() {
