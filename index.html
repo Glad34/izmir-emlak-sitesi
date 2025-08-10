@@ -43,15 +43,23 @@
       <a href="#iletisim" class="nav-link">İletişim</a>
       
       <!-- MASAÜSTÜ -->
+<!-- MASAÜSTÜ -->
 <div id="auth-container" class="hidden md:flex items-center space-x-4">
-  <a href="profil.html" id="profil-link" class="nav-link auth-hidden">Profilim</a>
+  <!-- YENİ: Profil Resmi ve Linki -->
+  <a href="profil.html" id="profil-link" class="flex items-center gap-2 auth-hidden">
+    <img id="profil-resmi-header" src="" alt="Profil" class="w-8 h-8 rounded-full object-cover border-2 border-gray-300">
+    <span class="nav-link">Profilim</span>
+  </a>
   <button id="btn-login" class="btn-auth">Giriş Yap</button>
   <button id="btn-logout" class="btn-auth auth-hidden">Çıkış Yap</button>
 </div>
 
 <!-- MOBİL -->
 <div id="auth-container-mobil" class="md:hidden w-full p-4 mt-2">
-  <a href="profil.html" id="profil-link-mobil" class="block py-2 text-center w-full btn-auth-mobil auth-hidden mb-2">Profilim</a>
+  <a href="profil.html" id="profil-link-mobil" class="flex items-center gap-3 w-full p-2 rounded-md hover:bg-gray-100 auth-hidden mb-2">
+    <img id="profil-resmi-header-mobil" src="" alt="Profil" class="w-10 h-10 rounded-full object-cover border-2 border-gray-400">
+    <span class="font-semibold">Profilim</span>
+  </a>
   <button id="btn-login-mobil" class="btn-auth-mobil w-full">Giriş Yap</button>
   <button id="btn-logout-mobil" class="btn-auth-mobil w-full auth-hidden">Çıkış Yap</button>
 </div>
@@ -89,6 +97,8 @@ const configureClient = async () => {
 /**
  * Arayüzü (butonlar ve linkler) kullanıcının giriş durumuna göre günceller.
  */
+// auth.js içindeki updateUI fonksiyonunu güncelleyin
+
 const updateUI = async () => { 
     if (!auth0Client) return;
     const isAuthenticated = await auth0Client.isAuthenticated();
@@ -101,6 +111,17 @@ const updateUI = async () => {
     document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(btn => {
         if (btn) btn.classList.toggle("auth-hidden", isAuthenticated);
     });
+
+    // --- YENİ EKLENEN KISIM: Profil Resmini Yükle ---
+    if (isAuthenticated) {
+        const user = await auth0Client.getUser();
+        if (user && user.picture) {
+            document.querySelectorAll("#profil-resmi-header, #profil-resmi-header-mobil").forEach(img => {
+                if (img) img.src = user.picture;
+            });
+        }
+    }
+    // --- BİTİŞ ---
 };
 
 /**

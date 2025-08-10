@@ -23,9 +23,15 @@
 
     <div id="ilan-icerik" class="hidden">
       <section class="mb-6">
-        <h1 id="ilan-baslik" class="text-3xl font-bold text-gray-800"></h1>
-        <p id="ilan-konum" class="text-gray-600 mt-1 flex items-center gap-2"><i class="fas fa-map-marker-alt"></i></p>
-      </section>
+  <div class="flex justify-between items-center">
+    <h1 id="ilan-baslik" class="text-3xl font-bold text-gray-800"></h1>
+    <!-- YENİ: Favori Butonu (Başlangıçta gizli) -->
+    <button id="favori-ekle-btn" class="p-2 rounded-full hover:bg-gray-200 transition hidden">
+      <i class="far fa-star text-2xl text-gray-600"></i>
+    </button>
+  </div>
+  <p id="ilan-konum" class="text-gray-600 mt-1 flex items-center gap-2"><i class="fas fa-map-marker-alt"></i></p>
+</section>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Sol Taraf: Galeri ve Yeni Sekmeli Yapı -->
