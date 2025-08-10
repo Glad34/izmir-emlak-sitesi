@@ -1,13 +1,27 @@
-// ilan-detay.js - "Tek Beyin" (auth.js) ile uyumlu nihai versiyon
+// ilan-detay.js - Favori Butonu Sorununu Çözen Nihai Versiyon
 
 document.addEventListener("DOMContentLoaded", async () => {
   // Header ve Footer'ı yükle
   fetch("header.html").then(res => res.text()).then(data => document.getElementById("header-placeholder").innerHTML = data);
   fetch("footer.html").then(res => res.text()).then(data => document.getElementById("footer-placeholder").innerHTML = data);
 
-  // auth.js'in hazır olmasını bekle ve giriş durumunu öğren
-  const { isAuthenticated } = await window.getAuthClient();
-  
+  let isAuthenticated = false;
+  let auth0Client = null;
+
+  try {
+    // Auth0 client'ını yapılandır ve giriş durumunu GÜVENİLİR bir şekilde kontrol et
+    const response = await fetch("/.netlify/functions/auth-config");
+    const config = await response.json();
+    auth0Client = await auth0.createAuth0Client({
+      domain: config.domain,
+      clientId: config.clientId
+    });
+    isAuthenticated = await auth0Client.isAuthenticated();
+  } catch (e) {
+    console.error("Auth0 durumu kontrol edilirken hata:", e);
+    // Hata olsa bile devam et, sadece favori butonu görünmez.
+  }
+
   // URL'den ilan ID'sini al
   const params = new URLSearchParams(window.location.search);
   const ilanID = params.get('id');
@@ -29,7 +43,6 @@ async function fetchIlanData(id, isLoggedIn) {
     const data = await response.json();
     if (data.error) throw new Error(data.error);
     
-    // Veriyi sayfaya yerleştir ve giriş durumunu ilet
     populatePage(data, isLoggedIn);
 
   } catch (error) {
@@ -94,7 +107,10 @@ function populatePage(ilan, isLoggedIn) {
 
   initializePlugins();
 
+  // --- FAVORİ BUTONU MANTIĞI ---
   const favoriBtn = document.getElementById('favori-ekle-btn');
+  
+  // Sadece giriş yapmış kullanıcılar favori butonunu görür
   if (isLoggedIn && favoriBtn) {
       favoriBtn.classList.remove('hidden');
   }
@@ -127,12 +143,14 @@ function populatePage(ilan, isLoggedIn) {
         }
     });
   }
+  // --- BİTİŞ ---
 
   document.getElementById('loading-spinner').classList.add('hidden');
   document.getElementById('ilan-icerik').classList.remove('hidden');
 }
 
 function initializePlugins() {
+  // ... (Bu fonksiyonun içeriği aynı kalacak)
   const thumbsSwiper = new Swiper('.thumbs-swiper', {spaceBetween: 10, slidesPerView: 4, freeMode: true, watchSlidesProgress: true});
   new Swiper('.main-swiper', {spaceBetween: 10, navigation: {nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev'}, pagination: {el: '.swiper-pagination', type: 'fraction'}, thumbs: {swiper: thumbsSwiper}});
   const tabButtons = document.querySelectorAll('.tab-button');
