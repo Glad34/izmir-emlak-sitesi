@@ -5,6 +5,8 @@ let auth0Client = null;
  * Auth0 client'ını, Netlify eklentisinin sağladığı ortam değişkenlerini
  * kullanarak yapılandırır.
  */
+// auth.js içindeki configureClient fonksiyonu
+
 const configureClient = async () => {
   try {
     const response = await fetch("/.netlify/functions/auth-config");
@@ -17,10 +19,8 @@ const configureClient = async () => {
       domain: config.domain,
       clientId: config.clientId,
       authorizationParams: {
-        redirect_uri: window.location.origin,
-        // Eklenti tarafından sağlanan "audience" bilgisini buraya ekliyoruz.
-        // Bu, API'nizi güvence altına almak için önemlidir.
-        audience: config.audience 
+        redirect_uri: window.location.origin
+        // "audience" satırını buradan kaldırdık.
       }
     });
   } catch (e) {
