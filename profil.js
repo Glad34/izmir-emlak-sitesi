@@ -1,71 +1,95 @@
-// profil.js
+// profil.js - Profil sayfasını yöneten nihai kod
+
 document.addEventListener('DOMContentLoaded', async () => {
-  // Header ve Footer'ı yükle
+  // Header ve Footer'ı her zamanki gibi yükle
   fetch("header.html").then(res => res.text()).then(data => document.getElementById("header-placeholder").innerHTML = data);
   fetch("footer.html").then(res => res.text()).then(data => document.getElementById("footer-placeholder").innerHTML = data);
 
-  // Auth0 client'ını yapılandır
-  const response = await fetch("/.netlify/functions/auth-config");
-  const config = await response.json();
-  const auth0 = await auth0.createAuth0Client({
-    domain: config.domain,
-    clientId: config.clientId
-  });
+  let auth0Client = null;
 
-  const isAuthenticated = await auth0.isAuthenticated();
-
-  if (isAuthenticated) {
-    // Kullanıcı giriş yapmışsa
-    document.getElementById('profil-icerik').classList.remove('hidden');
-    
-    const user = await auth0.getUser();
-    
-    // Profil bilgilerini doldur
-    document.getElementById('profil-resmi').src = user.picture;
-    document.getElementById('profil-adi').textContent = user.name;
-    document.getElementById('profil-email').textContent = user.email;
-
-    // Favorileri çek ve göster
-    await loadFavorites();
-
-  } else {
-    // Kullanıcı giriş yapmamışsa
-    document.getElementById('giris-yap-uyarisi').classList.remove('hidden');
-    document.getElementById('profil-login-btn').addEventListener('click', () => {
-        auth0.loginWithRedirect({ redirect_uri: window.location.href });
+  try {
+    // Auth0 client'ını yapılandır
+    const response = await fetch("/.netlify/functions/auth-config");
+    const config = await response.json();
+    auth0Client = await auth0.createAuth0Client({
+      domain: config.domain,
+      clientId: config.clientId
     });
+
+    const isAuthenticated = await auth0Client.isAuthenticated();
+
+    if (isAuthenticated) {
+      // --- KULLANICI GİRİŞ YAPMIŞSA ---
+      document.getElementById('profil-icerik').classList.remove('hidden');
+      
+      const user = await auth0Client.getUser();
+      
+      // Profil bilgilerini doldur
+      if (user) {
+        document.getElementById('profil-resmi').src = user.picture || 'images/placeholder-avatar.png'; // Eğer profil resmi yoksa varsayılan resim
+        document.getElementById('profil-adi').textContent = user.name || user.email;
+        document.getElementById('profil-email').textContent = user.email;
+      }
+
+      // Favorileri çek ve göster
+      await loadFavorites();
+
+    } else {
+      // --- KULLANICI GİRİŞ YAPMAMIŞSA ---
+      document.getElementById('giris-yap-uyarisi').classList.remove('hidden');
+      document.getElementById('profil-login-btn').addEventListener('click', () => {
+          // Giriş yaptıktan sonra bu sayfaya geri dönmesi için redirect_uri'yi ayarla
+          auth0Client.loginWithRedirect({
+              authorizationParams: {
+                  redirect_uri: window.location.href
+              }
+          });
+      });
+    }
+
+  } catch(e) {
+      console.error("Profil sayfası yüklenirken hata oluştu:", e);
+      document.getElementById('giris-yap-uyarisi').classList.remove('hidden');
+      document.getElementById('giris-yap-uyarisi').innerHTML = '<h2 class="text-2xl text-red-500">Bir hata oluştu. Lütfen daha sonra tekrar deneyin.</h2>';
   }
 });
 
+/**
+ * Giriş yapmış kullanıcının favorilerini Netlify fonksiyonu üzerinden çeker ve gösterir.
+ */
 async function loadFavorites() {
     try {
         const res = await fetch('/.netlify/functions/get-favorites');
+        
         if (!res.ok) {
-            // Eğer giriş yapılmamışsa fonksiyon 401 hatası döner
-            document.getElementById('favori-ilanlar-listesi').innerHTML = '<p>Favorileri görmek için giriş yapmalısınız.</p>';
-            return;
+            // Fonksiyon 401 (Unauthorized) gibi bir hata dönerse
+            const errorData = await res.json();
+            throw new Error(errorData.error || 'Favoriler alınamadı.');
         }
 
         const favorites = await res.json();
         const favoriListesiDiv = document.getElementById('favori-ilanlar-listesi');
 
-        if (favorites.length > 0) {
+        if (favorites && favorites.length > 0) {
             document.getElementById('favori-yok-mesaji').classList.add('hidden');
             
-            // Burada favori ilanların detaylarını göstermek için
-            // her bir ilan ID'si ile ilan detaylarını çeken bir fonksiyon yazmak gerekir.
-            // Şimdilik sadece ID'leri listeleyelim:
-            favoriListesiDiv.innerHTML = '<h3>Favori İlan ID\'leri:</h3>';
+            // Başlangıç olarak favori ilanların ID'lerini listeleyelim
+            favoriListesiDiv.innerHTML = '<h3>Favori İlanlarınız:</h3>';
             favorites.forEach(fav => {
-                favoriListesiDiv.innerHTML += `<p>${fav.ilan_id}</p>`;
+                // Her bir favori ilanı tıklanabilir bir link yapalım
+                favoriListesiDiv.innerHTML += `
+                    <a href="ilan-detay.html?id=${fav.ilan_id}" class="block p-4 bg-white rounded shadow hover:bg-gray-50">
+                        İlan ID: ${fav.ilan_id}
+                    </a>`;
             });
 
         } else {
-            // Favori yoksa mesaj görünür kalır
+            // Favori yoksa, "Favori yok" mesajı görünür kalır.
+            document.getElementById('favori-yok-mesaji').classList.remove('hidden');
         }
 
     } catch (error) {
         console.error('Favoriler yüklenirken hata:', error);
-        document.getElementById('favori-ilanlar-listesi').innerHTML = '<p>Favoriler yüklenirken bir hata oluştu.</p>';
+        document.getElementById('favori-ilanlar-listesi').innerHTML = `<p class="text-red-500">Favoriler yüklenirken bir hata oluştu: ${error.message}</p>`;
     }
 }
