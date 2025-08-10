@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profilim - İzmir Gayrimenkul</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <!-- Bu sayfaya özel stiller için ayrı bir CSS dosyası oluşturabiliriz -->
+  <link rel="stylesheet" href="profil.css"> 
+</head>
+<body class="bg-gray-100">
+
+  <div id="header-placeholder"></div>
+
+  <main class="max-w-6xl mx-auto py-12 px-4">
+    
+    <!-- Sayfa Başlığı -->
+    <h1 class="text-4xl font-bold text-gray-800 mb-8 border-b pb-4">Hesabım</h1>
+
+    <div id="profil-icerik" class="hidden grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <!-- Sol Taraf: Profil Bilgileri -->
+      <div class="md:col-span-1 bg-white p-6 rounded-lg shadow">
+        <div class="flex flex-col items-center">
+          <img id="profil-resmi" src="" alt="Profil Resmi" class="w-24 h-24 rounded-full mb-4">
+          <h2 id="profil-adi" class="text-2xl font-semibold"></h2>
+          <p id="profil-email" class="text-gray-500"></p>
+        </div>
+      </div>
+
+      <!-- Sağ Taraf: Favori İlanlar -->
+      <div class="md:col-span-2">
+        <h3 class="text-2xl font-semibold mb-6">Favori İlanlarım</h3>
+        <div id="favori-ilanlar-listesi" class="space-y-4">
+          <!-- Favori ilanlar buraya JS ile eklenecek -->
+          <p id="favori-yok-mesaji" class="text-gray-600">Henüz favorilerinize eklediğiniz bir ilan bulunmuyor.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Giriş Yapmamış Kullanıcılar İçin Uyarı -->
+    <div id="giris-yap-uyarisi" class="hidden text-center bg-white p-10 rounded-lg shadow">
+        <h2 class="text-2xl font-bold mb-4">Bu Sayfayı Görüntülemek İçin Giriş Yapmalısınız</h2>
+        <p class="text-gray-600 mb-6">Favori ilanlarınızı görmek ve hesabınızı yönetmek için lütfen giriş yapın.</p>
+        <button id="profil-login-btn" class="btn-auth-profil">Giriş Yap</button>
+    </div>
+
+  </main>
+
+  <div id="footer-placeholder"></div>
+  
+  <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+  <!-- `auth.js` yerine bu sayfaya özel yeni bir JS dosyası kullanacağız -->
+  <script src="profil.js"></script> 
+</body>
+</html>

@@ -42,17 +42,19 @@
       <a href="#hakkimizda" class="nav-link">Hakkımızda</a>
       <a href="#iletisim" class="nav-link">İletişim</a>
       
-      <!-- MASAÜSTÜ GİRİŞ/ÇIKIŞ BUTONLARI -->
-      <div id="auth-container" class="hidden md:flex items-center">
-        <button id="btn-login" class="btn-auth">Giriş Yap</button>
-        <button id="btn-logout" class="btn-auth auth-hidden">Çıkış Yap</button>
-      </div>
+      <!-- MASAÜSTÜ -->
+<div id="auth-container" class="hidden md:flex items-center space-x-4">
+  <a href="profil.html" id="profil-link" class="nav-link auth-hidden">Profilim</a>
+  <button id="btn-login" class="btn-auth">Giriş Yap</button>
+  <button id="btn-logout" class="btn-auth auth-hidden">Çıkış Yap</button>
+</div>
 
-      <!-- MOBİL GİRİŞ/ÇIKIŞ BUTONLARI -->
-      <div id="auth-container-mobil" class="md:hidden w-full p-4 mt-2 border-t">
-        <button id="btn-login-mobil" class="btn-auth-mobil w-full">Giriş Yap</button>
-        <button id="btn-logout-mobil" class="btn-auth-mobil w-full auth-hidden">Çıkış Yap</button>
-      </div>
+<!-- MOBİL -->
+<div id="auth-container-mobil" class="md:hidden w-full p-4 mt-2">
+  <a href="profil.html" id="profil-link-mobil" class="block py-2 text-center w-full btn-auth-mobil auth-hidden mb-2">Profilim</a>
+  <button id="btn-login-mobil" class="btn-auth-mobil w-full">Giriş Yap</button>
+  <button id="btn-logout-mobil" class="btn-auth-mobil w-full auth-hidden">Çıkış Yap</button>
+</div>
     </nav>
   </div>
 </header>
@@ -85,11 +87,16 @@
 
     // --- Olay Dinleyicileri ve UI Güncelleme ---
 
-    const updateUI = async () => { 
-      const isAuthenticated = await auth0Client.isAuthenticated();
-      document.querySelectorAll("#btn-logout, #btn-logout-mobil").forEach(btn => btn.classList.toggle("auth-hidden", !isAuthenticated));
-      document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(btn => btn.classList.toggle("auth-hidden", isAuthenticated));
-    };
+    // auth.js içindeki updateUI fonksiyonu
+const updateUI = async () => { 
+    if (!auth0Client) return;
+    const isAuthenticated = await auth0.isAuthenticated();
+    
+    // Çıkış ve Profil linklerini göster/gizle
+    document.querySelectorAll("#btn-logout, #btn-logout-mobil, #profil-link, #profil-link-mobil").forEach(btn => btn.classList.toggle("auth-hidden", !isAuthenticated));
+    // Giriş butonlarını göster/gizle
+    document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(btn => btn.classList.toggle("auth-hidden", isAuthenticated));
+};
 
     const handleLogin = () => auth0Client.loginWithRedirect();
     const handleLogout = () => auth0Client.logout({ logoutParams: { returnTo: window.location.origin } });

@@ -1,0 +1,15 @@
+.btn-auth-profil {
+  padding: 12px 24px;
+  border: 2px solid #111828;
+  color: #111828;
+  background-color: transparent;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-auth-profil:hover {
+  background-color: #111828;
+  color: white;
+}
