@@ -14,6 +14,7 @@
   
 
 <!-- Header -->
+<!-- Header -->
 <header class="fixed top-0 left-0 w-full z-50 bg-transparent text-white custom-header">
   <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-full">
     
@@ -55,6 +56,57 @@
     </nav>
   </div>
 </header>
+
+<!-- ========================================================== -->
+<!-- AUTH0 MANTIĞINI ÇALIŞTIRAN SCRIPT (DOĞRU YER BURASI)     -->
+<!-- ========================================================== -->
+<script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+<script>
+  // Bu script, yukarıdaki HTML'den hemen sonra çalıştığı için zamanlama sorunu yaşamaz.
+  document.addEventListener("DOMContentLoaded", async () => {
+    let auth0Client = null;
+
+    try {
+      const response = await fetch("/.netlify/functions/auth-config");
+      const config = await response.json();
+      
+      auth0Client = await auth0.createAuth0Client({
+        domain: config.domain,
+        clientId: config.clientId,
+        authorizationParams: {
+          redirect_uri: window.location.origin
+        }
+      });
+
+    } catch (e) {
+      console.error("Auth0 client yapılandırılamadı:", e);
+      return; // Hata varsa devam etme
+    }
+
+    // --- Olay Dinleyicileri ve UI Güncelleme ---
+
+    const updateUI = async () => { 
+      const isAuthenticated = await auth0Client.isAuthenticated();
+      document.querySelectorAll("#btn-logout, #btn-logout-mobil").forEach(btn => btn.classList.toggle("auth-hidden", !isAuthenticated));
+      document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(btn => btn.classList.toggle("auth-hidden", isAuthenticated));
+    };
+
+    const handleLogin = () => auth0Client.loginWithRedirect();
+    const handleLogout = () => auth0Client.logout({ logoutParams: { returnTo: window.location.origin } });
+
+    document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(btn => btn.addEventListener("click", handleLogin));
+    document.querySelectorAll("#btn-logout, #btn-logout-mobil").forEach(btn => btn.addEventListener("click", handleLogout));
+    
+    const query = window.location.search;
+    if (query.includes("code=") && query.includes("state=")) {
+      await auth0Client.handleRedirectCallback();
+      updateUI();
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else {
+      updateUI(); // Sayfa ilk yüklendiğinde de UI'ı güncelle
+    }
+  });
+</script>
   
   
 
