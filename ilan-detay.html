@@ -75,95 +75,64 @@
 <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 <script>
   // auth.js - Geri Yönlendirme (Redirect) Sorununu Çözen Nihai Versiyon
+// auth.js - TÜM SİTENİN TEK AUTH0 BEYNİ
 let auth0Client = null;
+let isAuthenticated = false;
 
-/**
- * Auth0 client'ını yapılandırır.
- */
-const configureClient = async () => {
-  try {
-    const response = await fetch("/.netlify/functions/auth-config");
-    const config = await response.json();
-    auth0Client = await auth0.createAuth0Client({
-      domain: config.domain,
-      clientId: config.clientId,
-      authorizationParams: {
-        redirect_uri: window.location.origin
-      }
-    });
-  } catch (e) {
-    console.error("Auth0 client yapılandırılamadı:", e);
-  }
-};
+// Bu fonksiyon, Auth0 client'ını başlatır ve durumu döndürür.
+// Zaten başlatılmışsa, tekrar başlatmaz, mevcut olanı kullanır.
+window.getAuthClient = async () => {
+    if (auth0Client) return { auth0Client, isAuthenticated };
 
-/**
- * Arayüzü (butonlar ve linkler) kullanıcının giriş durumuna göre günceller.
- */
-// auth.js içindeki updateUI fonksiyonunu güncelleyin
+    try {
+        const response = await fetch("/.netlify/functions/auth-config");
+        const config = await response.json();
+        auth0Client = await auth0.createAuth0Client({
+            domain: config.domain,
+            clientId: config.clientId,
+            authorizationParams: { redirect_uri: window.location.origin }
+        });
 
-const updateUI = async () => { 
-    if (!auth0Client) return;
-    const isAuthenticated = await auth0Client.isAuthenticated();
-    
-    // Çıkış ve Profil linklerini göster/gizle
-    document.querySelectorAll("#btn-logout, #btn-logout-mobil, #profil-link, #profil-link-mobil").forEach(btn => {
-        if (btn) btn.classList.toggle("auth-hidden", !isAuthenticated);
-    });
-    // Giriş butonlarını göster/gizle
-    document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(btn => {
-        if (btn) btn.classList.toggle("auth-hidden", isAuthenticated);
-    });
-
-    // --- YENİ EKLENEN KISIM: Profil Resmini Yükle ---
-    if (isAuthenticated) {
-        const user = await auth0Client.getUser();
-        if (user && user.picture) {
-            document.querySelectorAll("#profil-resmi-header, #profil-resmi-header-mobil").forEach(img => {
-                if (img) img.src = user.picture;
-            });
+        const query = window.location.search;
+        if (query.includes("code=") && query.includes("state=")) {
+            await auth0Client.handleRedirectCallback();
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
+
+        isAuthenticated = await auth0Client.isAuthenticated();
+        return { auth0Client, isAuthenticated };
+    } catch (e) {
+        console.error("Auth0 client hatası:", e);
+        return { auth0Client: null, isAuthenticated: false };
     }
-    // --- BİTİŞ ---
 };
 
-/**
- * Sayfa yüklendiğinde Auth0'ı başlatan ve olayları yöneten ana fonksiyon.
- */
-const mainAuthFlow = async () => {
-    await configureClient();
+// --- Arayüzü (Header Butonları) güncelleyen ana mantık ---
+async function updateHeaderUI() {
+    const { isAuthenticated, auth0Client } = await window.getAuthClient();
+    if (!auth0Client) return;
 
-    // --- YÖNLENDİRMEDEN GERİ DÖNÜŞÜ KONTROL ET (EN ÖNEMLİ KISIM) ---
-    const query = window.location.search;
-    if (query.includes("code=") && query.includes("state=")) {
-        // Eğer URL'de Auth0'dan gelen kodlar varsa, giriş işlemini tamamla
-        await auth0Client.handleRedirectCallback();
-        // URL'yi temizle ki sayfa yenilendiğinde tekrar çalışmasın
-        window.history.replaceState({}, document.title, window.location.pathname);
+    const user = isAuthenticated ? await auth0Client.getUser() : null;
+
+    document.querySelectorAll("#btn-logout, #btn-logout-mobil, #profil-link, #profil-link-mobil").forEach(el => el.classList.toggle("auth-hidden", !isAuthenticated));
+    document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(el => el.classList.toggle("auth-hidden", isAuthenticated));
+
+    if (isAuthenticated && user) {
+        document.querySelectorAll("#profil-resmi-header, #profil-resmi-header-mobil").forEach(img => {
+            if (img) img.src = user.picture;
+        });
     }
-    // --- BİTİŞ ---
 
-    // Arayüzü en son duruma göre güncelle
-    await updateUI();
+    // Olay dinleyicilerini ata
+    document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(btn => btn.onclick = () => auth0Client.loginWithRedirect());
+    document.querySelectorAll("#btn-logout, #btn-logout-mobil").forEach(btn => btn.onclick = () => auth0Client.logout({ logoutParams: { returnTo: window.location.origin } }));
+}
 
-    // Butonlara tıklama olaylarını ata
-    const handleLogin = () => auth0Client.loginWithRedirect();
-    const handleLogout = () => auth0Client.logout({ logoutParams: { returnTo: window.location.origin } });
-
-    document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(btn => {
-        if (btn) btn.addEventListener("click", handleLogin);
-    });
-    document.querySelectorAll("#btn-logout, #btn-logout-mobil").forEach(btn => {
-        if (btn) btn.addEventListener("click", handleLogout);
-    });
-};
-
-
-// Tüm süreç buradan başlar.
-// DOM'un tamamen hazır olmasını bekleyip ana fonksiyonu çalıştırır.
+// Sayfa yüklendiğinde Header UI'ını güncelle
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', mainAuthFlow);
+    document.addEventListener('DOMContentLoaded', updateHeaderUI);
 } else {
-    mainAuthFlow();
+    updateHeaderUI();
 }
 </script>
 
