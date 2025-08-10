@@ -1,0 +1,23 @@
+{
+  "name": "baron_gayrimenkul",
+  "version": "1.0.0",
+  "description": "",
+  "main": "ilan-detay.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Glad34/izmir-emlak-sitesi.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Glad34/izmir-emlak-sitesi/issues"
+  },
+  "homepage": "https://github.com/Glad34/izmir-emlak-sitesi#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.54.0"
+  }
+}
