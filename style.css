@@ -487,3 +487,25 @@ body, p, a, span, li, td, th, input, button {
     transform: translateX(0);
   }
 }
+
+/* style.css dosyanıza ekleyin */
+
+/* Butonlar için genel stil */
+.btn-auth {
+  padding: 8px 20px;
+  border: 2px solid white;
+  color: white;
+  background-color: transparent;
+  border-radius: 25px;
+  font-weight: 600;
+  font-family: 'Arapey', serif; /* Menü fontunuzla aynı */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap; /* "Giriş Yap" yazısının tek satırda kalmasını sağlar */
+}
+
+/* Üzerine gelinceki efekt */
+.btn-auth:hover {
+  background-color: white;
+  color: #111828; /* Koyu tema renginiz */
+}
