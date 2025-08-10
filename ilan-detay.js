@@ -1,20 +1,25 @@
+// ilan-detay.js - Favori Butonu Sorununu Çözen Nihai Versiyon
+
 document.addEventListener("DOMContentLoaded", async () => {
   // Header ve Footer'ı yükle
   fetch("header.html").then(res => res.text()).then(data => document.getElementById("header-placeholder").innerHTML = data);
   fetch("footer.html").then(res => res.text()).then(data => document.getElementById("footer-placeholder").innerHTML = data);
 
   let isAuthenticated = false;
+  let auth0Client = null;
+
   try {
-    // Auth0 client'ını yapılandır ve giriş durumunu kontrol et
+    // Auth0 client'ını yapılandır ve giriş durumunu GÜVENİLİR bir şekilde kontrol et
     const response = await fetch("/.netlify/functions/auth-config");
     const config = await response.json();
-    const auth0 = await auth0.createAuth0Client({
+    auth0Client = await auth0.createAuth0Client({
       domain: config.domain,
       clientId: config.clientId
     });
-    isAuthenticated = await auth0.isAuthenticated();
+    isAuthenticated = await auth0Client.isAuthenticated();
   } catch (e) {
     console.error("Auth0 durumu kontrol edilirken hata:", e);
+    // Hata olsa bile devam et, sadece favori butonu görünmez.
   }
 
   // URL'den ilan ID'sini al
@@ -25,6 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("loading-spinner").innerHTML = "<p class='text-red-500'>Hata: İlan kimliği bulunamadı.</p>";
     return;
   }
+  
   // İlan verisini çek ve giriş durumunu fonksiyona ilet
   fetchIlanData(ilanID, isAuthenticated);
 });
@@ -37,7 +43,6 @@ async function fetchIlanData(id, isLoggedIn) {
     const data = await response.json();
     if (data.error) throw new Error(data.error);
     
-    // Veriyi sayfaya yerleştir ve giriş durumunu ilet
     populatePage(data, isLoggedIn);
 
   } catch (error) {
@@ -102,39 +107,42 @@ function populatePage(ilan, isLoggedIn) {
 
   initializePlugins();
 
-  // --- YENİ EKLENEN FAVORİ BUTONU MANTIĞI ---
+  // --- FAVORİ BUTONU MANTIĞI ---
   const favoriBtn = document.getElementById('favori-ekle-btn');
   
-  if (isLoggedIn) {
+  // Sadece giriş yapmış kullanıcılar favori butonunu görür
+  if (isLoggedIn && favoriBtn) {
       favoriBtn.classList.remove('hidden');
   }
 
-  favoriBtn.addEventListener('click', async () => {
-      favoriBtn.disabled = true;
-      favoriBtn.querySelector('i').classList.add('animate-pulse');
+  if (favoriBtn) {
+    favoriBtn.addEventListener('click', async () => {
+        favoriBtn.disabled = true;
+        favoriBtn.querySelector('i').classList.add('animate-pulse');
 
-      try {
-        const response = await fetch('/.netlify/functions/add-favorite', {
-          method: 'POST',
-          body: JSON.stringify({ ilanId: ilan['İlan ID'] }),
-        });
+        try {
+          const response = await fetch('/.netlify/functions/add-favorite', {
+            method: 'POST',
+            body: JSON.stringify({ ilanId: ilan['İlan ID'] }),
+          });
 
-        if (response.ok) {
-          favoriBtn.querySelector('i').classList.replace('far', 'fas');
-          favoriBtn.querySelector('i').classList.add('text-yellow-500');
-        } else {
-          const errorData = await response.json();
-          alert(`Hata: ${errorData.error}`);
+          if (response.ok) {
+            favoriBtn.querySelector('i').classList.replace('far', 'fas');
+            favoriBtn.querySelector('i').classList.add('text-yellow-500');
+          } else {
+            const errorData = await response.json();
+            alert(`Hata: ${errorData.error}`);
+            favoriBtn.disabled = false;
+          }
+        } catch (error) {
+          console.error('Favori ekleme hatası:', error);
+          alert('Favorilere eklenirken bir sorun oluştu.');
           favoriBtn.disabled = false;
+        } finally {
+          favoriBtn.querySelector('i').classList.remove('animate-pulse');
         }
-      } catch (error) {
-        console.error('Favori ekleme hatası:', error);
-        alert('Favorilere eklenirken bir sorun oluştu.');
-        favoriBtn.disabled = false;
-      } finally {
-        favoriBtn.querySelector('i').classList.remove('animate-pulse');
-      }
-  });
+    });
+  }
   // --- BİTİŞ ---
 
   document.getElementById('loading-spinner').classList.add('hidden');
@@ -142,24 +150,10 @@ function populatePage(ilan, isLoggedIn) {
 }
 
 function initializePlugins() {
-  const thumbsSwiper = new Swiper('.thumbs-swiper', {
-    spaceBetween: 10, slidesPerView: 4, freeMode: true, watchSlidesProgress: true,
-  });
-  new Swiper('.main-swiper', {
-    spaceBetween: 10,
-    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-    pagination: { el: '.swiper-pagination', type: 'fraction' },
-    thumbs: { swiper: thumbsSwiper },
-  });
+  // ... (Bu fonksiyonun içeriği aynı kalacak)
+  const thumbsSwiper = new Swiper('.thumbs-swiper', {spaceBetween: 10, slidesPerView: 4, freeMode: true, watchSlidesProgress: true});
+  new Swiper('.main-swiper', {spaceBetween: 10, navigation: {nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev'}, pagination: {el: '.swiper-pagination', type: 'fraction'}, thumbs: {swiper: thumbsSwiper}});
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabPanes = document.querySelectorAll('.tab-pane');
-  tabButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const tabId = button.getAttribute('data-tab');
-      tabButtons.forEach(btn => btn.classList.remove('active'));
-      tabPanes.forEach(pane => pane.classList.remove('active'));
-      button.classList.add('active');
-      document.getElementById(tabId).classList.add('active');
-    });
-  });
+  tabButtons.forEach(button => { button.addEventListener('click', () => { const tabId = button.getAttribute('data-tab'); tabButtons.forEach(btn => btn.classList.remove('active')); tabPanes.forEach(pane => pane.classList.remove('active')); button.classList.add('active'); document.getElementById(tabId).classList.add('active'); }); });
 }
