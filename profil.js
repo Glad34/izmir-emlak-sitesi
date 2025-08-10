@@ -59,35 +59,35 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function loadFavorites() {
     try {
-        const res = await fetch('/.netlify/functions/get-favorites');
+        // Auth0'dan erişim anahtarını al
+        const { accessToken } = await window.getAuthClient();
+        if (!accessToken) {
+            throw new Error('Giriş yapmalısınız.');
+        }
+
+        // fetch isteğine Authorization başlığını ekle
+        const res = await fetch('/.netlify/functions/get-favorites', {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
         
+        // ... (fonksiyonun geri kalanı aynı kalacak) ...
         if (!res.ok) {
-            // Fonksiyon 401 (Unauthorized) gibi bir hata dönerse
             const errorData = await res.json();
             throw new Error(errorData.error || 'Favoriler alınamadı.');
         }
-
         const favorites = await res.json();
         const favoriListesiDiv = document.getElementById('favori-ilanlar-listesi');
-
         if (favorites && favorites.length > 0) {
             document.getElementById('favori-yok-mesaji').classList.add('hidden');
-            
-            // Başlangıç olarak favori ilanların ID'lerini listeleyelim
             favoriListesiDiv.innerHTML = '<h3>Favori İlanlarınız:</h3>';
             favorites.forEach(fav => {
-                // Her bir favori ilanı tıklanabilir bir link yapalım
-                favoriListesiDiv.innerHTML += `
-                    <a href="ilan-detay.html?id=${fav.ilan_id}" class="block p-4 bg-white rounded shadow hover:bg-gray-50">
-                        İlan ID: ${fav.ilan_id}
-                    </a>`;
+                favoriListesiDiv.innerHTML += `<a href="ilan-detay.html?id=${fav.ilan_id}" class="block p-4 bg-white rounded shadow hover:bg-gray-50 border my-2">İlan ID: <strong>${fav.ilan_id}</strong></a>`;
             });
-
         } else {
-            // Favori yoksa, "Favori yok" mesajı görünür kalır.
             document.getElementById('favori-yok-mesaji').classList.remove('hidden');
         }
-
     } catch (error) {
         console.error('Favoriler yüklenirken hata:', error);
         document.getElementById('favori-ilanlar-listesi').innerHTML = `<p class="text-red-500">Favoriler yüklenirken bir hata oluştu: ${error.message}</p>`;

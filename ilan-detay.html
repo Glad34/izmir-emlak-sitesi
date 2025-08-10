@@ -72,17 +72,16 @@
 <!-- ========================================================== -->
 <!-- AUTH0 MANTIĞINI ÇALIŞTIRAN SCRIPT (DOĞRU YER BURASI)     -->
 <!-- ========================================================== -->
+<!-- header.html içindeki script'i bununla değiştirin -->
+
 <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 <script>
-  // auth.js - Geri Yönlendirme (Redirect) Sorununu Çözen Nihai Versiyon
-// auth.js - TÜM SİTENİN TEK AUTH0 BEYNİ
 let auth0Client = null;
 let isAuthenticated = false;
+let accessToken = null; // YENİ: Erişim anahtarını saklamak için
 
-// Bu fonksiyon, Auth0 client'ını başlatır ve durumu döndürür.
-// Zaten başlatılmışsa, tekrar başlatmaz, mevcut olanı kullanır.
 window.getAuthClient = async () => {
-    if (auth0Client) return { auth0Client, isAuthenticated };
+    if (auth0Client) return { auth0Client, isAuthenticated, accessToken };
 
     try {
         const response = await fetch("/.netlify/functions/auth-config");
@@ -90,7 +89,10 @@ window.getAuthClient = async () => {
         auth0Client = await auth0.createAuth0Client({
             domain: config.domain,
             clientId: config.clientId,
-            authorizationParams: { redirect_uri: window.location.origin }
+            authorizationParams: { 
+                redirect_uri: window.location.origin,
+                audience: config.audience // AUDIENCE'I BURADA İSTİYORUZ
+            }
         });
 
         const query = window.location.search;
@@ -100,35 +102,35 @@ window.getAuthClient = async () => {
         }
 
         isAuthenticated = await auth0Client.isAuthenticated();
-        return { auth0Client, isAuthenticated };
+        
+        // YENİ: Eğer kullanıcı giriş yapmışsa, erişim anahtarını al
+        if (isAuthenticated) {
+            accessToken = await auth0Client.getTokenSilently();
+        }
+
+        return { auth0Client, isAuthenticated, accessToken };
     } catch (e) {
         console.error("Auth0 client hatası:", e);
-        return { auth0Client: null, isAuthenticated: false };
+        return { auth0Client: null, isAuthenticated: false, accessToken: null };
     }
 };
 
-// --- Arayüzü (Header Butonları) güncelleyen ana mantık ---
 async function updateHeaderUI() {
+    // ... Bu fonksiyonun içeriği aynı kalacak ...
     const { isAuthenticated, auth0Client } = await window.getAuthClient();
     if (!auth0Client) return;
-
     const user = isAuthenticated ? await auth0Client.getUser() : null;
-
     document.querySelectorAll("#btn-logout, #btn-logout-mobil, #profil-link, #profil-link-mobil").forEach(el => el.classList.toggle("auth-hidden", !isAuthenticated));
     document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(el => el.classList.toggle("auth-hidden", isAuthenticated));
-
     if (isAuthenticated && user) {
         document.querySelectorAll("#profil-resmi-header, #profil-resmi-header-mobil").forEach(img => {
             if (img) img.src = user.picture;
         });
     }
-
-    // Olay dinleyicilerini ata
     document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(btn => btn.onclick = () => auth0Client.loginWithRedirect());
     document.querySelectorAll("#btn-logout, #btn-logout-mobil").forEach(btn => btn.onclick = () => auth0Client.logout({ logoutParams: { returnTo: window.location.origin } }));
 }
 
-// Sayfa yüklendiğinde Header UI'ını güncelle
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', updateHeaderUI);
 } else {

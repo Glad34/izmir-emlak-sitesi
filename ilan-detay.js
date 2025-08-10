@@ -117,31 +117,42 @@ function populatePage(ilan, isLoggedIn) {
 
   if (favoriBtn) {
     favoriBtn.addEventListener('click', async () => {
-        favoriBtn.disabled = true;
-        favoriBtn.querySelector('i').classList.add('animate-pulse');
+    favoriBtn.disabled = true;
+    favoriBtn.querySelector('i').classList.add('animate-pulse');
 
-        try {
-          const response = await fetch('/.netlify/functions/add-favorite', {
+    try {
+        // Auth0'dan erişim anahtarını al
+        const { accessToken } = await window.getAuthClient();
+        if (!accessToken) {
+            throw new Error('Giriş yapmalısınız.');
+        }
+
+        const response = await fetch('/.netlify/functions/add-favorite', {
             method: 'POST',
+            // fetch isteğine Authorization başlığını ekle
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            },
             body: JSON.stringify({ ilanId: ilan['İlan ID'] }),
-          });
+        });
 
-          if (response.ok) {
+        // ... (fonksiyonun geri kalanı aynı kalacak) ...
+        if (response.ok) {
             favoriBtn.querySelector('i').classList.replace('far', 'fas');
             favoriBtn.querySelector('i').classList.add('text-yellow-500');
-          } else {
+        } else {
             const errorData = await response.json();
             alert(`Hata: ${errorData.error}`);
             favoriBtn.disabled = false;
-          }
-        } catch (error) {
-          console.error('Favori ekleme hatası:', error);
-          alert('Favorilere eklenirken bir sorun oluştu.');
-          favoriBtn.disabled = false;
-        } finally {
-          favoriBtn.querySelector('i').classList.remove('animate-pulse');
         }
-    });
+    } catch (error) {
+        console.error('Favori ekleme hatası:', error);
+        alert(`Favorilere eklenirken bir sorun oluştu: ${error.message}`);
+        favoriBtn.disabled = false;
+    } finally {
+        favoriBtn.querySelector('i').classList.remove('animate-pulse');
+    }
+});
   }
   // --- BİTİŞ ---
 
