@@ -1,4 +1,5 @@
-// auth.js - TÜM SİTENİN TEK AUTH0 BEYNİ (AYRI DOSYA)
+// auth.js - TÜM SİTENİN TEK AUTH0 BEYNİ
+
 let auth0Client = null;
 let isAuthenticated = false;
 let accessToken = null;
@@ -47,18 +48,26 @@ async function updateHeaderUI() {
         });
     }
 
+    // Olay Dinleyicileri (En Önemli Kısım)
     document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(btn => { if(btn) btn.onclick = () => auth0Client.loginWithRedirect() });
     document.querySelectorAll("#btn-logout, #btn-logout-mobil").forEach(btn => { if(btn) btn.onclick = () => auth0Client.logout({ logoutParams: { returnTo: window.location.origin } }) });
 }
 
-// Header dinamik olarak yüklendiği için, butonların varlığını periyodik olarak kontrol et
+/**
+ * Bu fonksiyon, header HTML'i fetch ile yüklendikten sonra butonların
+ * DOM'a eklenmesini bekler. Bulduğu anda da UI'ı günceller.
+ * BU, TIKLAMA SORUNUNU ÇÖZEN ANAHTARDIR.
+ */
 function waitForHeaderButtons() {
     const loginButton = document.getElementById('btn-login');
     if (loginButton) {
+        // Butonlar artık sayfada, UI'ı ve olay dinleyicilerini ayarla
         updateHeaderUI();
     } else {
+        // Butonlar henüz yüklenmemiş, 100ms sonra tekrar kontrol et
         setTimeout(waitForHeaderButtons, 100);
     }
 }
 
+// Tüm süreç buradan başlar.
 waitForHeaderButtons();
