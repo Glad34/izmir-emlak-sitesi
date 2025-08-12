@@ -44,14 +44,26 @@
 
     <div id="ilan-icerik" class="hidden">
       <section class="mb-6">
+  <!-- 1. Satır: Sadece Başlık -->
+  <h1 id="ilan-baslik" class="text-3xl font-bold text-gray-800 mb-2"></h1>
+  
+  <!-- 2. Satır: Konum ve Butonlar yan yana -->
   <div class="flex justify-between items-center">
-    <h1 id="ilan-baslik" class="text-3xl font-bold text-gray-800"></h1>
-    <!-- YENİ: Favori Butonu (Başlangıçta gizli) -->
-    <button id="favori-ekle-btn" class="p-2 rounded-full hover:bg-gray-200 transition hidden">
-      <i class="far fa-star text-2xl text-gray-600"></i>
-    </button>
+    <!-- Konum (Sol Taraf) -->
+    <p id="ilan-konum" class="text-gray-600 flex items-center gap-2"><i class="fas fa-map-marker-alt"></i></p>
+    
+    <!-- Aksiyon Butonları (Sağ Taraf) -->
+    <div class="flex items-center space-x-3">
+      <!-- Paylaş Butonu -->
+      <button id="share-btn" class="p-2 rounded-full hover:bg-gray-200 transition" title="Paylaş">
+        <i class="fas fa-share-nodes text-xl text-gray-600"></i>
+      </button>
+      <!-- Favori Butonu (Başlangıçta gizli) -->
+      <button id="favori-ekle-btn" class="p-2 rounded-full hover:bg-gray-200 transition hidden" title="Favorilere Ekle">
+        <i class="far fa-star text-2xl text-gray-600"></i>
+      </button>
+    </div>
   </div>
-  <p id="ilan-konum" class="text-gray-600 mt-1 flex items-center gap-2"><i class="fas fa-map-marker-alt"></i></p>
 </section>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
