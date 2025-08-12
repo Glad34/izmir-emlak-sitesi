@@ -7,29 +7,41 @@ console.log("✅ script.js YÜKLENDİ VE ÇALIŞIYOR.");
 document.addEventListener('DOMContentLoaded', () => {
 
     /**
-     * 1. MOBİL MENÜ KONTROLÜ
-     * Header fetch ile yüklendiği için, menü butonunu bulana kadar
-     * periyodik olarak kontrol eder ve sonra tıklama olayını atar.
+     * 1. HEADER'I SAYFAYA YÜKLE
+     * Önce header'ın HTML'ini sayfaya ekleyelim.
      */
-    function setupMobileMenu() {
-        const menuToggle = document.getElementById('menu-toggle');
-        const mobileMenu = document.getElementById('mobile-menu');
-
-        if (menuToggle && mobileMenu) {
-            menuToggle.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
+    const headerPlaceholder = document.getElementById('header-placeholder');
+    if (headerPlaceholder) {
+        fetch("header.html")
+            .then(res => res.text())
+            .then(data => {
+                headerPlaceholder.innerHTML = data;
+                // Header yüklendikten SONRA diğer fonksiyonları çalıştır.
+                initializePageFunctions();
             });
-        } else {
-            setTimeout(setupMobileMenu, 100);
-        }
+    } else {
+        // Eğer header-placeholder yoksa bile diğer fonksiyonları çalıştır.
+        initializePageFunctions();
     }
-    setupMobileMenu(); // Mobil menü kontrolünü başlat
+});
 
 
-    /**
-     * 2. HEADER SCROLL (KAYDIRMA) EFEKTİ
-     * Hata vermemesi için elementlerin varlığını her zaman kontrol eder.
-     */
+/**
+ * Bu ana fonksiyon, header yüklendikten sonra veya doğrudan çalışarak
+ * sayfadaki tüm diğer JS işlevlerini başlatır.
+ */
+function initializePageFunctions() {
+
+    // --- MOBİL MENÜ KONTROLÜ ---
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+
+    // --- HEADER SCROLL (KAYDIRMA) EFEKTİ ---
     const header = document.querySelector('.custom-header');
     if (header) {
         window.addEventListener('scroll', () => {
@@ -40,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (window.scrollY > 50) {
                 header.classList.add('scrolled');
-                // Null kontrolü (element varsa işlem yap)
                 if (logoDefault) logoDefault.classList.replace('block', 'hidden');
                 if (logoScrolled) logoScrolled.classList.replace('hidden', 'block');
                 if (hamburgerIcon) hamburgerIcon.classList.replace('text-white', 'text-black');
@@ -55,86 +66,75 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- AUTH0 ÜYELİK SİSTEMİ ---
+    // Bu fonksiyonu hemen çalıştır.
+    setupAuth0();
 
-    /**
-     * 3. TESTIMONIAL SLIDER (Sadece ilgili sayfada çalışır)
-     */
+    // --- TESTIMONIAL SLIDER ---
     const slider = document.getElementById("testimonial-slider");
     if (slider) {
-        let index = 0;
-        const items = slider.getElementsByClassName("testimonial-item");
-        const totalItems = items.length;
-        if (totalItems > 1) {
-            function showNextTestimonial() {
-                items[index].style.display = "none";
-                index = (index + 1) % totalItems;
-                items[index].style.display = "block";
-            }
-            setInterval(showNextTestimonial, 3000);
-            for (let i = 1; i < totalItems; i++) {
-                items[i].style.display = "none";
-            }
-        }
+        // ... (slider kodunuz buraya gelecek)
     }
 
-
-    /**
-     * 4. DROPDOWN ARAMA KONTROLÜ (Sadece ilgili sayfada çalışır)
-     */
+    // --- DROPDOWN ARAMA ---
     const input = document.getElementById("search-input");
     const dropdown = document.getElementById("dropdown-options");
     if (input && dropdown) {
-        const options = dropdown.querySelectorAll("li");
-        input.addEventListener("focus", () => dropdown.classList.remove("hidden"));
-        options.forEach(option => {
-            option.addEventListener("click", () => {
-                const url = option.getAttribute("data-url");
-                if (url) window.location.href = url;
-            });
-        });
-        document.addEventListener("click", (e) => {
-            if (!dropdown.contains(e.target) && e.target !== input) {
-                dropdown.classList.add("hidden");
-            }
-        });
+        // ... (dropdown kodunuz buraya gelecek)
     }
-});
+}
 
 
-// ==========================================================
-// CHATBOT POP-UP KONTROL MERKEZİ
-// Bu bölüm, sayfanın tüm içeriği (resimler vb.) yüklendikten sonra çalışır.
-// ==========================================================
+/**
+ * AUTH0'ı başlatan ve yöneten ana fonksiyon.
+ */
+async function setupAuth0() {
+    try {
+      const response = await fetch("/.netlify/functions/auth-config");
+      const config = await response.json();
+      
+      const auth0Client = await auth0.createAuth0Client({
+        domain: config.domain,
+        clientId: config.clientId,
+        authorizationParams: {
+          redirect_uri: window.location.origin,
+          audience: config.audience
+        }
+      });
+
+      const updateUI = async () => { 
+        const isAuthenticated = await auth0Client.isAuthenticated();
+        const user = isAuthenticated ? await auth0Client.getUser() : null;
+        document.querySelectorAll("#btn-logout, #btn-logout-mobil, #profil-link, #profil-link-mobil").forEach(el => el.classList.toggle("auth-hidden", !isAuthenticated));
+        document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(el => el.classList.toggle("auth-hidden", isAuthenticated));
+        if (isAuthenticated && user) {
+            document.querySelectorAll("#profil-resmi-header, #profil-resmi-header-mobil").forEach(img => { if (img) img.src = user.picture; });
+        }
+      };
+
+      const handleLogin = () => auth0Client.loginWithRedirect();
+      const handleLogout = () => auth0Client.logout({ logoutParams: { returnTo: window.location.origin } });
+
+      document.querySelectorAll("#btn-login, #btn-login-mobil").forEach(btn => btn.addEventListener("click", handleLogin));
+      document.querySelectorAll("#btn-logout, #btn-logout-mobil").forEach(btn => btn.addEventListener("click", handleLogout));
+      
+      const query = window.location.search;
+      if (query.includes("code=") && query.includes("state=")) {
+        await auth0Client.handleRedirectCallback();
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+      
+      await updateUI();
+
+    } catch (e) {
+      console.error("Auth0 başlatılırken hata oluştu:", e);
+    }
+}
+
+
+/**
+ * CHATBOT POP-UP KONTROL MERKEZİ
+ */
 window.addEventListener("load", function() {
-  const chatbotPopup = document.getElementById('chatbot-popup');
-  const kapatDugmesi = document.getElementById('chatbot-kapat-btn');
-  const canliSohbetAcDugmesi = document.getElementById('canli-sohbet-ac');
-
-  function openChatbot() {
-    if (chatbotPopup) chatbotPopup.classList.remove('chatbot-hidden');
-  }
-  function closeChatbot() {
-    if (chatbotPopup) chatbotPopup.classList.add('chatbot-hidden');
-  }
-
-  // 5 saniye sonra otomatik aç
-  setTimeout(openChatbot, 5000);
-  
-  // Olay dinleyicileri
-  if (kapatDugmesi) kapatDugmesi.addEventListener('click', closeChatbot);
-  if (canliSohbetAcDugmesi) {
-    canliSohbetAcDugmesi.addEventListener('click', (event) => {
-      event.preventDefault();
-      openChatbot();
-    });
-  }
-
-  // Yeni mesaj için sorgulama mekanizması
-  setInterval(() => {
-    const newAiMessageFlag = localStorage.getItem('newAiMessageFlag');
-    if (newAiMessageFlag && chatbotPopup && chatbotPopup.classList.contains('chatbot-hidden')) {
-      openChatbot();
-      localStorage.removeItem('newAiMessageFlag');
-    }
-  }, 1000);
+  // ... (chatbot kodunuz burada olduğu gibi kalabilir, o doğru çalışıyordu)
 });
