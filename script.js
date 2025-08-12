@@ -25,14 +25,35 @@ window.auth0ClientPromise = new Promise(async (resolve, reject) => {
         window.getAuthClient = () => auth0Client;
         
         // Favori ekleme gibi işlemler için daha güvenli olan token alma fonksiyonunu da tanımlıyoruz.
-        window.getAuthToken = async () => {
-            const client = window.getAuthClient();
-            if (!client || !(await client.isAuthenticated())) {
-                throw new Error("Bu işlem için giriş yapmanız gerekmektedir.");
-            }
-            // Access token'ı sessizce (popup olmadan) al.
-            return await client.getTokenSilently();
-        };
+        // script.js dosyasında bu fonksiyonu bulun ve değiştirin:
+
+// Favori ekleme gibi işlemler için daha güvenli olan token alma fonksiyonunu da tanımlıyoruz.
+window.getAuthToken = async () => {
+    const client = window.getAuthClient();
+    if (!client) {
+        throw new Error("Auth0 istemcisi hazır değil.");
+    }
+    
+    const isAuthenticated = await client.isAuthenticated();
+    if (!isAuthenticated) {
+        throw new Error("Bu işlem için giriş yapmanız gerekmektedir.");
+    }
+
+    try {
+        // Access token'ı sessizce (popup olmadan) al.
+        const token = await client.getTokenSilently();
+        if (!token) {
+            // Bu ek kontrol, token'ın boş gelme ihtimaline karşı bir güvencedir.
+            throw new Error("Alınan token geçersiz veya boş.");
+        }
+        return token;
+    } catch (error) {
+        // getTokenSilently'den gelebilecek "login_required" gibi hataları yakala
+        console.error("Token alınırken hata oluştu (login_required olabilir):", error);
+        // Hatanın sebebini daha anlaşılır bir şekilde ön yüze geri fırlat.
+        throw new Error("Oturumunuzun yenilenmesi gerekiyor. Lütfen tekrar giriş yapın.");
+    }
+};
 
         console.log("Auth0 istemcisi başarıyla başlatıldı ve global olarak hazır.");
         resolve(auth0Client); // Promise'i başarıyla tamamla ve istemciyi döndür.
