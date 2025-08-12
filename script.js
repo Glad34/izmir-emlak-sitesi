@@ -54,7 +54,6 @@ window.getAuthToken = async () => {
         throw new Error("Oturumunuzun yenilenmesi gerekiyor. Lütfen tekrar giriş yapın.");
     }
 };
-
         console.log("Auth0 istemcisi başarıyla başlatıldı ve global olarak hazır.");
         resolve(auth0Client); // Promise'i başarıyla tamamla ve istemciyi döndür.
     } catch (e) {
