@@ -13,3 +13,74 @@
   background-color: #111828;
   color: white;
 }
+
+
+
+/* profil.css - Favori ilan kartları için özel stiller */
+
+/* profil.css - Favori ilan kartları için özel ve uyumlu stiller */
+
+/* Ana favori listesi konteyneri için boşluk ayarı */
+#favori-ilanlar-listesi {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Kartlar arasına 16px boşluk ekler */
+}
+
+/* Her bir favori kartının ana yapısı */
+.favorite-card {
+  display: flex; /* Resmi ve içeriği yan yana hizalar */
+  background-color: white;
+  border-radius: 0.5rem; /* 8px */
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  overflow: hidden; /* Köşelerden taşan resmi gizler */
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+  text-decoration: none; /* Alt çizgiyi kaldırır */
+  color: inherit; /* Yazı rengini korur */
+}
+
+/* Fare ile üzerine gelindiğinde karta hafif bir gölge ve kaldırma efekti verir */
+.favorite-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Favori kartındaki resim alanı */
+.favorite-card__image {
+  width: 128px;   /* 8rem - Kartın sol tarafında sabit genişlikli resim */
+  height: auto;   /* Yüksekliği içeriğe göre ayarlar */
+  flex-shrink: 0; /* İçerik uzasa bile resmin küçülmesini engeller */
+  object-fit: cover; /* Resmin orantısını bozmadan alanı kaplamasını sağlar */
+}
+
+/* Favori kartındaki başlık ve fiyatın bulunduğu sağ taraf */
+.favorite-card__content {
+  padding: 1rem; /* 16px - İç boşluk */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* İçeriği dikey olarak ortalar */
+  flex-grow: 1; /* Mevcut alanı doldurur */
+}
+
+/* Favori kart başlığı */
+.favorite-card__title {
+  font-size: 1.125rem; /* 18px */
+  font-weight: 600;
+  color: #1f2937; /* text-gray-800 */
+  margin-bottom: 0.5rem; /* 8px - Başlık ve fiyat arasına boşluk */
+  
+  /* Uzun başlıklar için... */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;    /* ESKİ TARAYICILAR İÇİN */
+  line-clamp: 2;            /* YENİ EKLENEN STANDART SATIR */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Favori kart fiyatı */
+.favorite-card__price {
+  font-size: 1rem; /* 16px */
+  font-weight: 500;
+  color: #1e40af; /* Projenizin ana mavi rengi veya dilediğiniz bir renk */
+}

@@ -1,46 +1,29 @@
-// profil.js - Profil sayfasını yöneten NİHAİ ve MERKEZİ SİSTEME UYUMLU kod
-
 document.addEventListener('DOMContentLoaded', async () => {
-  // Not: Header/Footer yükleme işlemi artık merkezi script.js tarafından yapılıyor.
-  // Bu yüzden buradaki fetch'leri kaldırıyoruz, script.js zaten hallediyor.
-
   try {
-    // Merkezi Auth0 Promise'inin tamamlanmasını bekle
     const auth0Client = await window.auth0ClientPromise;
     const isAuthenticated = await auth0Client.isAuthenticated();
 
     if (isAuthenticated) {
-      // --- KULLANICI GİRİŞ YAPMIŞSA ---
       document.getElementById('profil-icerik').classList.remove('hidden');
-      
       const user = await auth0Client.getUser();
       
-      // Profil bilgilerini doldur
       if (user) {
         document.getElementById('profil-resmi').src = user.picture || 'images/placeholder-avatar.png';
         document.getElementById('profil-adi').textContent = user.name || user.email;
         document.getElementById('profil-email').textContent = user.email;
       }
-
-      // Favorileri çek ve göster
-      await loadFavorites();
+      
+      await loadFavoritesWithDetails();
 
     } else {
-      // --- KULLANICI GİRİŞ YAPMAMIŞSA ---
       document.getElementById('giris-yap-uyarisi').classList.remove('hidden');
-      
       const loginButton = document.getElementById('profil-login-btn');
       if (loginButton) {
         loginButton.addEventListener('click', () => {
-            auth0Client.loginWithRedirect({
-                authorizationParams: {
-                    redirect_uri: window.location.href
-                }
-            });
+            auth0Client.loginWithRedirect({ authorizationParams: { redirect_uri: window.location.href } });
         });
       }
     }
-
   } catch(e) {
       console.error("Profil sayfası yüklenirken hata oluştu:", e);
       document.getElementById('giris-yap-uyarisi').classList.remove('hidden');
@@ -48,17 +31,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-/**
- * Giriş yapmış kullanıcının favorilerini Netlify fonksiyonu üzerinden çeker ve gösterir.
- */
-async function loadFavorites() {
-    try {
-        // ARTIK DOĞRU VE MERKEZİ FONKSİYONU KULLANIYORUZ!
-        const accessToken = await window.getAuthToken();
-        if (!accessToken) {
-            throw new Error('Geçerli bir oturum anahtarı alınamadı.');
-        }
 
+/**
+ * Favorileri çeker, ardından her birinin detayını alarak ekrana tam bir kart olarak basar.
+ */
+async function loadFavoritesWithDetails() {
+    const favoriListesiDiv = document.getElementById('favori-ilanlar-listesi');
+    try {
+        const accessToken = await window.getAuthToken();
+        if (!accessToken) throw new Error('Geçerli bir oturum anahtarı alınamadı.');
+
+        // 1. Backend'den sadece favori ilan ID'lerini al
         const res = await fetch('/.netlify/functions/get-favorites', {
             headers: { 'Authorization': `Bearer ${accessToken}` }
         });
@@ -69,31 +52,50 @@ async function loadFavorites() {
         }
 
         const favorites = await res.json();
-        const favoriListesiDiv = document.getElementById('favori-ilanlar-listesi');
 
+        // 2. Favori var mı kontrol et
         if (favorites && favorites.length > 0) {
             document.getElementById('favori-yok-mesaji').classList.add('hidden');
-            
-            // Mevcut listeyi temizle (eğer varsa)
-            favoriListesiDiv.innerHTML = ''; 
+            favoriListesiDiv.innerHTML = '<p class="text-gray-600 animate-pulse">Favori ilanlarınız yükleniyor...</p>'; // Kullanıcıya yükleniyor bilgisi ver
 
-            // Her bir favori için ilan detaylarını çek ve kart oluştur
-            // Bu, sadece ID yerine ilan başlığı ve resmini göstermemizi sağlar
-            // Not: Bu işlem, çok sayıda favori varsa yavaş olabilir. 
-            // Daha gelişmiş sistemlerde bu tek bir backend isteği ile yapılır.
-            
-            // Şimdilik basitçe ID'leri gösterelim:
-            favorites.forEach(fav => {
-                favoriListesiDiv.innerHTML += `
-                  <a href="ilan-detay.html?id=${fav.ilan_id}" class="block p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                    İlan ID: <strong>${fav.ilan_id}</strong>
-                  </a>`;
+            // 3. Her bir ID için ilan detaylarını çekmek üzere bir Promise dizisi oluştur
+            const ilanDetayPromises = favorites.map(fav => {
+                const jsonURL = `https://script.google.com/macros/s/AKfycbw3Ye0dEXs5O4nmZ_PDQqJOGvEDM5hL1yP6EyO1lnpRh_Brj0kwJy6GP1ZSDrMPOi-5/exec?ilanID=${fav.ilan_id}`;
+                return fetch(jsonURL).then(response => response.json());
             });
+
+            // 4. Tüm detay çekme işlemlerinin BİRDEN tamamlanmasını bekle
+            const ilanDetaylari = await Promise.all(ilanDetayPromises);
+            
+            favoriListesiDiv.innerHTML = ''; // Yükleniyor mesajını temizle
+
+            // 5. Her bir ilan detayı için bir kart oluştur ve ekrana bas
+            ilanDetaylari.forEach(ilan => {
+                // Hata durumunda (ilan bulunamadıysa) bu ilanı atla
+                if (!ilan || !ilan['İlan ID']) return;
+
+                const fiyat = parseInt(String(ilan['Fiyat']).replace(/[^\d]/g, ''));
+                const formatliFiyat = !isNaN(fiyat) ? `${fiyat.toLocaleString('tr-TR')} TL` : "Fiyat Belirtilmemiş";
+                const resimUrl = ilan['Resim 1'] || 'images/placeholder.jpg'; // Ana resim yoksa varsayılan resim
+
+                favoriListesiDiv.innerHTML += `
+                  <a href="ilan-detay.html?id=${ilan['İlan ID']}" class="favorite-card">
+                    <img src="${resimUrl}" alt="${ilan['Başlık']}" class="favorite-card__image">
+                    <div class="favorite-card__content">
+                      <h4 class="favorite-card__title">${ilan['Başlık']}</h4>
+                      <p class="favorite-card__price">${formatliFiyat}</p>
+                    </div>
+                  </a>
+                `;
+            });
+
         } else {
+            // Favori ilan yoksa mesajı göster
             document.getElementById('favori-yok-mesaji').classList.remove('hidden');
+            favoriListesiDiv.innerHTML = ''; // Liste boşsa tamamen temizle
         }
     } catch (error) {
         console.error('Favoriler yüklenirken hata:', error);
-        document.getElementById('favori-ilanlar-listesi').innerHTML = `<p class="text-red-500">Favoriler yüklenirken bir hata oluştu: ${error.message}</p>`;
+        favoriListesiDiv.innerHTML = `<p class="text-red-500">Favoriler yüklenirken bir hata oluştu: ${error.message}</p>`;
     }
 }
