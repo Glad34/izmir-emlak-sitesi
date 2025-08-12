@@ -1,27 +1,21 @@
-// ilan-detay.js - Favori Butonu Sorununu Çözen Nihai Versiyon
+// ilan-detay.js - "Tek Beyin" (auth.js) ile tam uyumlu
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // Header ve Footer'ı yükle
+  // Header ve Footer'ı yükle. Bu script'ler footer.html'den yükleneceği için
+  // bu işlem sayfanın görsel bütünlüğünü sağlar.
   fetch("header.html").then(res => res.text()).then(data => document.getElementById("header-placeholder").innerHTML = data);
   fetch("footer.html").then(res => res.text()).then(data => document.getElementById("footer-placeholder").innerHTML = data);
 
-  let isAuthenticated = false;
-  let auth0Client = null;
-
-  try {
-    // Auth0 client'ını yapılandır ve giriş durumunu GÜVENİLİR bir şekilde kontrol et
-    const response = await fetch("/.netlify/functions/auth-config");
-    const config = await response.json();
-    auth0Client = await auth0.createAuth0Client({
-      domain: config.domain,
-      clientId: config.clientId
-    });
-    isAuthenticated = await auth0Client.isAuthenticated();
-  } catch (e) {
-    console.error("Auth0 durumu kontrol edilirken hata:", e);
-    // Hata olsa bile devam et, sadece favori butonu görünmez.
+  // ÖNEMLİ: getAuthClient'in var olmasını bekle
+  // Bu, auth.js'in tamamen yüklendiğinden ve hazır olduğundan emin olmamızı sağlar.
+  if (typeof window.getAuthClient !== 'function') {
+      // Eğer fonksiyon hemen bulunamazsa, küçük bir gecikmeyle tekrar dene
+      await new Promise(resolve => setTimeout(resolve, 300)); 
   }
 
+  // Artık auth.js'den gelen global fonksiyonu güvenle kullanabiliriz
+  const { isAuthenticated } = await window.getAuthClient();
+  
   // URL'den ilan ID'sini al
   const params = new URLSearchParams(window.location.search);
   const ilanID = params.get('id');
@@ -107,61 +101,52 @@ function populatePage(ilan, isLoggedIn) {
 
   initializePlugins();
 
-  // --- FAVORİ BUTONU MANTIĞI ---
   const favoriBtn = document.getElementById('favori-ekle-btn');
-  
-  // Sadece giriş yapmış kullanıcılar favori butonunu görür
   if (isLoggedIn && favoriBtn) {
       favoriBtn.classList.remove('hidden');
   }
 
   if (favoriBtn) {
     favoriBtn.addEventListener('click', async () => {
-    favoriBtn.disabled = true;
-    favoriBtn.querySelector('i').classList.add('animate-pulse');
+        favoriBtn.disabled = true;
+        favoriBtn.querySelector('i').classList.add('animate-pulse');
 
-    try {
-        // Auth0'dan erişim anahtarını al
-        const { accessToken } = await window.getAuthClient();
-        if (!accessToken) {
-            throw new Error('Giriş yapmalısınız.');
-        }
+        try {
+            // Auth0'dan erişim anahtarını al (artık auth.js'den geliyor)
+            const { accessToken } = await window.getAuthClient();
+            if (!accessToken) {
+                throw new Error('Giriş yapmalısınız.');
+            }
 
-        const response = await fetch('/.netlify/functions/add-favorite', {
-            method: 'POST',
-            // fetch isteğine Authorization başlığını ekle
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({ ilanId: ilan['İlan ID'] }),
-        });
+            const response = await fetch('/.netlify/functions/add-favorite', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${accessToken}` },
+                body: JSON.stringify({ ilanId: ilan['İlan ID'] }),
+            });
 
-        // ... (fonksiyonun geri kalanı aynı kalacak) ...
-        if (response.ok) {
-            favoriBtn.querySelector('i').classList.replace('far', 'fas');
-            favoriBtn.querySelector('i').classList.add('text-yellow-500');
-        } else {
-            const errorData = await response.json();
-            alert(`Hata: ${errorData.error}`);
+            if (response.ok) {
+                favoriBtn.querySelector('i').classList.replace('far', 'fas');
+                favoriBtn.querySelector('i').classList.add('text-yellow-500');
+            } else {
+                const errorData = await response.json();
+                alert(`Hata: ${errorData.error}`);
+                favoriBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error('Favori ekleme hatası:', error);
+            alert(`Favorilere eklenirken bir sorun oluştu: ${error.message}`);
             favoriBtn.disabled = false;
+        } finally {
+            favoriBtn.querySelector('i').classList.remove('animate-pulse');
         }
-    } catch (error) {
-        console.error('Favori ekleme hatası:', error);
-        alert(`Favorilere eklenirken bir sorun oluştu: ${error.message}`);
-        favoriBtn.disabled = false;
-    } finally {
-        favoriBtn.querySelector('i').classList.remove('animate-pulse');
-    }
-});
+    });
   }
-  // --- BİTİŞ ---
 
   document.getElementById('loading-spinner').classList.add('hidden');
   document.getElementById('ilan-icerik').classList.remove('hidden');
 }
 
 function initializePlugins() {
-  // ... (Bu fonksiyonun içeriği aynı kalacak)
   const thumbsSwiper = new Swiper('.thumbs-swiper', {spaceBetween: 10, slidesPerView: 4, freeMode: true, watchSlidesProgress: true});
   new Swiper('.main-swiper', {spaceBetween: 10, navigation: {nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev'}, pagination: {el: '.swiper-pagination', type: 'fraction'}, thumbs: {swiper: thumbsSwiper}});
   const tabButtons = document.querySelectorAll('.tab-button');
