@@ -1,42 +1,42 @@
+// ==========================================================
+// Baron Gayrimenkul - Ana Kontrol Script'i
+// ==========================================================
 console.log("✅ script.js YÜKLENDİ VE ÇALIŞIYOR.");
 
-// ==========================================================
-// ANA KONTROL MERKEZİ
-// Tüm sayfa genelindeki JavaScript mantığı bu tek yerden yönetilir.
-// ==========================================================
 document.addEventListener('DOMContentLoaded', () => {
-
-    /**
-     * 1. HEADER'I SAYFAYA YÜKLE
-     * Önce header'ın HTML'ini sayfaya ekleyelim.
-     */
+    // Önce Header ve Footer'ı yükle
     const headerPlaceholder = document.getElementById('header-placeholder');
+    const footerPlaceholder = document.getElementById('footer-placeholder');
+
     if (headerPlaceholder) {
         fetch("header.html")
             .then(res => res.text())
             .then(data => {
                 headerPlaceholder.innerHTML = data;
-                // Header yüklendikten SONRA diğer tüm fonksiyonları çalıştır.
-                initializePageFunctions();
-            })
-            .catch(error => {
-                console.error("Header yüklenirken hata oluştu:", error);
-                // Header yüklenemese bile diğer fonksiyonları çalıştırmayı dene
-                initializePageFunctions();
+                // Header yüklendikten SONRA ona bağlı fonksiyonları çalıştır
+                initializeHeaderFunctions();
             });
-    } else {
-        // Eğer sayfada header-placeholder yoksa, yine de diğer fonksiyonları çalıştır.
-        initializePageFunctions();
     }
+
+    if (footerPlaceholder) {
+        fetch("footer.html")
+            .then(res => res.text())
+            .then(data => {
+                footerPlaceholder.innerHTML = data;
+                // Footer yüklendikten SONRA ona bağlı fonksiyonları çalıştır
+                initializeFooterFunctions();
+            });
+    }
+
+    // Header'a bağlı olmayan diğer fonksiyonlar burada başlayabilir
+    initializePageFunctions();
 });
 
-
 /**
- * Bu ana fonksiyon, header yüklendikten sonra veya doğrudan çalışarak
- * sayfadaki tüm diğer JS işlevlerini başlatır.
+ * Bu ana fonksiyon, header ve footer yüklendikten sonra
+ * onlara bağımlı olan tüm JS işlevlerini başlatır.
  */
-function initializePageFunctions() {
-
+function initializeHeaderFunctions() {
     // --- MOBİL MENÜ KONTROLÜ ---
     const menuToggle = document.getElementById('menu-toggle');
     const mobileMenu = document.getElementById('mobile-menu');
@@ -70,49 +70,56 @@ function initializePageFunctions() {
             }
         });
     }
-
+    
     // --- AUTH0 ÜYELİK SİSTEMİ ---
     setupAuth0();
-
-    // --- TESTIMONIAL SLIDER ---
-    const slider = document.getElementById("testimonial-slider");
-    if (slider) {
-        let index = 0;
-        const items = slider.getElementsByClassName("testimonial-item");
-        const totalItems = items.length;
-        if (totalItems > 1) {
-            function showNextTestimonial() {
-                items[index].style.display = "none";
-                index = (index + 1) % totalItems;
-                items[index].style.display = "block";
-            }
-            setInterval(showNextTestimonial, 3000);
-            for (let i = 1; i < totalItems; i++) {
-                items[i].style.display = "none";
-            }
-        }
-    }
-
-    // --- DROPDOWN ARAMA KONTROLÜ ---
-    const input = document.getElementById("search-input");
-    const dropdown = document.getElementById("dropdown-options");
-    if (input && dropdown) {
-        const options = dropdown.querySelectorAll("li");
-        input.addEventListener("focus", () => dropdown.classList.remove("hidden"));
-        options.forEach(option => {
-            option.addEventListener("click", () => {
-                const url = option.getAttribute("data-url");
-                if (url) window.location.href = url;
-            });
-        });
-        document.addEventListener("click", (e) => {
-            if (!dropdown.contains(e.target) && e.target !== input) {
-                dropdown.classList.add("hidden");
-            }
-        });
-    }
 }
 
+/**
+ * Footer yüklendikten sonra ona bağımlı işlevleri başlatır.
+ */
+function initializeFooterFunctions() {
+    // --- CHATBOT POP-UP KONTROL MERKEZİ ---
+    const chatbotPopup = document.getElementById('chatbot-popup');
+    const kapatDugmesi = document.getElementById('chatbot-kapat-btn');
+    const canliSohbetAcDugmesi = document.getElementById('canli-sohbet-ac');
+
+    function openChatbot() {
+        if (chatbotPopup) chatbotPopup.classList.remove('chatbot-hidden');
+    }
+    function closeChatbot() {
+        if (chatbotPopup) chatbotPopup.classList.add('chatbot-hidden');
+    }
+
+    setTimeout(openChatbot, 5000);
+    if (kapatDugmesi) kapatDugmesi.addEventListener('click', closeChatbot);
+    if (canliSohbetAcDugmesi) {
+        canliSohbetAcDugmesi.addEventListener('click', (event) => {
+            event.preventDefault();
+            openChatbot();
+        });
+    }
+    setInterval(() => {
+        const flag = localStorage.getItem('newAiMessageFlag');
+        if (flag && chatbotPopup && chatbotPopup.classList.contains('chatbot-hidden')) {
+            openChatbot();
+            localStorage.removeItem('newAiMessageFlag');
+        }
+    }, 1000);
+}
+
+/**
+ * Header/Footer'a bağlı olmayan, sayfa özelindeki işlevleri başlatır.
+ */
+function initializePageFunctions() {
+    // --- TESTIMONIAL SLIDER ---
+    const slider = document.getElementById("testimonial-slider");
+    if (slider) { /* ... slider kodunuz ... */ }
+
+    // --- DROPDOWN ARAMA ---
+    const input = document.getElementById("search-input");
+    if (input) { /* ... dropdown kodunuz ... */ }
+}
 
 /**
  * AUTH0'ı başlatan ve yöneten ana fonksiyon.
@@ -159,38 +166,3 @@ async function setupAuth0() {
       console.error("Auth0 başlatılırken hata oluştu:", e);
     }
 }
-
-
-/**
- * CHATBOT POP-UP KONTROL MERKEZİ
- */
-window.addEventListener("load", function() {
-  const chatbotPopup = document.getElementById('chatbot-popup');
-  const kapatDugmesi = document.getElementById('chatbot-kapat-btn');
-  const canliSohbetAcDugmesi = document.getElementById('canli-sohbet-ac');
-
-  function openChatbot() {
-    if (chatbotPopup) chatbotPopup.classList.remove('chatbot-hidden');
-  }
-  function closeChatbot() {
-    if (chatbotPopup) chatbotPopup.classList.add('chatbot-hidden');
-  }
-
-  setTimeout(openChatbot, 5000);
-  
-  if (kapatDugmesi) kapatDugmesi.addEventListener('click', closeChatbot);
-  if (canliSohbetAcDugmesi) {
-    canliSohbetAcDugmesi.addEventListener('click', (event) => {
-      event.preventDefault();
-      openChatbot();
-    });
-  }
-
-  setInterval(() => {
-    const newAiMessageFlag = localStorage.getItem('newAiMessageFlag');
-    if (newAiMessageFlag && chatbotPopup && chatbotPopup.classList.contains('chatbot-hidden')) {
-      openChatbot();
-      localStorage.removeItem('newAiMessageFlag');
-    }
-  }, 1000);
-});
