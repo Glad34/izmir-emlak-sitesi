@@ -1,47 +1,38 @@
-// ilan-detay.js - Favori Butonu Sorununu Çözen Nihai Versiyon
-
+// ==========================================================
+// İlan Detay Script'i (MERKEZİ YAPIYA UYUMLU - TAM SÜRÜM)
+// ==========================================================
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // Header ve Footer'ı yükle
-  fetch("header.html").then(res => res.text()).then(data => document.getElementById("header-placeholder").innerHTML = data);
-  fetch("footer.html").then(res => res.text()).then(data => document.getElementById("footer-placeholder").innerHTML = data);
-
+  // Not: Header/Footer yükleme işlemi artık merkezi script.js tarafından yapılıyor.
 
   let isAuthenticated = false;
-  let auth0Client = null;
-
 
   try {
-    // Auth0 client'ını yapılandır ve giriş durumunu GÜVENİLİR bir şekilde kontrol et
-    const response = await fetch("/.netlify/functions/auth-config");
-    const config = await response.json();
-    auth0Client = await auth0.createAuth0Client({
-      domain: config.domain,
-      clientId: config.clientId
-    });
+    // script.js'in hazırladığı global Auth0 Promise'inin tamamlanmasını bekle.
+    const auth0Client = await window.auth0ClientPromise;
     isAuthenticated = await auth0Client.isAuthenticated();
+    console.log("İlan Detay: Auth0 durumu kontrol edildi. Giriş yapıldı mı?", isAuthenticated);
   } catch (e) {
-    console.error("Auth0 durumu kontrol edilirken hata:", e);
-    // Hata olsa bile devam et, sadece favori butonu görünmez.
+    console.error("İlan Detay: Auth0 durumu kontrol edilirken hata:", e);
+    // Hata olsa bile sayfanın çalışmasına devam et, sadece favori butonu gizli kalır.
   }
-
 
   // URL'den ilan ID'sini al
   const params = new URLSearchParams(window.location.search);
   const ilanID = params.get('id');
-
 
   if (!ilanID) {
     document.getElementById("loading-spinner").innerHTML = "<p class='text-red-500'>Hata: İlan kimliği bulunamadı.</p>";
     return;
   }
  
-  // İlan verisini çek ve giriş durumunu fonksiyona ilet
+  // İlan verisini çek ve GÜNCEL giriş durumunu fonksiyona ilet
   fetchIlanData(ilanID, isAuthenticated);
 });
 
 
 async function fetchIlanData(id, isLoggedIn) {
+  // Bu fonksiyonda değişiklik yok.
   const jsonURL = `https://script.google.com/macros/s/AKfycbw3Ye0dEXs5O4nmZ_PDQqJOGvEDM5hL1yP6EyO1lnpRh_Brj0kwJy6GP1ZSDrMPOi-5/exec?ilanID=${id}`;
   try {
     const response = await fetch(jsonURL);
@@ -51,33 +42,29 @@ async function fetchIlanData(id, isLoggedIn) {
    
     populatePage(data, isLoggedIn);
 
-
   } catch (error) {
     console.error("Veri çekilirken hata oluştu:", error);
     document.getElementById("loading-spinner").innerHTML = `<p class='text-red-500'>Hata: İlan yüklenemedi. (${error.message})</p>`;
   }
 }
 
-
 function populatePage(ilan, isLoggedIn) {
+  // Sayfa içeriğini doldurma kısmında favori butonu dışında değişiklik yok.
   document.title = ilan['Başlık'];
   document.getElementById('ilan-baslik').textContent = ilan['Başlık'];
   document.getElementById('ilan-konum').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${ilan['Konum']}`;
-
-
+  
   const fiyatSayisi = parseInt(String(ilan['Fiyat']).replace(/[^\d]/g, ''));
   document.getElementById('ilan-fiyat').textContent = !isNaN(fiyatSayisi) ? `${fiyatSayisi.toLocaleString('tr-TR')} TL` : "Belirtilmemiş";
- 
+  
   document.getElementById('ilan-aciklama').innerHTML = ilan['Açıklama'].replace(/\n/g, '<br>');
-
-
+  
   const ozellikler = {
     "İlan Tipi": ilan['İlan Tipi'], "Oda Sayısı": ilan['Oda Sayısı'], "m² (Brüt)": ilan['m² (Brüt)'],
     "Bina Yaşı": ilan['Bina Yaşı'], "Isıtma": ilan['Isıtma'], "Banyo Sayısı": ilan['Banyo Sayısı'],
     "Balkon": ilan['Balkon'], "Eşyalı": ilan['Eşyalı'], "Site İçerisinde": ilan['Site İçerisinde'],
     "Krediye Uygun": ilan['Krediye Uygun'], "Aidat (TL)": ilan['Aidat (TL)'], "Bulunduğu Kat": ilan['Bulunduğu Kat']
   };
-
 
   const ozelliklerListesiTab = document.getElementById('ilan-ozellikler-tab');
   ozelliklerListesiTab.innerHTML = '';
@@ -90,26 +77,23 @@ function populatePage(ilan, isLoggedIn) {
         </li>`;
     }
   });
-
-
+  
   document.getElementById('harita-iframe').src = ilan['Harita Linki'];
   document.getElementById('danisman-adi').textContent = "Onur Başaran";
   document.getElementById('danisman-tel').href = `https://wa.me/905308775368`;
-
-
+  
   const resimler = [];
   for (let i = 1; i <= 15; i++) {
     if (ilan[`Resim ${i}`] && ilan[`Resim ${i}`].trim() !== "") {
       resimler.push(ilan[`Resim ${i}`]);
     }
   }
-
-
+  
   const mainWrapper = document.getElementById('main-swiper-wrapper');
   const thumbsWrapper = document.getElementById('thumbs-swiper-wrapper');
   mainWrapper.innerHTML = '';
   thumbsWrapper.innerHTML = '';
- 
+  
   if (resimler.length > 0) {
     resimler.forEach(resimSrc => {
       mainWrapper.innerHTML += `<div class="swiper-slide"><img src="${resimSrc}" /></div>`;
@@ -118,12 +102,10 @@ function populatePage(ilan, isLoggedIn) {
   } else {
     mainWrapper.innerHTML = `<div class="swiper-slide"><img src="images/placeholder.jpg" /></div>`;
   }
-
-
+  
   initializePlugins();
 
-
-  // --- FAVORİ BUTONU MANTIĞI ---
+  // --- FAVORİ BUTONU MANTIĞI (DÜZELTİLDİ) ---
   const favoriBtn = document.getElementById('favori-ekle-btn');
  
   // Sadece giriş yapmış kullanıcılar favori butonunu görür
@@ -131,62 +113,86 @@ function populatePage(ilan, isLoggedIn) {
       favoriBtn.classList.remove('hidden');
   }
 
-
-  if (favoriBtn) {
+  // Sadece buton varsa ve kullanıcı giriş yapmışsa tıklama olayını ekle
+  if (favoriBtn && isLoggedIn) {
     favoriBtn.addEventListener('click', async () => {
-    favoriBtn.disabled = true;
-    favoriBtn.querySelector('i').classList.add('animate-pulse');
+        favoriBtn.disabled = true;
+        favoriBtn.querySelector('i').classList.add('animate-pulse');
 
+        try {
+            // Artık script.js'te tanımlanan global fonksiyondan token'ı güvenli bir şekilde alıyoruz!
+            const accessToken = await window.getAuthToken(); 
 
-    try {
-        // Auth0'dan erişim anahtarını al
-        const { accessToken } = await window.getAuthClient();
-        if (!accessToken) {
-            throw new Error('Giriş yapmalısınız.');
-        }
+            const response = await fetch('/.netlify/functions/add-favorite', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ilanId: ilan['İlan ID'] }),
+            });
 
-
-        const response = await fetch('/.netlify/functions/add-favorite', {
-            method: 'POST',
-            // fetch isteğine Authorization başlığını ekle
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({ ilanId: ilan['İlan ID'] }),
-        });
-
-
-        // ... (fonksiyonun geri kalanı aynı kalacak) ...
-        if (response.ok) {
-            favoriBtn.querySelector('i').classList.replace('far', 'fas');
-            favoriBtn.querySelector('i').classList.add('text-yellow-500');
-        } else {
-            const errorData = await response.json();
-            alert(`Hata: ${errorData.error}`);
+            if (response.ok) {
+                favoriBtn.querySelector('i').classList.replace('far', 'fas');
+                favoriBtn.querySelector('i').classList.add('text-yellow-500');
+            } else {
+                const errorData = await response.json();
+                alert(`Hata: ${errorData.error || 'Bilinmeyen bir sunucu hatası.'}`);
+                favoriBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error('Favori ekleme hatası:', error);
+            alert(`Favorilere eklenirken bir sorun oluştu: ${error.message}`);
             favoriBtn.disabled = false;
+        } finally {
+            favoriBtn.querySelector('i').classList.remove('animate-pulse');
         }
-    } catch (error) {
-        console.error('Favori ekleme hatası:', error);
-        alert(`Favorilere eklenirken bir sorun oluştu: ${error.message}`);
-        favoriBtn.disabled = false;
-    } finally {
-        favoriBtn.querySelector('i').classList.remove('animate-pulse');
-    }
-});
+    });
   }
   // --- BİTİŞ ---
 
-
+  // Yükleme animasyonunu gizle ve içeriği göster
   document.getElementById('loading-spinner').classList.add('hidden');
   document.getElementById('ilan-icerik').classList.remove('hidden');
 }
 
 
 function initializePlugins() {
-  // ... (Bu fonksiyonun içeriği aynı kalacak)
-  const thumbsSwiper = new Swiper('.thumbs-swiper', {spaceBetween: 10, slidesPerView: 4, freeMode: true, watchSlidesProgress: true});
-  new Swiper('.main-swiper', {spaceBetween: 10, navigation: {nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev'}, pagination: {el: '.swiper-pagination', type: 'fraction'}, thumbs: {swiper: thumbsSwiper}});
+  // Swiper ve Tab yapısını başlatan fonksiyonda değişiklik yok.
+  const thumbsSwiper = new Swiper('.thumbs-swiper', {
+    spaceBetween: 10,
+    slidesPerView: 4,
+    freeMode: true,
+    watchSlidesProgress: true,
+  });
+
+  new Swiper('.main-swiper', {
+    spaceBetween: 10,
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+    pagination: {
+      el: '.swiper-pagination',
+      type: 'fraction'
+    },
+    thumbs: {
+      swiper: thumbsSwiper,
+    },
+  });
+
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabPanes = document.querySelectorAll('.tab-pane');
-  tabButtons.forEach(button => { button.addEventListener('click', () => { const tabId = button.getAttribute('data-tab'); tabButtons.forEach(btn => btn.classList.remove('active')); tabPanes.forEach(pane => pane.classList.remove('active')); button.classList.add('active'); document.getElementById(tabId).classList.add('active'); }); });
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const tabId = button.getAttribute('data-tab');
+      
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      tabPanes.forEach(pane => pane.classList.remove('active'));
+      
+      button.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    });
+  });
 }

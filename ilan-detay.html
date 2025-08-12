@@ -18,23 +18,7 @@
  <!-- Header -->
  <div id="header-placeholder"></div>
 
- <script>
-   fetch("header.html")
-     .then(res => res.text())
-     .then(data => {
-       document.getElementById("header-placeholder").innerHTML = data;
- 
-       // Menü elemanları artık DOM'da. Şimdi tıklama işlevi eklenebilir.
-       const menuToggle = document.getElementById("menu-toggle");
-       const mobileMenu = document.getElementById("mobile-menu");
- 
-       if (menuToggle && mobileMenu) {
-         menuToggle.addEventListener("click", function () {
-           mobileMenu.classList.toggle("active");
-         });
-       }
-     });
- </script>
+
 
   <main class="max-w-6xl mx-auto py-8 px-4">
     <div id="loading-spinner" class="text-center py-20">
@@ -158,17 +142,22 @@
 <!-- Header -->
  <div id="footer-placeholder"></div>
 
-  <script>
-    fetch("footer.html")
-      .then(res => res.text())
-      .then(data => document.getElementById("footer-placeholder").innerHTML = data);
-  </script>
+
 
   <!-- Swiper.js eklendi -->
-   <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="script.js"></script>
-  <script src="ilan-detay.js"></script>
-  <script src="chatbot/chatbot.js"></script>
+   <!-- Önce Auth0 Kütüphanesi -->
+<script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+
+<!-- Sonra Swiper.js -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<!-- ÖNCE MERKEZİ SCRİPT'İMİZ -->
+<script src="script.js"></script>
+
+<!-- SONRA BU SAYFAYA ÖZEL SCRİPT -->
+<script src="ilan-detay.js"></script>
+
+<!-- Diğerleri -->
+<script src="chatbot/chatbot.js"></script>
 </body>
 </html>
