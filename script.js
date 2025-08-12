@@ -16,11 +16,16 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(res => res.text())
             .then(data => {
                 headerPlaceholder.innerHTML = data;
-                // Header yüklendikten SONRA diğer fonksiyonları çalıştır.
+                // Header yüklendikten SONRA diğer tüm fonksiyonları çalıştır.
+                initializePageFunctions();
+            })
+            .catch(error => {
+                console.error("Header yüklenirken hata oluştu:", error);
+                // Header yüklenemese bile diğer fonksiyonları çalıştırmayı dene
                 initializePageFunctions();
             });
     } else {
-        // Eğer header-placeholder yoksa bile diğer fonksiyonları çalıştır.
+        // Eğer sayfada header-placeholder yoksa, yine de diğer fonksiyonları çalıştır.
         initializePageFunctions();
     }
 });
@@ -67,20 +72,44 @@ function initializePageFunctions() {
     }
 
     // --- AUTH0 ÜYELİK SİSTEMİ ---
-    // Bu fonksiyonu hemen çalıştır.
     setupAuth0();
 
     // --- TESTIMONIAL SLIDER ---
     const slider = document.getElementById("testimonial-slider");
     if (slider) {
-        // ... (slider kodunuz buraya gelecek)
+        let index = 0;
+        const items = slider.getElementsByClassName("testimonial-item");
+        const totalItems = items.length;
+        if (totalItems > 1) {
+            function showNextTestimonial() {
+                items[index].style.display = "none";
+                index = (index + 1) % totalItems;
+                items[index].style.display = "block";
+            }
+            setInterval(showNextTestimonial, 3000);
+            for (let i = 1; i < totalItems; i++) {
+                items[i].style.display = "none";
+            }
+        }
     }
 
-    // --- DROPDOWN ARAMA ---
+    // --- DROPDOWN ARAMA KONTROLÜ ---
     const input = document.getElementById("search-input");
     const dropdown = document.getElementById("dropdown-options");
     if (input && dropdown) {
-        // ... (dropdown kodunuz buraya gelecek)
+        const options = dropdown.querySelectorAll("li");
+        input.addEventListener("focus", () => dropdown.classList.remove("hidden"));
+        options.forEach(option => {
+            option.addEventListener("click", () => {
+                const url = option.getAttribute("data-url");
+                if (url) window.location.href = url;
+            });
+        });
+        document.addEventListener("click", (e) => {
+            if (!dropdown.contains(e.target) && e.target !== input) {
+                dropdown.classList.add("hidden");
+            }
+        });
     }
 }
 
@@ -136,5 +165,32 @@ async function setupAuth0() {
  * CHATBOT POP-UP KONTROL MERKEZİ
  */
 window.addEventListener("load", function() {
-  // ... (chatbot kodunuz burada olduğu gibi kalabilir, o doğru çalışıyordu)
+  const chatbotPopup = document.getElementById('chatbot-popup');
+  const kapatDugmesi = document.getElementById('chatbot-kapat-btn');
+  const canliSohbetAcDugmesi = document.getElementById('canli-sohbet-ac');
+
+  function openChatbot() {
+    if (chatbotPopup) chatbotPopup.classList.remove('chatbot-hidden');
+  }
+  function closeChatbot() {
+    if (chatbotPopup) chatbotPopup.classList.add('chatbot-hidden');
+  }
+
+  setTimeout(openChatbot, 5000);
+  
+  if (kapatDugmesi) kapatDugmesi.addEventListener('click', closeChatbot);
+  if (canliSohbetAcDugmesi) {
+    canliSohbetAcDugmesi.addEventListener('click', (event) => {
+      event.preventDefault();
+      openChatbot();
+    });
+  }
+
+  setInterval(() => {
+    const newAiMessageFlag = localStorage.getItem('newAiMessageFlag');
+    if (newAiMessageFlag && chatbotPopup && chatbotPopup.classList.contains('chatbot-hidden')) {
+      openChatbot();
+      localStorage.removeItem('newAiMessageFlag');
+    }
+  }, 1000);
 });
