@@ -1,5 +1,6 @@
 console.log("✅ script.js YÜKLENDİ VE ÇALIŞIYOR.");
 
+
 document.addEventListener("DOMContentLoaded", function () {
     // Testimonial Slider
     const slider = document.getElementById("testimonial-slider");
@@ -8,11 +9,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const items = slider.getElementsByClassName("testimonial-item");
         const totalItems = items.length;
 
+
         function showNextTestimonial() {
             items[index].style.display = "none";
             index = (index + 1) % totalItems;
             items[index].style.display = "block";
         }
+
 
         setInterval(showNextTestimonial, 3000);
         for (let i = 1; i < totalItems; i++) {
@@ -20,9 +23,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+
     // Hamburger Menü Aç/Kapat
     const menuToggle = document.getElementById("menu-toggle");
     const mobileMenu = document.getElementById("mobile-menu");
+
 
     if (menuToggle && mobileMenu) {
         menuToggle.addEventListener("click", function () {
@@ -30,16 +35,20 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+
     // Dropdown Seçeneklerinden Sayfaya Gitme
     const input = document.getElementById("search-input");
     const dropdown = document.getElementById("dropdown-options");
 
+
     if (input && dropdown) {
         const options = dropdown.querySelectorAll("li");
+
 
         input.addEventListener("focus", function () {
             dropdown.classList.remove("hidden");
         });
+
 
         options.forEach(option => {
             option.addEventListener("click", function () {
@@ -50,6 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
+
         // Input dışına tıklanınca kapat
         document.addEventListener("click", function (e) {
             if (!dropdown.contains(e.target) && e.target !== input) {
@@ -59,10 +69,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+
 // Scroll Efekti (dışarıda kalabilir)
 window.addEventListener("scroll", function () {
     const header = document.querySelector("header");
     const hamburgerIcon = document.getElementById("hamburger-icon");
+
 
     if (window.scrollY > 50) {
         header.classList.add("scrolled");
@@ -77,20 +89,28 @@ window.addEventListener("scroll", function () {
 
 
 
+
+
+
 // script.js dosyasının uygun bir yerine bu kodu ekleyin.
+
+
 
 
 // ==========================================================
 // CHATBOT KONTROL MERKEZİ - SORGULAMA MEKANİZMALI (NİHAİ VERSİYON)
 // ==========================================================
 
+
 // Bu fonksiyon, tüm sayfa tamamen yüklendiğinde çalışır.
 window.addEventListener("load", function() {
+
 
   // Gerekli HTML elementlerini seç
   const chatbotPopup = document.getElementById('chatbot-popup');
   const kapatDugmesi = document.getElementById('chatbot-kapat-btn');
   const canliSohbetAcDugmesi = document.getElementById('canli-sohbet-ac');
+
 
   // Pop-up'ı açma ve kapama için merkezi fonksiyonlar
   function openChatbot() {
@@ -104,15 +124,17 @@ window.addEventListener("load", function() {
     }
   }
 
+
   // --- OLAY DİNLEYİCİLERİ ---
-  
+ 
   // 5 saniye sonra otomatik aç
   setTimeout(openChatbot, 5000);
-  
+ 
   // Kapatma düğmesine tıklandığında
   if (kapatDugmesi) {
     kapatDugmesi.addEventListener('click', closeChatbot);
   }
+
 
   // Canlı Sohbet linkine tıklandığında
   if (canliSohbetAcDugmesi) {
@@ -122,17 +144,19 @@ window.addEventListener("load", function() {
     });
   }
 
+
   // --- YENİ MESAJ KONTROL MEKANİZMASI ---
   // Her saniye, chatbot.js'in yeni bir mesaj bırakıp bırakmadığını kontrol et.
   setInterval(() => {
     // Tarayıcı hafızasındaki bayrağı kontrol et
     const newAiMessageFlag = localStorage.getItem('newAiMessageFlag');
 
+
     // Eğer bayrak varsa VE chatbot şu an kapalıysa
     if (newAiMessageFlag && chatbotPopup && chatbotPopup.classList.contains('chatbot-hidden')) {
       // Pop-up'ı aç
       openChatbot();
-      
+     
       // Bayrağı, tekrar tekrar açılmasını önlemek için hemen temizle
       localStorage.removeItem('newAiMessageFlag');
     }
@@ -141,3 +165,67 @@ window.addEventListener("load", function() {
 
 
 
+// script.js dosyasının içine bu kodu ekleyin
+
+// ==========================================================
+// HEADER SCROLL (KAYDIRMA) EFEKTİ
+// Bu kod, sayfa aşağı kaydırıldığında header'ın stilini değiştirir.
+// ==========================================================
+
+// Bu fonksiyon, tüm sayfa DOM'u hazır olduğunda çalışır.
+document.addEventListener('DOMContentLoaded', () => {
+
+  // Header elementini ve logoları seç
+  const header = document.querySelector('.custom-header');
+  const logoDefault = document.querySelector('.logo-default');
+  const logoScrolled = document.querySelector('.logo-scrolled');
+  const navLinks = document.querySelectorAll('.nav-link'); // Menü linklerini de seçelim
+  const hamburgerIcon = document.getElementById('hamburger-icon'); // Hamburger ikonu
+
+  // Eğer header elementi sayfada bulunamazsa, kodu çalıştırma
+  if (!header) {
+    return;
+  }
+
+  // Pencerenin kaydırma olayını dinle
+  window.addEventListener('scroll', () => {
+    // Sayfanın dikey olarak ne kadar kaydırıldığını kontrol et
+    // 50 pikselden fazla kaydırıldıysa...
+    if (window.scrollY > 50) {
+      header.classList.add('scrolled');
+      
+      // Logoları değiştir
+      if(logoDefault) logoDefault.classList.add('hidden');
+      if(logoDefault) logoDefault.classList.remove('block');
+      if(logoScrolled) logoScrolled.classList.add('block');
+      if(logoScrolled) logoScrolled.classList.remove('hidden');
+
+      // Menü linklerinin ve ikonun rengini değiştir (opsiyonel)
+      if(hamburgerIcon) hamburgerIcon.classList.remove('text-white');
+      if(hamburgerIcon) hamburgerIcon.classList.add('text-black');
+      navLinks.forEach(link => {
+        link.classList.remove('text-white');
+        link.classList.add('text-gray-800');
+      });
+
+    } else {
+      // 50 pikselden az kaydırıldıysa (yani en tepedeyse)...
+      header.classList.remove('scrolled');
+
+      // Logoları eski haline getir
+      if(logoDefault) logoDefault.classList.add('block');
+      if(logoDefault) logoDefault.classList.remove('hidden');
+      if(logoScrolled) logoScrolled.classList.add('hidden');
+      if(logoScrolled) logoScrolled.classList.remove('block');
+
+      // Menü linklerinin ve ikonun rengini eski haline getir
+      if(hamburgerIcon) hamburgerIcon.classList.add('text-white');
+      if(hamburgerIcon) hamburgerIcon.classList.remove('text-black');
+      navLinks.forEach(link => {
+        link.classList.add('text-white');
+        link.classList.remove('text-gray-800');
+      });
+    }
+  });
+
+});

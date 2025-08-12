@@ -512,3 +512,134 @@ body, p, a, span, li, td, th, input, button {
   display: none !important;
 }
 
+
+/* ======================================= */
+/* HEADER VE MENÜ STİLLERİ                 */
+/* ======================================= */
+
+/* Ana header yapısı */
+.custom-header {
+  height: 80px; /* Header için sabit bir yükseklik */
+  transition: background-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Sayfa aşağı kaydırıldığında header'a eklenecek sınıf */
+.custom-header.scrolled {
+  background-color: white;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Menü linkleri için genel stil */
+.nav-link {
+  position: relative;
+  padding-bottom: 4px;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+/* Linklerin altına gelecek çizgi efekti */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: currentColor; /* Linkin kendi rengini alır (beyaz veya siyah) */
+  transition: width 0.4s ease;
+}
+
+/* Linkin üzerine gelince çizginin belirmesi */
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Kaydırıldığında menü linklerinin rengi JavaScript ile değişecek */
+/* (text-white -> text-gray-800) */
+
+
+/* ======================================= */
+/* MOBİL AÇILIR MENÜ STİLLERİ             */
+/* ======================================= */
+
+/* Mobil menü animasyonu ve temel yapısı */
+#mobile-menu {
+  transition: opacity 0.3s ease, transform 0.3s ease-in-out;
+  transform-origin: top;
+}
+
+/* Tailwind'in .hidden sınıfı menüyü gizler.
+   JavaScript bu sınıfı kaldırınca aşağıdaki stiller görünür olur. */
+#mobile-menu:not(.hidden) {
+  transform: scaleY(1);
+  opacity: 1;
+}
+
+/* Mobil menünün başlangıçtaki gizli hali (animasyon için) */
+#mobile-menu.hidden {
+  transform: scaleY(0.95);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ======================================= */
+/* AUTH0 GİRİŞ/ÇIKIŞ BUTONU STİLLERİ       */
+/* ======================================= */
+
+/* Masaüstü butonları için genel stil */
+.btn-auth {
+  padding: 8px 20px;
+  border: 2px solid; /* Renk JS'den veya header'ın kendi renginden gelecek */
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+/* Kaydırılmamış header'da (transparent) buton stilleri */
+.custom-header:not(.scrolled) .btn-auth {
+  border-color: white;
+  color: white;
+}
+.custom-header:not(.scrolled) .btn-auth:hover {
+  background-color: white;
+  color: #111828;
+}
+
+/* Kaydırılmış header'da (beyaz) buton stilleri */
+.custom-header.scrolled .btn-auth {
+  border-color: #111828;
+  color: #111828;
+}
+.custom-header.scrolled .btn-auth:hover {
+  background-color: #111828;
+  color: white;
+}
+
+/* Mobil menüdeki buton */
+.btn-auth-mobil {
+  background-color: #111828;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+.btn-auth-mobil:hover {
+    background-color: #333;
+}
+
+/* JS tarafından butonları gizlemek için kullanılan sınıf */
+.auth-hidden {
+  display: none !important;
+}
+
+
+/* Header'a .scrolled sınıfı eklendiğinde uygulanacak stiller */
+header.scrolled {
+  background-color: white !important; /* Arka planı beyaz yap */
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  color: #1f2937 !important; /* Metin rengini koyu gri yap */
+}
