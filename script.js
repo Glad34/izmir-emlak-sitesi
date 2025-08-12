@@ -1,17 +1,13 @@
-// ==========================================================
-// Baron Gayrimenkul - Ana Kontrol Script'i
-// ==========================================================
-
 console.log("✅ script.js YÜKLENDİ VE ÇALIŞIYOR.");
 
-// ----------------------------------------------------------
-// BÖLÜM 1: TEMEL SAYFA İŞLEVLERİ
-// Bu bölüm, DOM tamamen hazır olduğunda çalışır.
-// ----------------------------------------------------------
+// ==========================================================
+// ANA KONTROL MERKEZİ
+// Tüm sayfa genelindeki JavaScript mantığı bu tek yerden yönetilir.
+// ==========================================================
 document.addEventListener('DOMContentLoaded', () => {
 
     /**
-     * 1.1 - Mobil Menü Kontrolü
+     * 1. MOBİL MENÜ KONTROLÜ
      * Header fetch ile yüklendiği için, menü butonunu bulana kadar
      * periyodik olarak kontrol eder ve sonra tıklama olayını atar.
      */
@@ -24,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 mobileMenu.classList.toggle('hidden');
             });
         } else {
-            // Buton henüz yüklenmemiş, 100ms sonra tekrar dene
             setTimeout(setupMobileMenu, 100);
         }
     }
@@ -32,10 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     /**
-     * 1.2 - Header Scroll (Kaydırma) Efekti
-     * Sayfa aşağı kaydırıldığında header'ın stilini, logosunu ve
-     * menü renklerini değiştirir. Hata vermemesi için elementlerin
-     * varlığını her zaman kontrol eder.
+     * 2. HEADER SCROLL (KAYDIRMA) EFEKTİ
+     * Hata vermemesi için elementlerin varlığını her zaman kontrol eder.
      */
     const header = document.querySelector('.custom-header');
     if (header) {
@@ -47,30 +40,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (window.scrollY > 50) {
                 header.classList.add('scrolled');
+                // Null kontrolü (element varsa işlem yap)
                 if (logoDefault) logoDefault.classList.replace('block', 'hidden');
                 if (logoScrolled) logoScrolled.classList.replace('hidden', 'block');
                 if (hamburgerIcon) hamburgerIcon.classList.replace('text-white', 'text-black');
-                navLinks.forEach(link => { if(link) link.classList.replace('text-white', 'text-gray-800') });
+                navLinks.forEach(link => { if (link) link.classList.replace('text-white', 'text-gray-800') });
             } else {
                 header.classList.remove('scrolled');
                 if (logoDefault) logoDefault.classList.replace('hidden', 'block');
                 if (logoScrolled) logoScrolled.classList.replace('block', 'hidden');
                 if (hamburgerIcon) hamburgerIcon.classList.replace('text-black', 'text-white');
-                navLinks.forEach(link => { if(link) link.classList.replace('text-gray-800', 'text-white') });
+                navLinks.forEach(link => { if (link) link.classList.replace('text-gray-800', 'text-white') });
             }
         });
     }
 
 
     /**
-     * 1.3 - Testimonial Slider (Sadece ilgili sayfada çalışır)
+     * 3. TESTIMONIAL SLIDER (Sadece ilgili sayfada çalışır)
      */
     const slider = document.getElementById("testimonial-slider");
     if (slider) {
         let index = 0;
         const items = slider.getElementsByClassName("testimonial-item");
         const totalItems = items.length;
-        if (totalItems > 1) { // Sadece 1'den fazla eleman varsa çalıştır
+        if (totalItems > 1) {
             function showNextTestimonial() {
                 items[index].style.display = "none";
                 index = (index + 1) % totalItems;
@@ -85,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     /**
-     * 1.4 - Dropdown Arama Kontrolü (Sadece ilgili sayfada çalışır)
+     * 4. DROPDOWN ARAMA KONTROLÜ (Sadece ilgili sayfada çalışır)
      */
     const input = document.getElementById("search-input");
     const dropdown = document.getElementById("dropdown-options");
@@ -107,17 +101,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// ----------------------------------------------------------
-// BÖLÜM 2: CHATBOT POP-UP KONTROL MERKEZİ
-// Bu bölüm, sayfanın tüm içeriği (resimler vb.) yüklendikten
-// sonra çalışır.
-// ----------------------------------------------------------
+// ==========================================================
+// CHATBOT POP-UP KONTROL MERKEZİ
+// Bu bölüm, sayfanın tüm içeriği (resimler vb.) yüklendikten sonra çalışır.
+// ==========================================================
 window.addEventListener("load", function() {
   const chatbotPopup = document.getElementById('chatbot-popup');
   const kapatDugmesi = document.getElementById('chatbot-kapat-btn');
   const canliSohbetAcDugmesi = document.getElementById('canli-sohbet-ac');
 
-  // Pop-up'ı açma ve kapama fonksiyonları
   function openChatbot() {
     if (chatbotPopup) chatbotPopup.classList.remove('chatbot-hidden');
   }
