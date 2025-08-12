@@ -155,11 +155,13 @@
       </div>
     </div>
   </main>
+<!-- Header -->
+ <div id="footer-placeholder"></div>
 
- <script>
-    // Bu script'ler SADECE HTML'i getirir, içlerindeki script'leri çalıştırmaz.
-    fetch("header.html").then(res => res.text()).then(data => document.getElementById("header-placeholder").innerHTML = data);
-    fetch("footer.html").then(res => res.text()).then(data => document.getElementById("footer-placeholder").innerHTML = data);
+  <script>
+    fetch("footer.html")
+      .then(res => res.text())
+      .then(data => document.getElementById("footer-placeholder").innerHTML = data);
   </script>
 
   <!-- Swiper.js eklendi -->
