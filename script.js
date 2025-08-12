@@ -53,7 +53,7 @@ function initializeHeaderFunctions() {
             const logoDefault = document.querySelector('.logo-default');
             const logoScrolled = document.querySelector('.logo-scrolled');
             const navLinks = document.querySelectorAll('.nav-link');
-            const hamburgerIcon = document.getElementById('hamburger-icon');
+            const hamburgerIcon = document.getElementById('menu-toggle');
 
             if (window.scrollY > 50) {
                 header.classList.add('scrolled');
