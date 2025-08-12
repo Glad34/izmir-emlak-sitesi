@@ -1,25 +1,23 @@
-// /.netlify/functions/add-favorite.js
+// /.netlify/functions/add-favorite.js (NİHAİ SÜRÜM)
 
+const { createClient } = require('@supabase/supabase-js');
 const jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');
 
-// Auth0 alan adınızı ve API Audience'ınızı .env dosyalarından veya Netlify UI'dan alıyoruz.
-// BU BİLGİLERİ GÜVENLİK İÇİN KODA DOĞRUDAN YAZMAYIN!
+// Netlify ortam değişkenlerini al
 const AUTH0_DOMAIN = process.env.AUTH0_DOMAIN;
 const AUTH0_AUDIENCE = process.env.AUTH0_AUDIENCE;
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY; // Backend'de daima SERVICE_ROLE_KEY kullanılır
 
-if (!AUTH0_DOMAIN || !AUTH0_AUDIENCE) {
-  throw new Error('Auth0 domain veya audience ortam değişkenleri ayarlanmamış.');
-}
-
-// Auth0'nun genel anahtarını (public key) almak için bir istemci oluşturuyoruz.
-const client = jwksClient({
+// Auth0'nun genel anahtarını almak için bir istemci oluştur
+const jwks = jwksClient({
   jwksUri: `https://${AUTH0_DOMAIN}/.well-known/jwks.json`
 });
 
 // Anahtarı getiren yardımcı fonksiyon
 function getKey(header, callback) {
-  client.getSigningKey(header.kid, function(err, key) {
+  jwks.getSigningKey(header.kid, function(err, key) {
     if (err) {
       return callback(err);
     }
@@ -28,62 +26,71 @@ function getKey(header, callback) {
   });
 }
 
-exports.handler = async function(event, context) {
-  // Sadece POST isteklerini kabul et
+exports.handler = async function(event) {
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
   }
 
   try {
-    // 1. Authorization başlığını al
+    // 1. Auth0 Token'ını al ve doğrula
     const authHeader = event.headers.authorization;
-    if (!authHeader) {
-      return { statusCode: 401, body: JSON.stringify({ error: 'Authorization başlığı eksik.' }) };
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return { statusCode: 401, body: JSON.stringify({ error: 'Yetkilendirme başlığı eksik veya hatalı.' }) };
     }
+    const token = authHeader.substring(7); // "Bearer " kısmını at
 
-    // "Bearer " kısmını ayıklayarak token'ı al
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-      return { statusCode: 401, body: JSON.stringify({ error: 'Bearer token bulunamadı.' }) };
-    }
-
-    // 2. Token'ı Doğrula
     const decodedToken = await new Promise((resolve, reject) => {
       jwt.verify(token, getKey, {
-        audience: AUTH0_AUDIENCE, // Token'ın bizim API için olduğunu doğrula
-        issuer: `https://${AUTH0_DOMAIN}/`, // Token'ı doğru Auth0 domain'inin verdiğini doğrula
+        audience: AUTH0_AUDIENCE,
+        issuer: `https://${AUTH0_DOMAIN}/`,
         algorithms: ['RS256']
       }, (err, decoded) => {
-        if (err) {
-          return reject(err);
-        }
+        if (err) return reject(err);
         resolve(decoded);
       });
     });
 
-    // Token geçerliyse, decodedToken içinde kullanıcının bilgileri (sub: user_id) bulunur.
+    // Token geçerliyse, Auth0 kullanıcı ID'sini (sub) al
     const userId = decodedToken.sub;
     const { ilanId } = JSON.parse(event.body);
 
-    console.log(`Kullanıcı (${userId}), ilan ID'si (${ilanId}) olan ilanı favorilere ekliyor.`);
+    if (!ilanId) {
+        return { statusCode: 400, body: JSON.stringify({ error: 'İlan ID eksik.' }) };
+    }
 
-    // 3. BURADAN SONRASI SİZİN VERİTABANI İŞLEMİNİZ
-    // Örneğin, bu bilgiyi Airtable'a, Google Sheets'e veya veritabanınıza kaydedin.
-    // Bu kısım şimdilik başarılı bir cevap döndürecek.
-    // await saveToDatabase(userId, ilanId);
+    // 2. Supabase İstemcisini Başlat
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // 3. Veritabanına Kayıt Ekle
+    const { data, error } = await supabase
+      .from('favorites') // Tablo adınızın 'favorites' olduğunu varsayıyoruz
+      .insert([
+        { 
+          user_id: userId,   // Auth0'dan gelen kullanıcı ID'si
+          ilan_id: ilanId    // Frontend'den gelen ilan ID'si
+        }
+      ]);
+
+    // Supabase'den bir hata gelirse
+    if (error) {
+        // Eğer hata "duplicate key" ise (yani zaten favorilere eklenmişse)
+        if (error.code === '23505') {
+            return { statusCode: 200, body: JSON.stringify({ success: true, message: 'Bu ilan zaten favorilerinizde.' }) };
+        }
+        throw error; // Diğer hataları fırlat
+    }
+
+    // Başarılı olursa
     return {
       statusCode: 200,
       body: JSON.stringify({ success: true, message: 'İlan başarıyla favorilere eklendi.' })
     };
 
   } catch (error) {
-    console.error('Token doğrulama hatası:', error);
-    // Bu, "Hata: Lütfen giriş yapınız" hatasını üreten yer olabilir.
-    // Daha spesifik bir hata mesajı verelim.
+    console.error('Fonksiyon hatası:', error);
     return {
-      statusCode: 401,
-      body: JSON.stringify({ error: `Geçersiz token: ${error.message}` })
+      statusCode: 401, // Genellikle token doğrulama hataları için
+      body: JSON.stringify({ error: `İşlem başarısız: ${error.message}` })
     };
   }
 };
