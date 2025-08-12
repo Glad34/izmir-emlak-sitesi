@@ -1,32 +1,23 @@
-// ilan-detay.js - "Tek Beyin" (auth.js) ile tam uyumlu
+// ilan-detay.js - Favori Butonu Sorununu Çözen Nihai Versiyon
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // Header ve Footer'ı yükle. Bu script'ler footer.html'den yükleneceği için
-  // bu işlem sayfanın görsel bütünlüğünü sağlar.
-  fetch("header.html").then(res => res.text()).then(data => document.getElementById("header-placeholder").innerHTML = data);
-  fetch("footer.html").then(res => res.text()).then(data => document.getElementById("footer-placeholder").innerHTML = data);
-
-  // ÖNEMLİ: getAuthClient'in var olmasını bekle
-  // Bu, auth.js'in tamamen yüklendiğinden ve hazır olduğundan emin olmamızı sağlar.
+  // auth.js'in hazır olmasını bekle
   if (typeof window.getAuthClient !== 'function') {
-      // Eğer fonksiyon hemen bulunamazsa, küçük bir gecikmeyle tekrar dene
-      await new Promise(resolve => setTimeout(resolve, 300)); 
+      await new Promise(resolve => setTimeout(resolve, 300));
   }
 
   // Artık auth.js'den gelen global fonksiyonu güvenle kullanabiliriz
-  const { isAuthenticated } = await window.getAuthClient();
+  const { isAuthenticated, accessToken } = await window.getAuthClient();
   
-  // URL'den ilan ID'sini al
   const params = new URLSearchParams(window.location.search);
   const ilanID = params.get('id');
 
   if (!ilanID) {
-    document.getElementById("loading-spinner").innerHTML = "<p class='text-red-500'>Hata: İlan kimliği bulunamadı.</p>";
+    document.getElementById("loading-spinner").innerHTML = "<p>Hata: İlan kimliği bulunamadı.</p>";
     return;
   }
   
-  // İlan verisini çek ve giriş durumunu fonksiyona ilet
-  fetchIlanData(ilanID, isAuthenticated);
+  fetchIlanData(ilanID, isAuthenticated, accessToken);
 });
 
 async function fetchIlanData(id, isLoggedIn) {
@@ -101,52 +92,61 @@ function populatePage(ilan, isLoggedIn) {
 
   initializePlugins();
 
+  // --- FAVORİ BUTONU MANTIĞI ---
   const favoriBtn = document.getElementById('favori-ekle-btn');
+  
+  // Sadece giriş yapmış kullanıcılar favori butonunu görür
   if (isLoggedIn && favoriBtn) {
       favoriBtn.classList.remove('hidden');
   }
 
   if (favoriBtn) {
     favoriBtn.addEventListener('click', async () => {
-        favoriBtn.disabled = true;
-        favoriBtn.querySelector('i').classList.add('animate-pulse');
+    favoriBtn.disabled = true;
+    favoriBtn.querySelector('i').classList.add('animate-pulse');
 
-        try {
-            // Auth0'dan erişim anahtarını al (artık auth.js'den geliyor)
-            const { accessToken } = await window.getAuthClient();
-            if (!accessToken) {
-                throw new Error('Giriş yapmalısınız.');
-            }
-
-            const response = await fetch('/.netlify/functions/add-favorite', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${accessToken}` },
-                body: JSON.stringify({ ilanId: ilan['İlan ID'] }),
-            });
-
-            if (response.ok) {
-                favoriBtn.querySelector('i').classList.replace('far', 'fas');
-                favoriBtn.querySelector('i').classList.add('text-yellow-500');
-            } else {
-                const errorData = await response.json();
-                alert(`Hata: ${errorData.error}`);
-                favoriBtn.disabled = false;
-            }
-        } catch (error) {
-            console.error('Favori ekleme hatası:', error);
-            alert(`Favorilere eklenirken bir sorun oluştu: ${error.message}`);
-            favoriBtn.disabled = false;
-        } finally {
-            favoriBtn.querySelector('i').classList.remove('animate-pulse');
+    try {
+        // Auth0'dan erişim anahtarını al
+        const { accessToken } = await window.getAuthClient();
+        if (!accessToken) {
+            throw new Error('Giriş yapmalısınız.');
         }
-    });
+
+        const response = await fetch('/.netlify/functions/add-favorite', {
+            method: 'POST',
+            // fetch isteğine Authorization başlığını ekle
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({ ilanId: ilan['İlan ID'] }),
+        });
+
+        // ... (fonksiyonun geri kalanı aynı kalacak) ...
+        if (response.ok) {
+            favoriBtn.querySelector('i').classList.replace('far', 'fas');
+            favoriBtn.querySelector('i').classList.add('text-yellow-500');
+        } else {
+            const errorData = await response.json();
+            alert(`Hata: ${errorData.error}`);
+            favoriBtn.disabled = false;
+        }
+    } catch (error) {
+        console.error('Favori ekleme hatası:', error);
+        alert(`Favorilere eklenirken bir sorun oluştu: ${error.message}`);
+        favoriBtn.disabled = false;
+    } finally {
+        favoriBtn.querySelector('i').classList.remove('animate-pulse');
+    }
+});
   }
+  // --- BİTİŞ ---
 
   document.getElementById('loading-spinner').classList.add('hidden');
   document.getElementById('ilan-icerik').classList.remove('hidden');
 }
 
 function initializePlugins() {
+  // ... (Bu fonksiyonun içeriği aynı kalacak)
   const thumbsSwiper = new Swiper('.thumbs-swiper', {spaceBetween: 10, slidesPerView: 4, freeMode: true, watchSlidesProgress: true});
   new Swiper('.main-swiper', {spaceBetween: 10, navigation: {nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev'}, pagination: {el: '.swiper-pagination', type: 'fraction'}, thumbs: {swiper: thumbsSwiper}});
   const tabButtons = document.querySelectorAll('.tab-button');
