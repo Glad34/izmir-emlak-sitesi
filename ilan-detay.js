@@ -1,24 +1,45 @@
 // ilan-detay.js - Favori Butonu Sorununu Çözen Nihai Versiyon
 
+
 document.addEventListener("DOMContentLoaded", async () => {
-  // auth.js'in hazır olmasını bekle
-  if (typeof window.getAuthClient !== 'function') {
-      await new Promise(resolve => setTimeout(resolve, 300));
+  // Header ve Footer'ı yükle
+  fetch("header.html").then(res => res.text()).then(data => document.getElementById("header-placeholder").innerHTML = data);
+  fetch("footer.html").then(res => res.text()).then(data => document.getElementById("footer-placeholder").innerHTML = data);
+
+
+  let isAuthenticated = false;
+  let auth0Client = null;
+
+
+  try {
+    // Auth0 client'ını yapılandır ve giriş durumunu GÜVENİLİR bir şekilde kontrol et
+    const response = await fetch("/.netlify/functions/auth-config");
+    const config = await response.json();
+    auth0Client = await auth0.createAuth0Client({
+      domain: config.domain,
+      clientId: config.clientId
+    });
+    isAuthenticated = await auth0Client.isAuthenticated();
+  } catch (e) {
+    console.error("Auth0 durumu kontrol edilirken hata:", e);
+    // Hata olsa bile devam et, sadece favori butonu görünmez.
   }
 
-  // Artık auth.js'den gelen global fonksiyonu güvenle kullanabiliriz
-  const { isAuthenticated, accessToken } = await window.getAuthClient();
-  
+
+  // URL'den ilan ID'sini al
   const params = new URLSearchParams(window.location.search);
   const ilanID = params.get('id');
 
+
   if (!ilanID) {
-    document.getElementById("loading-spinner").innerHTML = "<p>Hata: İlan kimliği bulunamadı.</p>";
+    document.getElementById("loading-spinner").innerHTML = "<p class='text-red-500'>Hata: İlan kimliği bulunamadı.</p>";
     return;
   }
-  
-  fetchIlanData(ilanID, isAuthenticated, accessToken);
+ 
+  // İlan verisini çek ve giriş durumunu fonksiyona ilet
+  fetchIlanData(ilanID, isAuthenticated);
 });
+
 
 async function fetchIlanData(id, isLoggedIn) {
   const jsonURL = `https://script.google.com/macros/s/AKfycbw3Ye0dEXs5O4nmZ_PDQqJOGvEDM5hL1yP6EyO1lnpRh_Brj0kwJy6GP1ZSDrMPOi-5/exec?ilanID=${id}`;
@@ -27,8 +48,9 @@ async function fetchIlanData(id, isLoggedIn) {
     if (!response.ok) throw new Error('Sunucu hatası!');
     const data = await response.json();
     if (data.error) throw new Error(data.error);
-    
+   
     populatePage(data, isLoggedIn);
+
 
   } catch (error) {
     console.error("Veri çekilirken hata oluştu:", error);
@@ -36,15 +58,18 @@ async function fetchIlanData(id, isLoggedIn) {
   }
 }
 
+
 function populatePage(ilan, isLoggedIn) {
   document.title = ilan['Başlık'];
   document.getElementById('ilan-baslik').textContent = ilan['Başlık'];
   document.getElementById('ilan-konum').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${ilan['Konum']}`;
 
+
   const fiyatSayisi = parseInt(String(ilan['Fiyat']).replace(/[^\d]/g, ''));
   document.getElementById('ilan-fiyat').textContent = !isNaN(fiyatSayisi) ? `${fiyatSayisi.toLocaleString('tr-TR')} TL` : "Belirtilmemiş";
-  
+ 
   document.getElementById('ilan-aciklama').innerHTML = ilan['Açıklama'].replace(/\n/g, '<br>');
+
 
   const ozellikler = {
     "İlan Tipi": ilan['İlan Tipi'], "Oda Sayısı": ilan['Oda Sayısı'], "m² (Brüt)": ilan['m² (Brüt)'],
@@ -52,6 +77,7 @@ function populatePage(ilan, isLoggedIn) {
     "Balkon": ilan['Balkon'], "Eşyalı": ilan['Eşyalı'], "Site İçerisinde": ilan['Site İçerisinde'],
     "Krediye Uygun": ilan['Krediye Uygun'], "Aidat (TL)": ilan['Aidat (TL)'], "Bulunduğu Kat": ilan['Bulunduğu Kat']
   };
+
 
   const ozelliklerListesiTab = document.getElementById('ilan-ozellikler-tab');
   ozelliklerListesiTab.innerHTML = '';
@@ -65,9 +91,11 @@ function populatePage(ilan, isLoggedIn) {
     }
   });
 
+
   document.getElementById('harita-iframe').src = ilan['Harita Linki'];
   document.getElementById('danisman-adi').textContent = "Onur Başaran";
   document.getElementById('danisman-tel').href = `https://wa.me/905308775368`;
+
 
   const resimler = [];
   for (let i = 1; i <= 15; i++) {
@@ -76,11 +104,12 @@ function populatePage(ilan, isLoggedIn) {
     }
   }
 
+
   const mainWrapper = document.getElementById('main-swiper-wrapper');
   const thumbsWrapper = document.getElementById('thumbs-swiper-wrapper');
   mainWrapper.innerHTML = '';
   thumbsWrapper.innerHTML = '';
-  
+ 
   if (resimler.length > 0) {
     resimler.forEach(resimSrc => {
       mainWrapper.innerHTML += `<div class="swiper-slide"><img src="${resimSrc}" /></div>`;
@@ -90,20 +119,24 @@ function populatePage(ilan, isLoggedIn) {
     mainWrapper.innerHTML = `<div class="swiper-slide"><img src="images/placeholder.jpg" /></div>`;
   }
 
+
   initializePlugins();
+
 
   // --- FAVORİ BUTONU MANTIĞI ---
   const favoriBtn = document.getElementById('favori-ekle-btn');
-  
+ 
   // Sadece giriş yapmış kullanıcılar favori butonunu görür
   if (isLoggedIn && favoriBtn) {
       favoriBtn.classList.remove('hidden');
   }
 
+
   if (favoriBtn) {
     favoriBtn.addEventListener('click', async () => {
     favoriBtn.disabled = true;
     favoriBtn.querySelector('i').classList.add('animate-pulse');
+
 
     try {
         // Auth0'dan erişim anahtarını al
@@ -111,6 +144,7 @@ function populatePage(ilan, isLoggedIn) {
         if (!accessToken) {
             throw new Error('Giriş yapmalısınız.');
         }
+
 
         const response = await fetch('/.netlify/functions/add-favorite', {
             method: 'POST',
@@ -120,6 +154,7 @@ function populatePage(ilan, isLoggedIn) {
             },
             body: JSON.stringify({ ilanId: ilan['İlan ID'] }),
         });
+
 
         // ... (fonksiyonun geri kalanı aynı kalacak) ...
         if (response.ok) {
@@ -141,9 +176,11 @@ function populatePage(ilan, isLoggedIn) {
   }
   // --- BİTİŞ ---
 
+
   document.getElementById('loading-spinner').classList.add('hidden');
   document.getElementById('ilan-icerik').classList.remove('hidden');
 }
+
 
 function initializePlugins() {
   // ... (Bu fonksiyonun içeriği aynı kalacak)
