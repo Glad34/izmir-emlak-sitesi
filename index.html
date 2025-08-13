@@ -598,31 +598,9 @@
 </div>
   
 
- <script>
-   fetch("footer.html")
-     .then(res => res.text())
-     .then(data => {
-       document.getElementById("footer-placeholder").innerHTML = data;
+ 
 
-       // footer yüklendikten sonra JS'i çalıştır:
-     const launcher = document.getElementById("iletisim-launcher");
-     const menu = document.getElementById("iletisim-menusu");
-     const openBtn = document.getElementById("openContact");
-     const closeBtn = document.getElementById("closeContact");
-
-     if (openBtn && closeBtn) {
-       openBtn.addEventListener("click", () => {
-         launcher.style.display = "none";
-         menu.classList.remove("hidden");
-       });
-
-       closeBtn.addEventListener("click", () => {
-         menu.classList.add("hidden");
-         launcher.style.display = "block";
-       });
-     }
-     });    
- </script>
+    <div id="footer-placeholder"></div>
 
   <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
   <script src="script.js"></script>

@@ -139,8 +139,36 @@ function initializeHeaderFunctions() {
 /**
  * Footer yüklendikten sonra ona bağımlı işlevleri başlatır. (DEĞİŞİKLİK YOK)
  */
+// script.js dosyasındaki bu fonksiyonu tamamen güncelleyin
+
+/**
+ * Footer yüklendikten sonra ona bağımlı işlevleri başlatır.
+ */
 function initializeFooterFunctions() {
-    // --- CHATBOT POP-UP KONTROL MERKEZİ ---
+    
+    // --- İLETİŞİM MENÜSÜ KONTROLÜ (NİHAİ SÜRÜM) ---
+    const launcher = document.getElementById("iletisim-launcher");
+    const menu = document.getElementById("iletisim-menusu");
+    const openBtn = document.getElementById("openContact");
+    const closeBtn = document.getElementById("closeContact");
+
+    // Tüm elementlerin var olduğundan emin ol
+    if (launcher && menu && openBtn && closeBtn) {
+        
+        // Ana butona (openBtn) tıklanınca menüyü aç
+        openBtn.addEventListener("click", () => {
+            launcher.style.display = "none";
+            menu.classList.remove("hidden");
+        });
+
+        // İptal butonuna (closeBtn) tıklanınca menüyü kapat
+        closeBtn.addEventListener("click", () => {
+            menu.classList.add("hidden");
+            launcher.style.display = "block";
+        });
+    }
+
+    // --- CHATBOT KONTROL MERKEZİ ---
     const chatbotPopup = document.getElementById('chatbot-popup');
     const kapatDugmesi = document.getElementById('chatbot-kapat-btn');
     const canliSohbetAcDugmesi = document.getElementById('canli-sohbet-ac');
@@ -150,12 +178,17 @@ function initializeFooterFunctions() {
 
     setTimeout(openChatbot, 5000);
     if (kapatDugmesi) kapatDugmesi.addEventListener('click', closeChatbot);
+    
+    // Canlı sohbet linkine tıklandığında hem iletişim menüsünü kapatıp hem de chatbotu aç
     if (canliSohbetAcDugmesi) {
         canliSohbetAcDugmesi.addEventListener('click', (event) => {
             event.preventDefault();
+            if (menu) menu.classList.add('hidden'); 
+            if (launcher) launcher.style.display = "block"; 
             openChatbot();
         });
     }
+
     setInterval(() => {
         const flag = localStorage.getItem('newAiMessageFlag');
         if (flag && chatbotPopup && chatbotPopup.classList.contains('chatbot-hidden')) {
