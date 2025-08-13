@@ -43,36 +43,29 @@
 }
 
 /* --- YENİ SEKME (TAB) STİLLERİ --- */
-/* --- YENİ SEKME (TAB) STİLLERİ (MOBİL UYUMLU - NİHAİ SÜRÜM) --- */
-.tab-buttons {
-  display: flex;
-  border-bottom: 1px solid #e5e7eb;
-  
-  /* YATAY KAYDIRMA İÇİN GEREKLİ KURALLAR */
-  overflow-x: auto;      /* Taşmayı yatayda kaydırılabilir yap */
-  -webkit-overflow-scrolling: touch; /* iOS için akıcı kaydırma */
-  
-  /* Kaydırma çubuğunu gizle (daha temiz bir görünüm için) */
-  scrollbar-width: none;  /* Firefox */
-  -ms-overflow-style: none;  /* IE, Edge */
-}
-.tab-buttons::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
-}
+/* --- YENİ SEKME (TAB) STİLLERİ (TAM RESPONSIVE - NİHAİ SÜRÜM) --- */
 
-/* ilan-detay.css içindeki .tab-button sınıfını güncelleyin */
+/* --- YENİ SEKME (TAB) STİLLERİ (TAMAMEN ESNEK - NİHAİ SÜRÜM) --- */
+
+.tab-buttons {
+  display: grid; /* DÜZENİ FLEX'TEN GRID'E DEĞİŞTİRDİK */
+  grid-auto-flow: column; /* Öğeleri sütunlar halinde yan yana akıt */
+  grid-auto-columns: 1fr; /* Her sütunun (butonun) eşit genişlikte olmasını sağla */
+  border-bottom: 1px solid #e5e7eb;
+}
 
 .tab-button {
-  padding: 1rem; /* Yan boşlukları biraz azalttık */
+  padding: 1rem 0.5rem; /* Yan boşlukları daha da azalttık, esnek yapı bunu telafi edecek */
   font-weight: 600;
   color: #6b7280;
   border-bottom: 3px solid transparent;
   transition: all 0.3s ease;
-  white-space: nowrap;
-
-  /* --- ESNEK YAPI İÇİN EKLENEN ANAHTAR KURALLAR --- */
-  flex-grow: 1;         /* Boş alanı diğer butonlarla eşit olarak paylaş */
-  text-align: center;   /* Metni, genişleyen butonun ortasına hizala */
+  white-space: nowrap;  /* Metinlerin alt satıra kaymasını engelle */
+  text-align: center;   /* Metni her zaman ortala */
+  
+  /* Taşma durumunda metnin sonuna "..." ekle (ek bir güvenlik önlemi) */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tab-button:hover {
@@ -84,6 +77,9 @@
   border-bottom-color: #3b82f6;
 }
 
+/* --- Medya Sorguları Bu Çözümde Gerekli Değildir --- */
+
+/* --- Bu kısımlar aynı kalıyor --- */
 .tab-content {
   padding: 1.5rem;
 }
@@ -95,7 +91,6 @@
 .tab-pane.active {
   display: block;
 }
-
 /* Harita iframe'i için stil */
 #tab-konum {
     padding: 0; /* Haritanın tam oturması için */
