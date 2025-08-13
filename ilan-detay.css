@@ -43,30 +43,52 @@
 }
 
 /* --- YENİ SEKME (TAB) STİLLERİ --- */
+/* --- YENİ SEKME (TAB) STİLLERİ (MOBİL UYUMLU - NİHAİ SÜRÜM) --- */
 .tab-buttons {
   display: flex;
   border-bottom: 1px solid #e5e7eb;
+  
+  /* YATAY KAYDIRMA İÇİN GEREKLİ KURALLAR */
+  overflow-x: auto;      /* Taşmayı yatayda kaydırılabilir yap */
+  -webkit-overflow-scrolling: touch; /* iOS için akıcı kaydırma */
+  
+  /* Kaydırma çubuğunu gizle (daha temiz bir görünüm için) */
+  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;  /* IE, Edge */
 }
+.tab-buttons::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
 .tab-button {
   padding: 1rem 1.5rem;
   font-weight: 600;
   color: #6b7280;
   border-bottom: 3px solid transparent;
   transition: all 0.3s ease;
+  
+  /* BUTONLARIN DAVRANIŞI İÇİN GEREKLİ KURALLAR */
+  white-space: nowrap;  /* Metnin alt satıra kaymasını engelle */
+  flex-shrink: 0;       /* Butonların daralıp küçülmesini engelle */
 }
+
 .tab-button:hover {
   background-color: #f9fafb;
 }
+
 .tab-button.active {
   color: #3b82f6;
   border-bottom-color: #3b82f6;
 }
+
 .tab-content {
   padding: 1.5rem;
 }
+
 .tab-pane {
   display: none;
 }
+
 .tab-pane.active {
   display: block;
 }
