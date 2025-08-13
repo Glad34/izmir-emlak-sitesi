@@ -60,16 +60,19 @@
   display: none; /* Chrome, Safari */
 }
 
+/* ilan-detay.css içindeki .tab-button sınıfını güncelleyin */
+
 .tab-button {
-  padding: 1rem 1.5rem;
+  padding: 1rem; /* Yan boşlukları biraz azalttık */
   font-weight: 600;
   color: #6b7280;
   border-bottom: 3px solid transparent;
   transition: all 0.3s ease;
-  
-  /* BUTONLARIN DAVRANIŞI İÇİN GEREKLİ KURALLAR */
-  white-space: nowrap;  /* Metnin alt satıra kaymasını engelle */
-  flex-shrink: 0;       /* Butonların daralıp küçülmesini engelle */
+  white-space: nowrap;
+
+  /* --- ESNEK YAPI İÇİN EKLENEN ANAHTAR KURALLAR --- */
+  flex-grow: 1;         /* Boş alanı diğer butonlarla eşit olarak paylaş */
+  text-align: center;   /* Metni, genişleyen butonun ortasına hizala */
 }
 
 .tab-button:hover {
