@@ -1,8 +1,46 @@
 // ==========================================================
-// İlan Detay Script'i (SAĞLAMLAŞTIRILMIŞ - TAM SÜRÜM)
+// İlan Detay Script'i (DİNAMİK YÜKLEME MESAJLI SÜRÜM)
 // ==========================================================
 
+// --- YENİ EKLENEN BÖLÜM BAŞLANGICI ---
+
+// Yükleme sırasında gösterilecek eğlenceli mesajlar
+const loadingMessages = [
+    "İlan bilgileri getiriliyor...",
+    "En güncel fotoğraflar yükleniyor...",
+    "Konum bilgileri haritaya işleniyor...",
+    "Fiyat analizi yapılıyor...",
+    "Sizin için en iyi detayı hazırlıyoruz...",
+    "Neredeyse hazır, harika bir ilana bakıyorsunuz!"
+];
+
+let messageInterval; // Mesaj değiştirme döngüsünü tutacak değişken
+
+// Yükleme mesajını değiştiren fonksiyon
+function startLoadingAnimation() {
+    const loadingTextElement = document.getElementById("loading-text");
+    if (!loadingTextElement) return;
+
+    let currentIndex = 0;
+    // Her 2 saniyede bir mesajı değiştir
+    messageInterval = setInterval(() => {
+        currentIndex = (currentIndex + 1) % loadingMessages.length;
+        loadingTextElement.textContent = loadingMessages[currentIndex];
+    }, 2000); // 2000 milisaniye = 2 saniye
+}
+
+// Yükleme animasyonunu ve döngüyü durduran fonksiyon
+function stopLoadingAnimation() {
+    clearInterval(messageInterval);
+}
+
+// --- YENİ EKLENEN BÖLÜM SONU ---
+
+
 document.addEventListener("DOMContentLoaded", async () => {
+  // --- DEĞİŞTİRİLEN SATIR ---
+  startLoadingAnimation(); // Sayfa yüklenir yüklenmez animasyonu başlat
+
   let isAuthenticated = false;
   try {
     const auth0Client = await window.auth0ClientPromise;
@@ -15,6 +53,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const ilanID = params.get('id');
   if (!ilanID) {
+    // --- DEĞİŞTİRİLEN SATIR ---
+    stopLoadingAnimation(); // Hata durumunda animasyonu durdur
     document.getElementById("loading-spinner").innerHTML = "<p class='text-red-500'>Hata: İlan kimliği bulunamadı.</p>";
     return;
   }
@@ -31,12 +71,18 @@ async function fetchIlanData(id, isLoggedIn) {
     if (data.error) throw new Error(data.error);
     populatePage(data, isLoggedIn);
   } catch (error) {
+    // --- DEĞİŞTİRİLEN SATIR ---
+    stopLoadingAnimation(); // Hata durumunda animasyonu durdur
     console.error("Veri çekilirken hata oluştu:", error);
     document.getElementById("loading-spinner").innerHTML = `<p class='text-red-500'>Hata: İlan yüklenemedi. (${error.message})</p>`;
   }
 }
 
 function populatePage(ilan, isLoggedIn) {
+  // --- DEĞİŞTİRİLEN SATIR ---
+  stopLoadingAnimation(); // Sayfa içeriği başarıyla doldurulunca animasyonu durdur
+
+  // Geri kalan kodunuzda hiçbir değişiklik yok...
   document.title = ilan['Başlık'];
   document.getElementById('ilan-baslik').textContent = ilan['Başlık'];
   document.getElementById('ilan-konum').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${ilan['Konum']}`;
@@ -68,35 +114,24 @@ function populatePage(ilan, isLoggedIn) {
     favoriBtn.addEventListener('click', async () => {
         favoriBtn.disabled = true;
         favoriBtn.querySelector('i').classList.add('animate-pulse');
-        let accessToken; // accessToken'ı try dışında tanımla
-
+        let accessToken;
         try {
-            // Sağlamlaştırılmış global fonksiyondan token'ı alıyoruz.
-            accessToken = await window.getAuthToken(); 
-
-            // HATA AYIKLAMA: Ne gönderdiğimizi görelim. Tarayıcı konsolunu kontrol et.
+            accessToken = await window.getAuthToken();
             console.log("Backend'e gönderilecek Access Token:", accessToken);
-
             const response = await fetch('/.netlify/functions/add-favorite', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ilanId: ilan['İlan ID'] }),
             });
-
             if (response.ok) {
                 favoriBtn.querySelector('i').classList.replace('far', 'fas');
                 favoriBtn.querySelector('i').classList.add('text-yellow-500');
             } else {
                 const errorData = await response.json();
-                // Backend'den gelen hatayı göster
                 alert(`Hata: ${errorData.error || 'Bilinmeyen bir sunucu hatası.'}`);
                 favoriBtn.disabled = false;
             }
         } catch (error) {
-            // getAuthToken'dan veya fetch'ten gelen hatayı yakala
             console.error('Favori ekleme işlemi sırasında hata:', error);
             alert(`Favorilere eklenirken bir sorun oluştu: ${error.message}`);
             favoriBtn.disabled = false;
