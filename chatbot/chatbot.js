@@ -4,16 +4,10 @@ console.log("🔥 chatbot.js YÜKLENDİ VE ÇALIŞIYOR.");
 const MAKE_DIALOG_WEBHOOK_URL = 'https://hook.eu2.make.com/c5dt1cwtpat7kk6i6oxilacno0yxnuif';
 const MAKE_STATUS_CHECK_URL = 'https://hook.eu2.make.com/jwfmybzglr2gjbgynuyeep7163nldzzj';
 
-
-
-
 // --- 2. HTML ELEMENTLERİNİN SEÇİLMESİ ---
 const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-input-form');
 const userInput = document.getElementById('user-input');
-
-
-
 
 // --- 3. KONUŞMA KİMLİĞİ (CONVERSATION ID) YÖNETİMİ ---
 function getOrCreateConversationId() {
@@ -26,14 +20,8 @@ function getOrCreateConversationId() {
 }
 const conversationId = getOrCreateConversationId();
 
-
-
-
 // --- 4. OLAY DİNLEYİCİ ---
 chatForm.addEventListener('submit', handleFormSubmit);
-
-
-
 
 // --- 5. ANA FONKSİYONLAR ---
 async function handleFormSubmit(event) {
@@ -49,29 +37,22 @@ async function handleFormSubmit(event) {
     try {
         const aiResponse = await sendMessageToMake(messageText);
         
-        // --- YENİ EKLENEN KISIM ---
-        // Gelen cevabın ne olduğuna bakmaksızın, AI'dan bir cevap geldiyse
-        // ve pop-up kapalıysa, onu aç.
         const chatbotPopup = document.getElementById('chatbot-popup');
         if (chatbotPopup && chatbotPopup.classList.contains('chatbot-hidden')) {
             chatbotPopup.classList.remove('chatbot-hidden');
         }
-        // --- BİTİŞ ---
 
         loadingIndicator.textContent = aiResponse.cevap;
        
         if (aiResponse.status === 'tamamlandi') {
             startPollingForResults();
         }
-    } catch (error) {
+    } catch (error)
+    {
         console.error('Asistanla iletişimde hata:', error);
         loadingIndicator.textContent = 'Üzgünüm, bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
     }
 }
-
-
-
-
 
 async function sendMessageToMake(text) {
     const payload = { text: text, conversation_id: conversationId };
@@ -84,14 +65,6 @@ async function sendMessageToMake(text) {
     const data = await response.json();
     return data;
 }
-
-
-
-
-// chatbot.js içindeki fonksiyonun güncellenmiş hali
-
-
-// chatbot.js içindeki fonksiyonun en direkt hali
 
 function addMessageToUI(content, sender, isHTML) {
     const messageElement = document.createElement('div');
@@ -106,18 +79,26 @@ function addMessageToUI(content, sender, isHTML) {
     return messageElement;
 }
 
+// --- 6. ASENKRON SONUÇ KONTROLÜ VE GÖRSELLEŞTİRME (HATA DÜZELTMELİ) ---
 
-// --- 6. ASENKRON SONUÇ KONTROLÜ VE GÖRSELLEŞTİRME ---
+// KİLİT DEĞİŞİKLİK: intervalId'yi herkesin ulaşabileceği bir yerde tanımlıyoruz.
+let pollingIntervalId = null;
+
 function startPollingForResults() {
+    // YENİ GÜVENLİK KURALI: Yeni bir döngü başlatmadan önce, eğer zaten çalışan
+    // bir döngü varsa, onu durdur ve temizle.
+    if (pollingIntervalId) {
+        clearInterval(pollingIntervalId);
+    }
+
     let pollCount = 0;
     const maxPolls = 24;
 
-
-
-
-    const intervalId = setInterval(async () => {
+    // Yeni döngüyü, herkesin ulaşabildiği pollingIntervalId değişkenine atıyoruz.
+    pollingIntervalId = setInterval(async () => {
         if (pollCount >= maxPolls) {
-            clearInterval(intervalId);
+            clearInterval(pollingIntervalId); // Döngüyü durdur
+            pollingIntervalId = null; // Referansı temizle
             addMessageToUI("Sonuçların hazırlanması beklenenden uzun sürdü.", 'ai', false);
             return;
         }
@@ -130,28 +111,22 @@ function startPollingForResults() {
             const data = await response.json();
            
             if (data.rapor_durumu === 'hazir') {
-                clearInterval(intervalId);
+                clearInterval(pollingIntervalId); // Döngüyü durdur
+                pollingIntervalId = null; // Referansı temizle
                 renderIlanSlider(data.ilan_sunumu);
             }
         } catch (error) {
             console.error("Sonuç kontrolü sırasında hata:", error);
-            clearInterval(intervalId);
+            clearInterval(pollingIntervalId); // Hata durumunda da döngüyü durdur
+            pollingIntervalId = null; // Referansı temizle
             addMessageToUI("Sonuçlar alınırken bir veri formatı hatası oluştu.", "ai", false);
         }
         pollCount++;
     }, 5000);
 }
 
-
-
-
-// SADECE BU FONKSİYON, "2 İLAN GÖSTER" MANTIĞI İÇİN GÜNCELLENDİ
-/**
- * Make.com'dan gelen ilan verilerini işleyip ekrana slider olarak çizer.
- * İşlem bittikten sonra, pop-up'ın açılması için bir sinyal gönderir.
- */
+// Bu fonksiyon, verdiğiniz çalışan kodla birebir aynı.
 function renderIlanSlider(ilanSunumuBase64) {
-    // console.log("🚀 renderIlanSlider fonksiyonu ÇAĞRILDI!"); // Test için
     if (!ilanSunumuBase64) {
         addMessageToUI("Size uygun ilan bulunamadı.", 'ai', false);
         return;
@@ -191,11 +166,8 @@ function renderIlanSlider(ilanSunumuBase64) {
                 <p class="slider-cta">Tüm ilanları görmek ve uzman desteği almak için lütfen <strong>telefon numaranızı</strong> yazın.</p>
             </div>
         `;
-               // Önce mesajı UI'a ekle
         addMessageToUI(htmlContent, 'ai', true);
 
-        // --- EN ÖNEMLİ KISIM ---
-        // Yeni bir AI cevabı geldiğini belirtmek için tarayıcının hafızasına bir işaret bırak.
         localStorage.setItem('newAiMessageFlag', Date.now());
 
     } catch (error) {
