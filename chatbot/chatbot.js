@@ -83,22 +83,26 @@ function addMessageToUI(content, sender, isHTML) {
 
 // KİLİT DEĞİŞİKLİK: intervalId'yi herkesin ulaşabileceği bir yerde tanımlıyoruz.
 let pollingIntervalId = null;
+let isPollingActive = false; // Bu, "kilit" anahtarımız.
 
 function startPollingForResults() {
-    // YENİ GÜVENLİK KURALI: Yeni bir döngü başlatmadan önce, eğer zaten çalışan
-    // bir döngü varsa, onu durdur ve temizle.
-    if (pollingIntervalId) {
-        clearInterval(pollingIntervalId);
+    // YENİ GÜVENLİK KİLİDİ: Eğer zaten bir kontrol döngüsü aktifse, asla yenisini başlatma.
+    if (isPollingActive) {
+        console.log("Kontrol döngüsü zaten aktif. Yeni bir tane başlatılmıyor.");
+        return;
     }
+
+    // Kilidi aç ve yeni döngüyü başlat.
+    isPollingActive = true;
+    console.log("Kontrol döngüsü BAŞLATILDI.");
 
     let pollCount = 0;
     const maxPolls = 24;
 
-    // Yeni döngüyü, herkesin ulaşabildiği pollingIntervalId değişkenine atıyoruz.
     pollingIntervalId = setInterval(async () => {
         if (pollCount >= maxPolls) {
-            clearInterval(pollingIntervalId); // Döngüyü durdur
-            pollingIntervalId = null; // Referansı temizle
+            clearInterval(pollingIntervalId);
+            isPollingActive = false; // Döngü bittiğinde kilidi kapat
             addMessageToUI("Sonuçların hazırlanması beklenenden uzun sürdü.", 'ai', false);
             return;
         }
@@ -111,19 +115,23 @@ function startPollingForResults() {
             const data = await response.json();
            
             if (data.rapor_durumu === 'hazir') {
-                clearInterval(pollingIntervalId); // Döngüyü durdur
-                pollingIntervalId = null; // Referansı temizle
+                clearInterval(pollingIntervalId);
+                isPollingActive = false; // Döngü bittiğinde kilidi kapat
+                console.log("Sonuçlar bulundu! Döngü DURDURULDU.");
                 renderIlanSlider(data.ilan_sunumu);
+            } else {
+                 console.log("Sonuçlar henüz hazır değil. Kontrol ediliyor... Deneme:", pollCount + 1);
             }
         } catch (error) {
             console.error("Sonuç kontrolü sırasında hata:", error);
-            clearInterval(pollingIntervalId); // Hata durumunda da döngüyü durdur
-            pollingIntervalId = null; // Referansı temizle
+            clearInterval(pollingIntervalId);
+            isPollingActive = false; // Hata durumunda da kilidi kapat
             addMessageToUI("Sonuçlar alınırken bir veri formatı hatası oluştu.", "ai", false);
         }
         pollCount++;
     }, 5000);
 }
+// renderIlanSlider fonksiyonu aynı kalıyor...
 
 // Bu fonksiyon, verdiğiniz çalışan kodla birebir aynı.
 function renderIlanSlider(ilanSunumuBase64) {
