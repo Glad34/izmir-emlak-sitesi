@@ -135,15 +135,21 @@ function startPollingForResults() {
     }, 5000);
 }
 
-function renderIlanSlider(ilanSunumu) {
-    console.log("🎨 renderIlanSlider fonksiyonu ÇAĞRILDI. Gelen veri:", ilanSunumu);
-    if (!ilanSunumu) {
+function renderIlanSlider(ilanSunumuBase64) {
+    console.log("🎨 renderIlanSlider fonksiyonu ÇAĞRILDI. Gelen şifreli veri:", ilanSunumuBase64);
+    if (!ilanSunumuBase64) {
         console.error("Render hatası: ilanSunumu verisi boş veya tanımsız.");
         addMessageToUI("Size uygun ilan bulunamadı.", 'ai', false);
         return;
     }
     try {
-        const veriObjesi = JSON.parse(ilanSunumu);
+        // --- KRİTİK DÜZELTME BURADA ---
+        // Gelen Base64 metnini önce normal metne (JSON string) geri çeviriyoruz.
+        const ilanSunumuJSON = atob(ilanSunumuBase64);
+        console.log("🔓 Şifresi çözülmüş JSON metni:", ilanSunumuJSON);
+        // --- DÜZELTME BİTTİ ---
+
+        const veriObjesi = JSON.parse(ilanSunumuJSON);
         const ilanlarDizisi = veriObjesi.ilanlar;
 
         if (!Array.isArray(ilanlarDizisi) || ilanlarDizisi.length === 0) {
@@ -171,7 +177,7 @@ function renderIlanSlider(ilanSunumu) {
                 </div>`;
         });
         
-        htmlContent += `</div></div><p class="slider-cta">Tüm ilanları görmek ve uzman desteği almak için lütfen <strong>telefon numaranızı</strong> yazın.</p></div>`;
+        htmlContent += `</div></div><p class="slider-cta">Tüm ilanları görmek için lütfen <strong>telefon numaranızı</strong> yazın.</p></div>`;
         
         addMessageToUI(htmlContent, 'ai', true);
 
