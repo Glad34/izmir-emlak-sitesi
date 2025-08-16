@@ -9,7 +9,7 @@ const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-input-form');
 const userInput = document.getElementById('user-input');
 
-// --- 3. KONUŞMA KİMLİĞİ (CONVERSATION ID) YÖNETİMİ ---
+// --- 3. KONUŞMA KİMLİĞİ YÖNETİMİ ---
 function getOrCreateConversationId() {
     let id = localStorage.getItem('chatConversationId');
     if (!id) {
@@ -23,6 +23,11 @@ const conversationId = getOrCreateConversationId();
 // --- 4. OLAY DİNLEYİCİ ---
 chatForm.addEventListener('submit', handleFormSubmit);
 
+// --- HATA AYIKLAMA İÇİN GLOBAL DEĞİŞKENLER ---
+let pollingIntervalId = null;
+let isPollingActive = false;
+console.log("🔥 CHATBOT BAŞLATILDI. Polling durumu:", isPollingActive);
+
 // --- 5. ANA FONKSİYONLAR ---
 async function handleFormSubmit(event) {
     if (event) event.preventDefault();
@@ -35,22 +40,25 @@ async function handleFormSubmit(event) {
     const loadingIndicator = addMessageToUI('...', 'ai', false);
 
     try {
+        console.log("➡️ Mesaj gönderiliyor:", messageText);
         const aiResponse = await sendMessageToMake(messageText);
-        
-        const chatbotPopup = document.getElementById('chatbot-popup');
-        if (chatbotPopup && chatbotPopup.classList.contains('chatbot-hidden')) {
-            chatbotPopup.classList.remove('chatbot-hidden');
-        }
+        console.log("⬅️ Make.com'dan cevap alındı:", aiResponse);
 
-        loadingIndicator.textContent = aiResponse.cevap;
-       
-        if (aiResponse.status === 'tamamlandi') {
-            startPollingForResults();
+        if (aiResponse && aiResponse.cevap) {
+            loadingIndicator.textContent = aiResponse.cevap;
+            if (aiResponse.status === 'tamamlandi') {
+                console.log("✅ Durum 'tamamlandi' olarak tespit edildi. Kontrol döngüsü başlatılacak.");
+                startPollingForResults();
+            } else {
+                console.log("ℹ️ Durum 'devam' olarak tespit edildi. Yeni mesaj bekleniyor.");
+            }
+        } else {
+             console.error("❌ Make.com'dan beklenen formatta cevap gelmedi:", aiResponse);
+             loadingIndicator.textContent = 'Bir sorun oluştu, lütfen mesajınızı tekrar göndermeyi deneyin.';
         }
-    } catch (error)
-    {
-        console.error('Asistanla iletişimde hata:', error);
-        loadingIndicator.textContent = 'Üzgünüm, bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+    } catch (error) {
+        console.error('❌ Asistanla iletişimde hata:', error);
+        loadingIndicator.textContent = 'Üzgünüm, bir hata oluştu.';
     }
 }
 
@@ -79,30 +87,25 @@ function addMessageToUI(content, sender, isHTML) {
     return messageElement;
 }
 
-// --- 6. ASENKRON SONUÇ KONTROLÜ VE GÖRSELLEŞTİRME (HATA DÜZELTMELİ) ---
-
-// KİLİT DEĞİŞİKLİK: intervalId'yi herkesin ulaşabileceği bir yerde tanımlıyoruz.
-let pollingIntervalId = null;
-let isPollingActive = false; // Bu, "kilit" anahtarımız.
-
+// --- 6. ASENKRON SONUÇ KONTROLÜ VE GÖRSELLEŞTİRME ---
 function startPollingForResults() {
-    // YENİ GÜVENLİK KİLİDİ: Eğer zaten bir kontrol döngüsü aktifse, asla yenisini başlatma.
     if (isPollingActive) {
-        console.log("Kontrol döngüsü zaten aktif. Yeni bir tane başlatılmıyor.");
+        console.warn("⚠️ KONTROL DÖNGÜSÜ ZATEN AKTİF. Yeni bir tane başlatılmadı.");
         return;
     }
 
-    // Kilidi aç ve yeni döngüyü başlat.
     isPollingActive = true;
-    console.log("Kontrol döngüsü BAŞLATILDI.");
-
+    console.log("🟢 KONTROL DÖNGÜSÜ BAŞLATILDI.");
+    
     let pollCount = 0;
     const maxPolls = 24;
 
     pollingIntervalId = setInterval(async () => {
+        console.log(`📡 Kontrol ${pollCount + 1}/${maxPolls} gönderiliyor...`);
         if (pollCount >= maxPolls) {
             clearInterval(pollingIntervalId);
-            isPollingActive = false; // Döngü bittiğinde kilidi kapat
+            isPollingActive = false;
+            console.log("🔴 Döngü maksimum deneme sayısına ulaştı ve DURDURULDU.");
             addMessageToUI("Sonuçların hazırlanması beklenenden uzun sürdü.", 'ai', false);
             return;
         }
@@ -113,52 +116,51 @@ function startPollingForResults() {
                 body: JSON.stringify({ conversation_id: conversationId })
             });
             const data = await response.json();
+            console.log(`📥 Kontrol cevabı alındı:`, data);
            
             if (data.rapor_durumu === 'hazir') {
                 clearInterval(pollingIntervalId);
-                isPollingActive = false; // Döngü bittiğinde kilidi kapat
-                console.log("Sonuçlar bulundu! Döngü DURDURULDU.");
+                isPollingActive = false;
+                console.log("✅ SONUÇLAR BULUNDU! Döngü DURDURULDU.");
                 renderIlanSlider(data.ilan_sunumu);
-            } else {
-                 console.log("Sonuçlar henüz hazır değil. Kontrol ediliyor... Deneme:", pollCount + 1);
             }
         } catch (error) {
-            console.error("Sonuç kontrolü sırasında hata:", error);
+            console.error("❌ Sonuç kontrolü sırasında hata:", error);
             clearInterval(pollingIntervalId);
-            isPollingActive = false; // Hata durumunda da kilidi kapat
+            isPollingActive = false;
             addMessageToUI("Sonuçlar alınırken bir veri formatı hatası oluştu.", "ai", false);
         }
         pollCount++;
     }, 5000);
 }
-// renderIlanSlider fonksiyonu aynı kalıyor...
 
-// Bu fonksiyon, verdiğiniz çalışan kodla birebir aynı.
-function renderIlanSlider(ilanSunumuBase64) {
-    if (!ilanSunumuBase64) {
+function renderIlanSlider(ilanSunumu) {
+    console.log("🎨 renderIlanSlider fonksiyonu ÇAĞRILDI. Gelen veri:", ilanSunumu);
+    if (!ilanSunumu) {
+        console.error("Render hatası: ilanSunumu verisi boş veya tanımsız.");
         addMessageToUI("Size uygun ilan bulunamadı.", 'ai', false);
         return;
     }
     try {
-        const ilanSunumuJSON = atob(ilanSunumuBase64);
-        const veriObjesi = JSON.parse(ilanSunumuJSON);
+        const veriObjesi = JSON.parse(ilanSunumu);
         const ilanlarDizisi = veriObjesi.ilanlar;
 
         if (!Array.isArray(ilanlarDizisi) || ilanlarDizisi.length === 0) {
+            console.error("Render hatası: İlan verisi bir dizi değil veya boş.", ilanlarDizisi);
             addMessageToUI("Taleplerinize uygun bir ilan bulunamadı.", 'ai', false);
             return;
         }
-       
+        
         const gosterilecekAdet = 2;
         const gosterilecekIlanlar = ilanlarDizisi.slice(0, gosterilecekAdet);
-       
+        
         let htmlContent = `
             <div class="slider-message">
                 <p>Taleplerinize yönelik <strong>${ilanlarDizisi.length} adet</strong> ilan buldum. İşte ilk ${gosterilecekIlanlar.length} tanesi:</p>
                 <div class="ilan-slider-container">
                     <div class="ilan-slider">
         `;
-       
+        
         gosterilecekIlanlar.forEach((ilan) => {
             const formatliFiyat = new Intl.NumberFormat('tr-TR').format(ilan.fiyat);
             htmlContent += `
@@ -167,19 +169,13 @@ function renderIlanSlider(ilanSunumuBase64) {
                     <div class="fiyat">${formatliFiyat} TL</div>
                 </div>`;
         });
-       
-        htmlContent += `
-                    </div>
-                </div>
-                <p class="slider-cta">Tüm ilanları görmek ve uzman desteği almak için lütfen <strong>telefon numaranızı</strong> yazın.</p>
-            </div>
-        `;
+        
+        htmlContent += `</div></div><p class="slider-cta">Tüm ilanları görmek ve uzman desteği almak için lütfen <strong>telefon numaranızı</strong> yazın.</p></div>`;
+        
         addMessageToUI(htmlContent, 'ai', true);
 
-        localStorage.setItem('newAiMessageFlag', Date.now());
-
     } catch (error) {
-        console.error("İlan slider'ı oluşturulurken hata:", error);
+        console.error("❌ İlan slider'ı oluşturulurken KRİTİK HATA:", error);
         addMessageToUI("Sonuçlar görüntülenirken bir sorun oluştu.", 'ai', false);
     }
 }
