@@ -1,51 +1,37 @@
 // ==========================================================
-// İlan Detay Script'i (DİNAMİK YÜKLEME MESAJLI SÜRÜM)
+// İlan Detay Script'i - DİĞER İLANLAR ÖZELLİĞİ EKLENDİ
 // ==========================================================
 
-// --- YENİ EKLENEN BÖLÜM BAŞLANGICI ---
-
-// Yükleme sırasında gösterilecek eğlenceli mesajlar
+// --- Yükleme Animasyonu Bölümü ---
 const loadingMessages = [
-    "İlan bilgileri getiriliyor...",
-    "En güncel fotoğraflar yükleniyor...",
-    "Konum bilgileri haritaya işleniyor...",
-    "Fiyat analizi yapılıyor...",
-    "Sizin için en iyi detayı hazırlıyoruz...",
-    "Neredeyse hazır, harika bir ilana bakıyorsunuz!"
+    "İlan bilgileri getiriliyor...", "En güncel fotoğraflar yükleniyor...",
+    "Konum bilgileri haritaya işleniyor...", "Fiyat analizi yapılıyor...",
+    "Sizin için en iyi detayı hazırlıyoruz...", "Neredeyse hazır, harika bir ilana bakıyorsunuz!"
 ];
+let messageInterval;
 
-let messageInterval; // Mesaj değiştirme döngüsünü tutacak değişken
-
-// Yükleme mesajını değiştiren fonksiyon
 function startLoadingAnimation() {
     const loadingTextElement = document.getElementById("loading-text");
     if (!loadingTextElement) return;
-
     let currentIndex = 0;
-    // Her 2 saniyede bir mesajı değiştir
     messageInterval = setInterval(() => {
         currentIndex = (currentIndex + 1) % loadingMessages.length;
         loadingTextElement.textContent = loadingMessages[currentIndex];
-    }, 2000); // 2000 milisaniye = 2 saniye
+    }, 2000);
 }
 
-// Yükleme animasyonunu ve döngüyü durduran fonksiyon
 function stopLoadingAnimation() {
     clearInterval(messageInterval);
 }
 
-// --- YENİ EKLENEN BÖLÜM SONU ---
-
-
+// --- Ana Sayfa Yükleme Mantığı ---
 document.addEventListener("DOMContentLoaded", async () => {
-  // --- DEĞİŞTİRİLEN SATIR ---
-  startLoadingAnimation(); // Sayfa yüklenir yüklenmez animasyonu başlat
+  startLoadingAnimation();
 
   let isAuthenticated = false;
   try {
     const auth0Client = await window.auth0ClientPromise;
     isAuthenticated = await auth0Client.isAuthenticated();
-    console.log("İlan Detay: Auth0 durumu kontrol edildi. Giriş yapıldı mı?", isAuthenticated);
   } catch (e) {
     console.error("İlan Detay: Auth0 durumu kontrol edilirken hata:", e);
   }
@@ -53,8 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const ilanID = params.get('id');
   if (!ilanID) {
-    // --- DEĞİŞTİRİLEN SATIR ---
-    stopLoadingAnimation(); // Hata durumunda animasyonu durdur
+    stopLoadingAnimation();
     document.getElementById("loading-spinner").innerHTML = "<p class='text-red-500'>Hata: İlan kimliği bulunamadı.</p>";
     return;
   }
@@ -62,8 +47,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   fetchIlanData(ilanID, isAuthenticated);
 });
 
+// --- Veri Çekme Fonksiyonu ---
 async function fetchIlanData(id, isLoggedIn) {
-  const jsonURL = `https://script.google.com/macros/s/AKfycbw3Ye0dEXs5O4nmZ_PDQqJOGvEDM5hL1yP6EyO1lnpRh_Brj0kwJy6GP1ZSDrMPOi-5/exec?ilanID=${id}`;
+  const jsonURL = `https://script.google.com/macros/s/AKfycbx9P6TAzuOypcj-5ByLPb3P1OKBPbUM5Ras2mZ29eby4TUl0pfosQBxMqHlC-1BWgw0/exec?ilanID=${id}`;
   try {
     const response = await fetch(jsonURL);
     if (!response.ok) throw new Error('Sunucu hatası!');
@@ -71,18 +57,21 @@ async function fetchIlanData(id, isLoggedIn) {
     if (data.error) throw new Error(data.error);
     populatePage(data, isLoggedIn);
   } catch (error) {
-    // --- DEĞİŞTİRİLEN SATIR ---
-    stopLoadingAnimation(); // Hata durumunda animasyonu durdur
+    stopLoadingAnimation();
     console.error("Veri çekilirken hata oluştu:", error);
     document.getElementById("loading-spinner").innerHTML = `<p class='text-red-500'>Hata: İlan yüklenemedi. (${error.message})</p>`;
   }
 }
 
-function populatePage(ilan, isLoggedIn) {
-  // --- DEĞİŞTİRİLEN SATIR ---
-  stopLoadingAnimation(); // Sayfa içeriği başarıyla doldurulunca animasyonu durdur
+// --- Sayfayı Doldurma Fonksiyonu (YENİ ÖZELLİKLER EKLENDİ) ---
+function populatePage(data, isLoggedIn) {
+  stopLoadingAnimation();
 
-  // Geri kalan kodunuzda hiçbir değişiklik yok...
+  // Gelen yeni veri yapısını ayrıştır
+  const ilan = data.anaIlan;
+  const digerIlanlar = data.digerIlanlar;
+
+  // --- ANA İLAN BİLGİLERİNİ DOLDURMA ---
   document.title = ilan['Başlık'];
   document.getElementById('ilan-baslik').textContent = ilan['Başlık'];
   document.getElementById('ilan-konum').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${ilan['Konum']}`;
@@ -100,24 +89,55 @@ function populatePage(ilan, isLoggedIn) {
   for (let i = 1; i <= 15; i++) { if (ilan[`Resim ${i}`] && ilan[`Resim ${i}`].trim() !== "") { resimler.push(ilan[`Resim ${i}`]); } }
   const mainWrapper = document.getElementById('main-swiper-wrapper');
   const thumbsWrapper = document.getElementById('thumbs-swiper-wrapper');
-  mainWrapper.innerHTML = '';
-  thumbsWrapper.innerHTML = '';
+  mainWrapper.innerHTML = ''; thumbsWrapper.innerHTML = '';
   if (resimler.length > 0) { resimler.forEach(resimSrc => { mainWrapper.innerHTML += `<div class="swiper-slide"><img src="${resimSrc}" /></div>`; thumbsWrapper.innerHTML += `<div class="swiper-slide"><img src="${resimSrc}" /></div>`; }); } else { mainWrapper.innerHTML = `<div class="swiper-slide"><img src="images/placeholder.jpg" /></div>`; }
+  
   initializePlugins();
 
+  // --- YENİ EKLENEN BÖLÜM: DİĞER İLANLAR ---
+  const digerIlanlarBolumu = document.getElementById('diger-ilanlar-bolumu');
+  const digerIlanlarListesi = document.getElementById('diger-ilanlar-listesi');
+  const mahalleAdiSpan = document.getElementById('mahalle-adi');
+
+  if (digerIlanlar && digerIlanlar.length > 0) {
+    mahalleAdiSpan.textContent = ilan['Mahalle'];
+    digerIlanlar.sort((a, b) => {
+      const fiyatA = parseInt(String(a.Fiyat).replace(/[^\d]/g, ''));
+      const fiyatB = parseInt(String(b.Fiyat).replace(/[^\d]/g, ''));
+      return fiyatA - fiyatB;
+    });
+
+    digerIlanlarListesi.innerHTML = '';
+    digerIlanlar.forEach((digerIlan, index) => {
+      const formatliFiyat = parseInt(String(digerIlan.Fiyat).replace(/[^\d]/g, '')).toLocaleString('tr-TR');
+      let etiketHTML = (index === 0) ? `<span class="en-uygun-etiket">En Uygun Fiyatlı</span>` : '';
+      
+      digerIlanlarListesi.innerHTML += `
+        <a href="ilan-detay.html?id=${digerIlan['İlan ID']}" class="diger-ilan-item">
+          <div class="diger-ilan-bilgi">
+            <h4 class="diger-ilan-baslik">${digerIlan['Başlık']}</h4>
+            <p class="diger-ilan-fiyat">${formatliFiyat} TL</p>
+          </div>
+          ${etiketHTML}
+        </a>
+      `;
+    });
+    digerIlanlarBolumu.classList.remove('hidden');
+  }
+  // --- YENİ BÖLÜM SONU ---
+
+
+  // --- Favori Butonu Mantığı (Mevcut kodunuz) ---
   const favoriBtn = document.getElementById('favori-ekle-btn');
   if (isLoggedIn && favoriBtn) {
       favoriBtn.classList.remove('hidden');
   }
-
   if (favoriBtn && isLoggedIn) {
     favoriBtn.addEventListener('click', async () => {
         favoriBtn.disabled = true;
         favoriBtn.querySelector('i').classList.add('animate-pulse');
-        let accessToken;
         try {
-            accessToken = await window.getAuthToken();
-            console.log("Backend'e gönderilecek Access Token:", accessToken);
+            const accessToken = await window.getAuthToken();
             const response = await fetch('/.netlify/functions/add-favorite', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
@@ -145,6 +165,7 @@ function populatePage(ilan, isLoggedIn) {
   document.getElementById('ilan-icerik').classList.remove('hidden');
 }
 
+// --- Initialize Plugins Fonksiyonu (Değişiklik yok) ---
 function initializePlugins() {
   const thumbsSwiper = new Swiper('.thumbs-swiper', { spaceBetween: 10, slidesPerView: 4, freeMode: true, watchSlidesProgress: true });
   new Swiper('.main-swiper', { spaceBetween: 10, navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }, pagination: { el: '.swiper-pagination', type: 'fraction' }, thumbs: { swiper: thumbsSwiper } });
