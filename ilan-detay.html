@@ -14,31 +14,29 @@
 <body class="bg-gray-100">
 
 
-
  <!-- Header -->
  <div id="header-placeholder"></div>
-
-
 
   <main class="max-w-6xl mx-auto py-8 px-4">
   <div id="loading-spinner" class="text-center py-20">
     <i class="fas fa-spinner fa-spin fa-3x text-gray-500"></i>
-    
+   
     <!-- BU SATIRA BİR ID EKLEDİK -->
     <p id="loading-text" class="mt-4 text-lg">İlan bilgileri yükleniyor...</p>
-    
+   
   </div>
+
 
     <div id="ilan-icerik" class="hidden">
       <section class="mb-6">
   <!-- 1. Satır: Sadece Başlık -->
   <h1 id="ilan-baslik" class="text-3xl font-bold text-gray-800 mb-2"></h1>
-  
+ 
   <!-- 2. Satır: Konum ve Butonlar yan yana -->
   <div class="flex justify-between items-center">
     <!-- Konum (Sol Taraf) -->
     <p id="ilan-konum" class="text-gray-600 flex items-center gap-2"><i class="fas fa-map-marker-alt"></i></p>
-    
+   
     <!-- Aksiyon Butonları (Sağ Taraf) -->
     <div class="flex items-center space-x-3">
       <!-- Paylaş Butonu -->
@@ -53,10 +51,11 @@
   </div>
 </section>
 
+
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Sol Taraf: Galeri ve Yeni Sekmeli Yapı -->
         <div class="lg:col-span-2">
-          
+         
           <!-- YENİ SWIPER RESİM GALERİSİ -->
           <section id="resim-galerisi" class="mb-8">
             <!-- Ana Resim Slider'ı -->
@@ -69,6 +68,7 @@
               <div class="swiper-pagination"></div>
             </div>
 
+
             <!-- Küçük Resimler (Thumbnails) Slider'ı -->
             <div class="swiper thumbs-swiper">
               <div class="swiper-wrapper" id="thumbs-swiper-wrapper">
@@ -76,9 +76,14 @@
               </div>
             </div>
 
+
              <!-- YENİ PROFESYONEL SIRALAMA BİLGİSİ -->
-          
+            <div id="ilan-siralama-placeholder" class="siralama-bilgi-kutusu hidden">
+                  <i class="fas fa-chart-line"></i>
+                  <span id="siralama-metni"></span>
+              </div>
           </section>
+
 
           <!-- YENİ SEKMELİ YAPI (TABS) -->
           <section class="bg-white rounded-lg shadow overflow-hidden">
@@ -111,6 +116,7 @@
           </section>
         </div>
 
+
         <!-- Sağ Taraf: Fiyat ve Danışman (Özellikler buradan taşındı) -->
         <div class="lg:col-span-1 space-y-8">
           <section class="price-box">
@@ -127,6 +133,7 @@
   </div>
 </section>
 
+
           <!-- ======================================= -->
 <!-- YENİ: AYNI MAHALLEDEKİ DİĞER İLANLAR    -->
 <!-- ======================================= -->
@@ -142,7 +149,8 @@
     <!-- Diğer ilanlar buraya JS ile eklenecek -->
   </div>
 </section>
-          
+         
+
 
           <section class="bg-white p-6 rounded-lg shadow">
             <h2 class="text-xl font-semibold mb-4">Danışman Bilgileri</h2>
@@ -166,18 +174,25 @@
 
 
 
+
+
+
   <!-- Swiper.js eklendi -->
    <!-- Önce Auth0 Kütüphanesi -->
 <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 
+
 <!-- Sonra Swiper.js -->
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
 
 <!-- ÖNCE MERKEZİ SCRİPT'İMİZ -->
 <script src="script.js"></script>
 
+
 <!-- SONRA BU SAYFAYA ÖZEL SCRİPT -->
 <script src="ilan-detay.js"></script>
+
 
 <!-- Diğerleri -->
 <script src="chatbot/chatbot.js"></script>
