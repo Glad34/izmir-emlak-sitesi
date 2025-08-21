@@ -145,10 +145,14 @@
 /* DİĞER İLANLAR LİSTESİ STİLLERİ          */
 /* ======================================= */
 
+/* ======================================= */
+/* DİĞER İLANLAR LİSTESİ STİLLERİ (YENİ)   */
+/* ======================================= */
+
 .diger-ilan-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  align-items: center; /* Dikeyde hizala */
+  gap: 1rem; /* Aradaki boşluk */
   padding: 1rem;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -164,18 +168,38 @@
   transform: translateY(-2px);
 }
 
+/* Sıra Numarası (1., 2., 3.) */
+.ilan-sira-no {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #9ca3af; /* Gri */
+  flex-shrink: 0; /* Küçülmesini engelle */
+}
+
+/* Başlık ve Fiyatı içeren ana bölüm */
+.diger-ilan-bilgi {
+  flex-grow: 1; /* Tüm boş alanı doldurur */
+  min-width: 0; /* Flexbox'ın taşma sorununu çözer */
+}
+
+/* İlan Başlığı (Tek satır ve ... ile kesme) */
 .diger-ilan-baslik {
   font-weight: 600;
   color: #1f2937;
+  white-space: nowrap; /* Alt satıra geçmeyi engelle */
+  overflow: hidden; /* Taşanı gizle */
+  text-overflow: ellipsis; /* Sonuna ... ekle */
   margin-bottom: 0.25rem;
 }
 
+/* İlan Fiyatı */
 .diger-ilan-fiyat {
   font-size: 1.125rem;
   font-weight: 700;
   color: #3b82f6;
 }
 
+/* "En Uygun Fiyatlı" Etiketi */
 .en-uygun-etiket {
   background-color: #10b981; /* Yeşil */
   color: white;
@@ -184,4 +208,16 @@
   padding: 4px 10px;
   border-radius: 12px;
   text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* --- YENİ EKLENEN STİL --- */
+/* Ana resmin altındaki sıralama bilgisi için */
+.ilan-siralama-bilgisi {
+    text-align: right;
+    font-size: 0.875rem; /* 14px */
+    color: #4b5563; /* Koyu gri */
+    font-style: italic;
+    margin-top: -0.5rem; /* Resim galerisine biraz daha yakınlaştırır */
+    margin-bottom: 2rem;
 }

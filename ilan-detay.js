@@ -1,5 +1,5 @@
 // ==========================================================
-// İlan Detay Script'i - DİĞER İLANLAR ÖZELLİĞİ EKLENDİ
+// İlan Detay Script'i - DİĞER İLANLAR GÖRSEL GÜNCELLEMESİ
 // ==========================================================
 
 // --- Yükleme Animasyonu Bölümü ---
@@ -28,14 +28,12 @@ function stopLoadingAnimation() {
 document.addEventListener("DOMContentLoaded", async () => {
   startLoadingAnimation();
 
-  let isAuthenticated = false;
-  try {
-    const auth0Client = await window.auth0ClientPromise;
-    isAuthenticated = await auth0Client.isAuthenticated();
-  } catch (e) {
-    console.error("İlan Detay: Auth0 durumu kontrol edilirken hata:", e);
+  // auth.js'in hazır olmasını bekle ve giriş durumunu öğren
+  while (typeof window.getAuthClient !== 'function') {
+      await new Promise(resolve => setTimeout(resolve, 50));
   }
-
+  const { isAuthenticated, accessToken } = await window.getAuthClient();
+  
   const params = new URLSearchParams(window.location.search);
   const ilanID = params.get('id');
   if (!ilanID) {
@@ -44,18 +42,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
  
-  fetchIlanData(ilanID, isAuthenticated);
+  fetchIlanData(ilanID, isAuthenticated, accessToken);
 });
 
 // --- Veri Çekme Fonksiyonu ---
-async function fetchIlanData(id, isLoggedIn) {
-  const jsonURL = `https://script.google.com/macros/s/AKfycbx9P6TAzuOypcj-5ByLPb3P1OKBPbUM5Ras2mZ29eby4TUl0pfosQBxMqHlC-1BWgw0/exec?ilanID=${id}`;
+async function fetchIlanData(id, isLoggedIn, token) {
+  const jsonURL = `https://script.google.com/macros/s/AKfycbw3Ye0dEXs5O4nmZ_PDQqJOGvEDM5hL1yP6EyO1lnpRh_Brj0kwJy6GP1ZSDrMPOi-5/exec?ilanID=${id}`;
   try {
     const response = await fetch(jsonURL);
     if (!response.ok) throw new Error('Sunucu hatası!');
     const data = await response.json();
     if (data.error) throw new Error(data.error);
-    populatePage(data, isLoggedIn);
+    populatePage(data, isLoggedIn, token);
   } catch (error) {
     stopLoadingAnimation();
     console.error("Veri çekilirken hata oluştu:", error);
@@ -63,8 +61,8 @@ async function fetchIlanData(id, isLoggedIn) {
   }
 }
 
-// --- Sayfayı Doldurma Fonksiyonu (YENİ ÖZELLİKLER EKLENDİ) ---
-function populatePage(data, isLoggedIn) {
+// --- Sayfayı Doldurma Fonksiyonu (YENİ GÖRSEL ÖZELLİKLER EKLENDİ) ---
+function populatePage(data, isLoggedIn, token) {
   stopLoadingAnimation();
 
   // Gelen yeni veri yapısını ayrıştır
@@ -98,36 +96,52 @@ function populatePage(data, isLoggedIn) {
   const digerIlanlarBolumu = document.getElementById('diger-ilanlar-bolumu');
   const digerIlanlarListesi = document.getElementById('diger-ilanlar-listesi');
   const mahalleAdiSpan = document.getElementById('mahalle-adi');
+  const siralamaPlaceholder = document.getElementById('ilan-siralama-placeholder');
 
   if (digerIlanlar && digerIlanlar.length > 0) {
     mahalleAdiSpan.textContent = ilan['Mahalle'];
-    digerIlanlar.sort((a, b) => {
+    
+    const tumIlanlar = [ ...digerIlanlar, { "İlan ID": ilan['İlan ID'], "Başlık": ilan['Başlık'], "Fiyat": ilan['Fiyat'] } ];
+    tumIlanlar.sort((a, b) => {
       const fiyatA = parseInt(String(a.Fiyat).replace(/[^\d]/g, ''));
       const fiyatB = parseInt(String(b.Fiyat).replace(/[^\d]/g, ''));
       return fiyatA - fiyatB;
     });
 
     digerIlanlarListesi.innerHTML = '';
-    digerIlanlar.forEach((digerIlan, index) => {
-      const formatliFiyat = parseInt(String(digerIlan.Fiyat).replace(/[^\d]/g, '')).toLocaleString('tr-TR');
-      let etiketHTML = (index === 0) ? `<span class="en-uygun-etiket">En Uygun Fiyatlı</span>` : '';
+    let anaIlaninSirasi = -1;
+
+    tumIlanlar.forEach((siradakiIlan, index) => {
+      if (siradakiIlan['İlan ID'] == ilan['İlan ID']) {
+          anaIlaninSirasi = index + 1;
+      }
       
-      digerIlanlarListesi.innerHTML += `
-        <a href="ilan-detay.html?id=${digerIlan['İlan ID']}" class="diger-ilan-item">
-          <div class="diger-ilan-bilgi">
-            <h4 class="diger-ilan-baslik">${digerIlan['Başlık']}</h4>
-            <p class="diger-ilan-fiyat">${formatliFiyat} TL</p>
-          </div>
-          ${etiketHTML}
-        </a>
-      `;
+      if (siradakiIlan['İlan ID'] != ilan['İlan ID']) {
+        const formatliFiyat = parseInt(String(siradakiIlan.Fiyat).replace(/[^\d]/g, '')).toLocaleString('tr-TR');
+        let etiketHTML = (index === 0) ? `<span class="en-uygun-etiket">En Uygun</span>` : '';
+
+        digerIlanlarListesi.innerHTML += `
+          <a href="ilan-detay.html?id=${siradakiIlan['İlan ID']}" class="diger-ilan-item">
+            <span class="ilan-sira-no">${index + 1}.</span>
+            <div class="diger-ilan-bilgi">
+              <h4 class="diger-ilan-baslik">${siradakiIlan['Başlık']}</h4>
+              <p class="diger-ilan-fiyat">${formatliFiyat} TL</p>
+            </div>
+            ${etiketHTML}
+          </a>
+        `;
+      }
     });
+
+    if (anaIlaninSirasi !== -1 && siralamaPlaceholder) {
+        siralamaPlaceholder.textContent = `Bu ilan, ${ilan['Mahalle']} mahallesindeki en uygun ${anaIlaninSirasi}. ilandır.`;
+    }
     digerIlanlarBolumu.classList.remove('hidden');
   }
   // --- YENİ BÖLÜM SONU ---
 
 
-  // --- Favori Butonu Mantığı (Mevcut kodunuz) ---
+  // --- Favori Butonu Mantığı ---
   const favoriBtn = document.getElementById('favori-ekle-btn');
   if (isLoggedIn && favoriBtn) {
       favoriBtn.classList.remove('hidden');
@@ -137,10 +151,10 @@ function populatePage(data, isLoggedIn) {
         favoriBtn.disabled = true;
         favoriBtn.querySelector('i').classList.add('animate-pulse');
         try {
-            const accessToken = await window.getAuthToken();
+            if (!token) throw new Error('Yetkilendirme anahtarı bulunamadı.');
             const response = await fetch('/.netlify/functions/add-favorite', {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ilanId: ilan['İlan ID'] }),
             });
             if (response.ok) {
