@@ -301,3 +301,9 @@
 .en-uygun-etiket.turuncu {
   background-color: #f97316; /* Turuncu */
 }
+
+/* Ana ilanı listede vurgulamak için stil */
+.diger-ilan-item.ana-ilan-vurgu {
+  background-color: #eff6ff; /* Açık Mavi */
+  border-color: #3b82f6; /* Mavi */
+}
