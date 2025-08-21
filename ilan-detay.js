@@ -86,14 +86,12 @@ function populatePage(data, isLoggedIn, token) {
   
   initializePlugins();
 
-  // --- DİĞER İLANLAR VE ANALİZLER (DÜZELTİLMİŞ VE GELİŞTİRİLMİŞ) ---
   const digerIlanlarBolumu = document.getElementById('diger-ilanlar-bolumu');
   const digerIlanlarListesi = document.getElementById('diger-ilanlar-listesi');
   const mahalleAdiSpan = document.getElementById('mahalle-adi');
-  const siralamaPlaceholder = document.getElementById('ilan-siralama-placeholder');
-  const siralamaMetni = document.getElementById('siralama-metni');
   const ortalamaFiyatKutusu = document.getElementById('ortalama-fiyat-kutusu');
 
+  // Mahallede başka ilan varsa (kendisi hariç en az 1 tane)
   if (digerIlanlar && digerIlanlar.length > 0) {
     mahalleAdiSpan.textContent = ilan['Mahalle'];
     
@@ -113,16 +111,13 @@ function populatePage(data, isLoggedIn, token) {
         ortalamaFiyatKutusu.querySelector('p').innerHTML = `Mahalledeki Ortalama m² Fiyatı: <strong>${ortalamaM2Fiyati.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} TL/m²</strong>`;
         ortalamaFiyatKutusu.classList.remove('hidden');
 
+        // İlanları ana fiyata göre sırala
         tumIlanlar.sort((a, b) => parseInt(String(a.Fiyat).replace(/[^\d]/g, '')) - parseInt(String(b.Fiyat).replace(/[^\d]/g, '')));
 
         digerIlanlarListesi.innerHTML = '';
-        let anaIlaninSirasi = -1;
 
+        // Sıralanmış TÜM ilanları listele
         tumIlanlar.forEach((siradakiIlan, index) => {
-            if (siradakiIlan['İlan ID'] == ilan['İlan ID']) {
-                anaIlaninSirasi = index + 1;
-            }
-
             const mevcutIlanDetay = ilanlarVeM2Fiyatlari.find(i => i['İlan ID'] == siradakiIlan['İlan ID']);
             
             if (mevcutIlanDetay) {
@@ -143,6 +138,8 @@ function populatePage(data, isLoggedIn, token) {
 
                 const anaIlanSinifi = (siradakiIlan['İlan ID'] == ilan['İlan ID']) ? 'ana-ilan-vurgu' : '';
 
+                // --- DÜZELTİLEN YER ---
+                // Artık hiçbir ilanı filtrelemiyoruz, hepsini listeye ekliyoruz.
                 digerIlanlarListesi.innerHTML += `
                     <a href="ilan-detay.html?id=${siradakiIlan['İlan ID']}" class="diger-ilan-item ${anaIlanSinifi}">
                         <span class="ilan-sira-no">${index + 1}.</span>
@@ -158,11 +155,6 @@ function populatePage(data, isLoggedIn, token) {
                 `;
             }
         });
-
-        if (anaIlaninSirasi !== -1 && siralamaMetni) {
-            siralamaMetni.textContent = `Bu ilan, ${ilan['Mahalle']} mahallesindeki en uygun ${anaIlaninSirasi}. fırsattır.`;
-            siralamaPlaceholder.classList.remove('hidden');
-        }
         digerIlanlarBolumu.classList.remove('hidden');
     }
   }
