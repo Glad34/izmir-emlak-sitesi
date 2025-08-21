@@ -142,90 +142,53 @@
 
 
 /* ======================================= */
-/* DİĞER İLANLAR LİSTESİ STİLLERİ          */
+/* TEMEL SAYFA STİLLERİ                    */
 /* ======================================= */
 
-/* ======================================= */
-/* DİĞER İLANLAR LİSTESİ STİLLERİ (YENİ)   */
-/* ======================================= */
-
-.diger-ilan-item {
-  display: flex;
-  align-items: center; /* Dikeyde hizala */
-  gap: 1rem; /* Aradaki boşluk */
-  padding: 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  margin-bottom: 0.75rem;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  color: inherit;
+.prose { 
+  line-height: 1.75; 
 }
-
-.diger-ilan-item:hover {
-  border-color: #3b82f6;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  transform: translateY(-2px);
+.prose p { 
+  margin-bottom: 1em; 
 }
-
-/* Sıra Numarası (1., 2., 3.) */
-.ilan-sira-no {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #9ca3af; /* Gri */
-  flex-shrink: 0; /* Küçülmesini engelle */
-}
-
-/* Başlık ve Fiyatı içeren ana bölüm */
-.diger-ilan-bilgi {
-  flex-grow: 1; /* Tüm boş alanı doldurur */
-  min-width: 0; /* Flexbox'ın taşma sorununu çözer */
-}
-
-/* İlan Başlığı (Tek satır ve ... ile kesme) */
-.diger-ilan-baslik {
-  font-weight: 600;
-  color: #1f2937;
-  white-space: nowrap; /* Alt satıra geçmeyi engelle */
-  overflow: hidden; /* Taşanı gizle */
-  text-overflow: ellipsis; /* Sonuna ... ekle */
-  margin-bottom: 0.25rem;
-}
-
-/* İlan Fiyatı */
-.diger-ilan-fiyat {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #3b82f6;
-}
-
-/* "En Uygun Fiyatlı" Etiketi */
-.en-uygun-etiket {
-  background-color: #10b981; /* Yeşil */
-  color: white;
-  font-size: 0.75rem;
-  font-weight: bold;
-  padding: 4px 10px;
-  border-radius: 12px;
-  text-transform: uppercase;
-  flex-shrink: 0;
-}
-
-/* --- YENİ EKLENEN STİL --- */
-/* Ana resmin altındaki sıralama bilgisi için */
-.ilan-siralama-bilgisi {
-    text-align: right;
-    font-size: 0.875rem; /* 14px */
-    color: #4b5563; /* Koyu gri */
-    font-style: italic;
-    margin-top: -0.5rem; /* Resim galerisine biraz daha yakınlaştırır */
-    margin-bottom: 2rem;
-}
-
 
 /* ======================================= */
-/* YENİ PROFESYONEL STİLLER                */
+/* RESİM GALERİSİ (SWIPER) STİLLERİ         */
 /* ======================================= */
+
+.main-swiper { height: 400px; width: 100%; border-radius: 8px; margin-bottom: 10px; }
+.main-swiper .swiper-slide img { width: 100%; height: 100%; object-fit: cover; }
+.thumbs-swiper { height: 80px; box-sizing: border-box; padding: 10px 0; }
+.thumbs-swiper .swiper-slide { width: 25%; height: 100%; opacity: 0.6; cursor: pointer; border-radius: 4px; overflow: hidden; }
+.thumbs-swiper .swiper-slide-thumb-active { opacity: 1; border: 2px solid #3b82f6; }
+.thumbs-swiper .swiper-slide img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ======================================= */
+/* SEKME (TAB) STİLLERİ                    */
+/* ======================================= */
+
+.tab-buttons { display: flex; border-bottom: 1px solid #e5e7eb; }
+.tab-button { padding: 1rem 1.5rem; font-weight: 600; color: #6b7280; border-bottom: 3px solid transparent; transition: all 0.3s ease; }
+.tab-button:hover { background-color: #f9fafb; }
+.tab-button.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+.tab-content { padding: 1.5rem; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+#tab-konum { padding: 0; }
+
+/* ======================================= */
+/* PROFESYONEL FİYAT KUTUSU STİLLERİ       */
+/* ======================================= */
+
+.price-box { background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); overflow: hidden; border: 1px solid #e5e7eb; }
+.price-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #4b5563; font-size: 1rem; }
+.price-icon { color: #6b7280; }
+.price-amount { padding: 24px 16px; font-size: 2.5rem; font-weight: 700; text-align: center; color: #111828; line-height: 1.2; }
+.price-footer { background-color: #f9fafb; padding: 10px 16px; font-size: 0.8rem; text-align: center; color: #6b7280; border-top: 1px solid #e5e7eb; }
+
+/* ======================================================== */
+/* DİĞER İLANLAR & ANALİZ BÖLÜMÜ STİLLERİ (BİRLEŞTİRİLMİŞ)  */
+/* ======================================================== */
 
 /* Turuncu Sıralama Bilgi Kutusu */
 .siralama-bilgi-kutusu {
@@ -236,14 +199,14 @@
   color: white;
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  font-weight: 400;
+  font-weight: 600;
   margin-top: -0.5rem;
   margin-bottom: 2rem;
 }
 
-/* Ortalama Fiyat Bilgi Kutusu */
+/* Ortalama m² Fiyatı Bilgi Kutusu */
 .ortalama-fiyat-bilgisi {
-  background-color: #f3f4f6; /* Açık Gri */
+  background-color: #f3f4f6;
   color: #374151;
   padding: 0.75rem 1rem;
   border-radius: 8px;
@@ -251,39 +214,46 @@
   font-size: 0.9rem;
   text-align: center;
 }
-#ortalama-fiyat {
+.ortalama-fiyat-bilgisi strong {
   font-weight: 700;
 }
 
-/* Diğer İlan Kartı İçindeki Yeni Elementler */
-.diger-ilan-detaylar {
+/* Diğer İlanlar Listesi Ana Elemanı */
+.diger-ilan-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 0.5rem;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+}
+.diger-ilan-item:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  transform: translateY(-2px);
+}
+.diger-ilan-item.ana-ilan-vurgu {
+  background-color: #eff6ff;
+  border-color: #3b82f6;
 }
 
-.diger-ilan-fiyat {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #3b82f6;
-}
+/* Liste İçindeki Elementler */
+.ilan-sira-no { font-size: 1.25rem; font-weight: 700; color: #9ca3af; flex-shrink: 0; }
+.diger-ilan-bilgi { flex-grow: 1; min-width: 0; }
+.diger-ilan-baslik { font-weight: 600; color: #1f2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.diger-ilan-detaylar { display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem; }
+.diger-ilan-fiyat { font-size: 1.125rem; font-weight: 700; color: #3b82f6; }
 
-.fiyat-fark-gostergesi {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-}
-.fiyat-fark-gostergesi.yukari {
-  color: #ef4444; /* Kırmızı */
-}
-.fiyat-fark-gostergesi.asagi {
-  color: #10b981; /* Yeşil */
-}
+/* Fiyat Fark Göstergesi (Yukarı/Aşağı Oklar) */
+.fiyat-fark-gostergesi { display: flex; align-items: center; gap: 0.25rem; font-weight: 600; font-size: 0.875rem; }
+.fiyat-fark-gostergesi.yukari { color: #ef4444; }
+.fiyat-fark-gostergesi.asagi { color: #10b981; }
 
-/* "En Uygun Fiyatlı" Etiketi */
+/* "En Uygun" Etiketleri */
 .en-uygun-etiket {
   color: white;
   font-size: 0.75rem;
@@ -293,17 +263,5 @@
   text-transform: uppercase;
   flex-shrink: 0;
 }
-
-.en-uygun-etiket.yesil {
-  background-color: #10b981; /* Yeşil */
-}
-
-.en-uygun-etiket.turuncu {
-  background-color: #f97316; /* Turuncu */
-}
-
-/* Ana ilanı listede vurgulamak için stil */
-.diger-ilan-item.ana-ilan-vurgu {
-  background-color: #eff6ff; /* Açık Mavi */
-  border-color: #3b82f6; /* Mavi */
-}
+.en-uygun-etiket.yesil { background-color: #10b981; }
+.en-uygun-etiket.turuncu { background-color: #f97316; }
