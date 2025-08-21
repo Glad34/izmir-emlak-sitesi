@@ -1,5 +1,5 @@
 // ==========================================================
-// İlan Detay Script'i - DİĞER İLANLAR GÖRSEL GÜNCELLEMESİ
+// İlan Detay Script'i - GELİŞMİŞ ANALİZ ÖZELLİKLERİ EKLENDİ
 // ==========================================================
 
 // --- Yükleme Animasyonu Bölümü ---
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // --- Veri Çekme Fonksiyonu ---
 async function fetchIlanData(id, isLoggedIn, token) {
-  const jsonURL = `https://script.google.com/macros/s/AKfycbx9P6TAzuOypcj-5ByLPb3P1OKBPbUM5Ras2mZ29eby4TUl0pfosQBxMqHlC-1BWgw0/exec?ilanID=${id}`;
+  const jsonURL = `https://script.google.com/macros/s/AKfycbw3Ye0dEXs5O4nmZ_PDQqJOGvEDM5hL1yP6EyO1lnpRh_Brj0kwJy6GP1ZSDrMPOi-5/exec?ilanID=${id}`;
   try {
     const response = await fetch(jsonURL);
     if (!response.ok) throw new Error('Sunucu hatası!');
@@ -92,16 +92,26 @@ function populatePage(data, isLoggedIn, token) {
   
   initializePlugins();
 
-  // --- YENİ EKLENEN BÖLÜM: DİĞER İLANLAR ---
+  // --- YENİ EKLENEN BÖLÜM: DİĞER İLANLAR VE ANALİZLER ---
   const digerIlanlarBolumu = document.getElementById('diger-ilanlar-bolumu');
   const digerIlanlarListesi = document.getElementById('diger-ilanlar-listesi');
   const mahalleAdiSpan = document.getElementById('mahalle-adi');
   const siralamaPlaceholder = document.getElementById('ilan-siralama-placeholder');
+  const siralamaMetni = document.getElementById('siralama-metni');
+  const ortalamaFiyatKutusu = document.getElementById('ortalama-fiyat-kutusu');
+  const ortalamaFiyatElementi = document.getElementById('ortalama-fiyat');
 
   if (digerIlanlar && digerIlanlar.length > 0) {
     mahalleAdiSpan.textContent = ilan['Mahalle'];
     
     const tumIlanlar = [ ...digerIlanlar, { "İlan ID": ilan['İlan ID'], "Başlık": ilan['Başlık'], "Fiyat": ilan['Fiyat'] } ];
+    
+    const fiyatlar = tumIlanlar.map(i => parseInt(String(i.Fiyat).replace(/[^\d]/g, '')));
+    const toplamFiyat = fiyatlar.reduce((acc, fiyat) => acc + fiyat, 0);
+    const ortalamaFiyat = toplamFiyat / fiyatlar.length;
+    ortalamaFiyatElementi.textContent = `${ortalamaFiyat.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} TL`;
+    ortalamaFiyatKutusu.classList.remove('hidden');
+
     tumIlanlar.sort((a, b) => {
       const fiyatA = parseInt(String(a.Fiyat).replace(/[^\d]/g, ''));
       const fiyatB = parseInt(String(b.Fiyat).replace(/[^\d]/g, ''));
@@ -116,16 +126,30 @@ function populatePage(data, isLoggedIn, token) {
           anaIlaninSirasi = index + 1;
       }
       
-      if (siradakiIlan['İlan ID'] != ilan['İlan ID']) {
-        const formatliFiyat = parseInt(String(siradakiIlan.Fiyat).replace(/[^\d]/g, '')).toLocaleString('tr-TR');
-        let etiketHTML = (index === 0) ? `<span class="en-uygun-etiket">En Uygun</span>` : '';
+      const mevcutFiyat = parseInt(String(siradakiIlan.Fiyat).replace(/[^\d]/g, ''));
+      const formatliFiyat = mevcutFiyat.toLocaleString('tr-TR');
+      
+      const farkYuzdesi = Math.round(((mevcutFiyat - ortalamaFiyat) / ortalamaFiyat) * 100);
+      let farkGostergesiHTML = '';
+      if (farkYuzdesi > 0) {
+          farkGostergesiHTML = `<div class="fiyat-fark-gostergesi yukari"><span>%${farkYuzdesi}</span><i class="fas fa-arrow-up"></i></div>`;
+      } else if (farkYuzdesi < 0) {
+          farkGostergesiHTML = `<div class="fiyat-fark-gostergesi asagi"><span>%${Math.abs(farkYuzdesi)}</span><i class="fas fa-arrow-down"></i></div>`;
+      }
 
+      const etiketHTML = (index === 0 && siradakiIlan['İlan ID'] != ilan['İlan ID']) ? `<span class="en-uygun-etiket">En Uygun</span>` : '';
+
+      // Ana ilanı listede göstermiyoruz
+      if (siradakiIlan['İlan ID'] != ilan['İlan ID']) {
         digerIlanlarListesi.innerHTML += `
           <a href="ilan-detay.html?id=${siradakiIlan['İlan ID']}" class="diger-ilan-item">
             <span class="ilan-sira-no">${index + 1}.</span>
             <div class="diger-ilan-bilgi">
               <h4 class="diger-ilan-baslik">${siradakiIlan['Başlık']}</h4>
-              <p class="diger-ilan-fiyat">${formatliFiyat} TL</p>
+              <div class="diger-ilan-detaylar">
+                  <p class="diger-ilan-fiyat">${formatliFiyat} TL</p>
+                  ${farkGostergesiHTML}
+              </div>
             </div>
             ${etiketHTML}
           </a>
@@ -133,13 +157,12 @@ function populatePage(data, isLoggedIn, token) {
       }
     });
 
-    if (anaIlaninSirasi !== -1 && siralamaPlaceholder) {
-        siralamaPlaceholder.textContent = `Bu ilan, ${ilan['Mahalle']} mahallesindeki en uygun ${anaIlaninSirasi}. ilandır.`;
+    if (anaIlaninSirasi !== -1 && siralamaMetni) {
+        siralamaMetni.textContent = `Bu ilan, ${ilan['Mahalle']} mahallesindeki en uygun ${anaIlaninSirasi}. fırsattır.`;
+        siralamaPlaceholder.classList.remove('hidden');
     }
     digerIlanlarBolumu.classList.remove('hidden');
   }
-  // --- YENİ BÖLÜM SONU ---
-
 
   // --- Favori Butonu Mantığı ---
   const favoriBtn = document.getElementById('favori-ekle-btn');

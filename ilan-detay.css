@@ -221,3 +221,64 @@
     margin-top: -0.5rem; /* Resim galerisine biraz daha yakınlaştırır */
     margin-bottom: 2rem;
 }
+
+
+/* ======================================= */
+/* YENİ PROFESYONEL STİLLER                */
+/* ======================================= */
+
+/* Turuncu Sıralama Bilgi Kutusu */
+.siralama-bilgi-kutusu {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: #f97316; /* Turuncu */
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-top: -0.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Ortalama Fiyat Bilgi Kutusu */
+.ortalama-fiyat-bilgisi {
+  background-color: #f3f4f6; /* Açık Gri */
+  color: #374151;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+#ortalama-fiyat {
+  font-weight: 700;
+}
+
+/* Diğer İlan Kartı İçindeki Yeni Elementler */
+.diger-ilan-detaylar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.diger-ilan-fiyat {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.fiyat-fark-gostergesi {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+.fiyat-fark-gostergesi.yukari {
+  color: #ef4444; /* Kırmızı */
+}
+.fiyat-fark-gostergesi.asagi {
+  color: #10b981; /* Yeşil */
+}

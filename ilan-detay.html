@@ -76,9 +76,11 @@
               </div>
             </div>
 
-             <div id="ilan-siralama-placeholder" class="ilan-siralama-bilgisi">
-    <!-- Sıralama bilgisi JS ile buraya eklenecek -->
-             </div>
+             <!-- YENİ PROFESYONEL SIRALAMA BİLGİSİ -->
+            <div id="ilan-siralama-placeholder" class="siralama-bilgi-kutusu hidden">
+                  <i class="fas fa-chart-line"></i>
+                  <span id="siralama-metni"></span>
+              </div>
           </section>
 
           <!-- YENİ SEKMELİ YAPI (TABS) -->
@@ -132,9 +134,13 @@
 <!-- YENİ: AYNI MAHALLEDEKİ DİĞER İLANLAR    -->
 <!-- ======================================= -->
 <section id="diger-ilanlar-bolumu" class="mt-8 bg-white p-6 rounded-lg shadow hidden">
-  <h2 class="text-2xl font-semibold border-b pb-3 mb-4">
-    <span id="mahalle-adi"></span> Mahallesindeki Diğer Fırsatlar
-  </h2>
+  <!-- YENİ BAŞLIK VE ORTALAMA FİYAT BİLGİSİ -->
+<h2 class="text-2xl font-semibold border-b pb-3 mb-4">
+  <span id="mahalle-adi"></span> Mahallesindeki Diğer Fırsatlar
+</h2>
+<div id="ortalama-fiyat-kutusu" class="ortalama-fiyat-bilgisi hidden">
+  <p>Mahalledeki Ortalama İlan Fiyatı: <strong id="ortalama-fiyat"></strong></p>
+</div>
   <div id="diger-ilanlar-listesi">
     <!-- Diğer ilanlar buraya JS ile eklenecek -->
   </div>
