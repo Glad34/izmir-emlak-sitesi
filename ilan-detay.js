@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // --- Veri Çekme Fonksiyonu ---
 async function fetchIlanData(id, isLoggedIn, token) {
-  const jsonURL = `https://script.google.com/macros/s/AKfycbx9P6TAzuOypcj-5ByLPb3P1OKBPbUM5Ras2mZ29eby4TUl0pfosQBxMqHlC-1BWgw0/exec?ilanID=${id}`;
+  const jsonURL = `https://script.google.com/macros/s/AKfycbw3Ye0dEXs5O4nmZ_PDQqJOGvEDM5hL1yP6EyO1lnpRh_Brj0kwJy6GP1ZSDrMPOi-5/exec?ilanID=${id}`;
   try {
     const response = await fetch(jsonURL);
     if (!response.ok) throw new Error('Sunucu hatası!');
@@ -65,7 +65,6 @@ async function fetchIlanData(id, isLoggedIn, token) {
 function populatePage(data, isLoggedIn, token) {
   stopLoadingAnimation();
 
-  // Gelen yeni veri yapısını ayrıştır
   const ilan = data.anaIlan;
   const digerIlanlar = data.digerIlanlar;
 
@@ -92,7 +91,7 @@ function populatePage(data, isLoggedIn, token) {
   
   initializePlugins();
 
-  // --- YENİ EKLENEN BÖLÜM: DİĞER İLANLAR VE ANALİZLER ---
+  // --- YENİ BÖLÜM: DİĞER İLANLAR VE m² ANALİZLERİ ---
   const digerIlanlarBolumu = document.getElementById('diger-ilanlar-bolumu');
   const digerIlanlarListesi = document.getElementById('diger-ilanlar-listesi');
   const mahalleAdiSpan = document.getElementById('mahalle-adi');
@@ -104,64 +103,76 @@ function populatePage(data, isLoggedIn, token) {
   if (digerIlanlar && digerIlanlar.length > 0) {
     mahalleAdiSpan.textContent = ilan['Mahalle'];
     
-    const tumIlanlar = [ ...digerIlanlar, { "İlan ID": ilan['İlan ID'], "Başlık": ilan['Başlık'], "Fiyat": ilan['Fiyat'] } ];
+    const tumIlanlar = [ ...digerIlanlar, { "İlan ID": ilan['İlan ID'], "Başlık": ilan['Başlık'], "Fiyat": ilan['Fiyat'], "m² (Net)": ilan['m² (Net)'] } ];
     
-    const fiyatlar = tumIlanlar.map(i => parseInt(String(i.Fiyat).replace(/[^\d]/g, '')));
-    const toplamFiyat = fiyatlar.reduce((acc, fiyat) => acc + fiyat, 0);
-    const ortalamaFiyat = toplamFiyat / fiyatlar.length;
-    ortalamaFiyatElementi.textContent = `${ortalamaFiyat.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} TL`;
-    ortalamaFiyatKutusu.classList.remove('hidden');
+    const ilanlarVeM2Fiyatlari = tumIlanlar.map(i => {
+        const fiyat = parseInt(String(i.Fiyat).replace(/[^\d]/g, ''));
+        const netM2 = parseInt(i['m² (Net)']);
+        const m2Fiyati = (netM2 > 0) ? fiyat / netM2 : null;
+        return { ...i, m2Fiyati };
+    }).filter(i => i.m2Fiyati !== null);
 
-    tumIlanlar.sort((a, b) => {
-      const fiyatA = parseInt(String(a.Fiyat).replace(/[^\d]/g, ''));
-      const fiyatB = parseInt(String(b.Fiyat).replace(/[^\d]/g, ''));
-      return fiyatA - fiyatB;
-    });
+    if (ilanlarVeM2Fiyatlari.length > 0) {
+        const toplamM2Fiyati = ilanlarVeM2Fiyatlari.reduce((acc, i) => acc + i.m2Fiyati, 0);
+        const ortalamaM2Fiyati = toplamM2Fiyati / ilanlarVeM2Fiyatlari.length;
+        
+        ortalamaFiyatKutusu.querySelector('p').innerHTML = `Mahalledeki Ortalama m² Fiyatı: <strong id="ortalama-fiyat">${ortalamaM2Fiyati.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} TL/m²</strong>`;
+        ortalamaFiyatKutusu.classList.remove('hidden');
 
-    digerIlanlarListesi.innerHTML = '';
-    let anaIlaninSirasi = -1;
+        tumIlanlar.sort((a, b) => parseInt(String(a.Fiyat).replace(/[^\d]/g, '')) - parseInt(String(b.Fiyat).replace(/[^\d]/g, '')));
 
-    tumIlanlar.forEach((siradakiIlan, index) => {
-      if (siradakiIlan['İlan ID'] == ilan['İlan ID']) {
-          anaIlaninSirasi = index + 1;
-      }
-      
-      const mevcutFiyat = parseInt(String(siradakiIlan.Fiyat).replace(/[^\d]/g, ''));
-      const formatliFiyat = mevcutFiyat.toLocaleString('tr-TR');
-      
-      const farkYuzdesi = Math.round(((mevcutFiyat - ortalamaFiyat) / ortalamaFiyat) * 100);
-      let farkGostergesiHTML = '';
-      if (farkYuzdesi > 0) {
-          farkGostergesiHTML = `<div class="fiyat-fark-gostergesi yukari"><span>%${farkYuzdesi}</span><i class="fas fa-arrow-up"></i></div>`;
-      } else if (farkYuzdesi < 0) {
-          farkGostergesiHTML = `<div class="fiyat-fark-gostergesi asagi"><span>%${Math.abs(farkYuzdesi)}</span><i class="fas fa-arrow-down"></i></div>`;
-      }
+        digerIlanlarListesi.innerHTML = '';
+        let anaIlaninSirasi = -1;
 
-      const etiketHTML = (index === 0 && siradakiIlan['İlan ID'] != ilan['İlan ID']) ? `<span class="en-uygun-etiket">En Uygun</span>` : '';
+        tumIlanlar.forEach((siradakiIlan, index) => {
+            if (siradakiIlan['İlan ID'] == ilan['İlan ID']) {
+                anaIlaninSirasi = index + 1;
+            }
 
-      // Ana ilanı listede göstermiyoruz
-      if (siradakiIlan['İlan ID'] != ilan['İlan ID']) {
-        digerIlanlarListesi.innerHTML += `
-          <a href="ilan-detay.html?id=${siradakiIlan['İlan ID']}" class="diger-ilan-item">
-            <span class="ilan-sira-no">${index + 1}.</span>
-            <div class="diger-ilan-bilgi">
-              <h4 class="diger-ilan-baslik">${siradakiIlan['Başlık']}</h4>
-              <div class="diger-ilan-detaylar">
-                  <p class="diger-ilan-fiyat">${formatliFiyat} TL</p>
-                  ${farkGostergesiHTML}
-              </div>
-            </div>
-            ${etiketHTML}
-          </a>
-        `;
-      }
-    });
+            const mevcutIlanDetay = ilanlarVeM2Fiyatlari.find(i => i['İlan ID'] == siradakiIlan['İlan ID']);
+            
+            if (mevcutIlanDetay) {
+                const formatliFiyat = parseInt(String(siradakiIlan.Fiyat).replace(/[^\d]/g, '')).toLocaleString('tr-TR');
+                
+                const farkYuzdesi = Math.round(((mevcutIlanDetay.m2Fiyati - ortalamaM2Fiyati) / ortalamaM2Fiyati) * 100);
+                let farkGostergesiHTML = '';
+                if (farkYuzdesi > 0) {
+                    farkGostergesiHTML = `<div class="fiyat-fark-gostergesi yukari"><span>%${farkYuzdesi}</span><i class="fas fa-arrow-up"></i></div>`;
+                } else if (farkYuzdesi < 0) {
+                    farkGostergesiHTML = `<div class="fiyat-fark-gostergesi asagi"><span>%${Math.abs(farkYuzdesi)}</span><i class="fas fa-arrow-down"></i></div>`;
+                }
 
-    if (anaIlaninSirasi !== -1 && siralamaMetni) {
-        siralamaMetni.textContent = `Bu ilan, ${ilan['Mahalle']} mahallesindeki en uygun ${anaIlaninSirasi}. fırsattır.`;
-        siralamaPlaceholder.classList.remove('hidden');
+                let etiketHTML = '';
+                if (index === 0 && siradakiIlan['İlan ID'] != ilan['İlan ID']) {
+                    etiketHTML = `<span class="en-uygun-etiket yesil">En Uygun Fiyatlı</span>`;
+                } else if ((index === 1 || index === 2) && siradakiIlan['İlan ID'] != ilan['İlan ID']) {
+                    etiketHTML = `<span class="en-uygun-etiket turuncu">${index + 1}. Uygun Fiyat</span>`;
+                }
+
+                if (siradakiIlan['İlan ID'] != ilan['İlan ID']) {
+                    digerIlanlarListesi.innerHTML += `
+                        <a href="ilan-detay.html?id=${siradakiIlan['İlan ID']}" class="diger-ilan-item">
+                            <span class="ilan-sira-no">${index + 1}.</span>
+                            <div class="diger-ilan-bilgi">
+                                <h4 class="diger-ilan-baslik">${siradakiIlan['Başlık']}</h4>
+                                <div class="diger-ilan-detaylar">
+                                    <p class="diger-ilan-fiyat">${formatliFiyat} TL</p>
+                                    ${farkGostergesiHTML}
+                                </div>
+                            </div>
+                            ${etiketHTML}
+                        </a>
+                    `;
+                }
+            }
+        });
+
+        if (anaIlaninSirasi !== -1 && siralamaMetni) {
+            siralamaMetni.textContent = `Bu ilan, ${ilan['Mahalle']} mahallesindeki en uygun ${anaIlaninSirasi}. fırsattır.`;
+            siralamaPlaceholder.classList.remove('hidden');
+        }
+        digerIlanlarBolumu.classList.remove('hidden');
     }
-    digerIlanlarBolumu.classList.remove('hidden');
   }
 
   // --- Favori Butonu Mantığı ---
