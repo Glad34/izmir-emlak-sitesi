@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // --- Veri Çekme Fonksiyonu ---
 async function fetchIlanData(id, isLoggedIn, token) {
-  const jsonURL = `https://script.google.com/macros/s/AKfycby7aomquP5qZaV9IxNbXvkHQuERgEHMaOQVZWodjjwRrBEDqWJCGwxM0bGD6mdby97d/exec?ilanID=${id}`;
+  const jsonURL = `https://script.google.com/macros/s/AKfycbxUYOWqQMLnYxNGib11RYqkGvMB_njDK6VYG26aNx-YunB4RL01-mppElMEb98LPYZO/exec?ilanID=${id}`;
   try {
     const response = await fetch(jsonURL);
     if (!response.ok) throw new Error('Sunucu hatası!');
