@@ -203,7 +203,7 @@
   font-weight: 600;
   margin-top: -0.5rem;
   margin-bottom: 2rem;
-  font-size: 0.8rem; /* YAZI BOYUTUNU BİRAZ DAHA KÜÇÜLTTÜK (yaklaşık 13px) */
+  font-size: 0.4rem; /* YAZI BOYUTUNU BİRAZ DAHA KÜÇÜLTTÜK (yaklaşık 13px) */
   text-align: right; /* Metnin sağa yaslanmasını garantiler */
 }
 
@@ -249,7 +249,7 @@
 .diger-ilan-bilgi { flex-grow: 1; min-width: 0; }
 .diger-ilan-baslik { font-weight: 600; color: #1f2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .diger-ilan-detaylar { display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem; }
-.diger-ilan-fiyat { font-size: 1.125rem; font-weight: 700; color: #3b82f6; }
+.diger-ilan-fiyat { font-size: 1.125rem; font-weight: 700; color: #3b82f6; white-space: nowrap; }
 
 /* Fiyat Fark Göstergesi (Yukarı/Aşağı Oklar) */
 .fiyat-fark-gostergesi { display: flex; align-items: center; gap: 0.25rem; font-weight: 600; font-size: 0.875rem; }
@@ -268,3 +268,41 @@
 }
 .en-uygun-etiket.yesil { background-color: #10b981; }
 .en-uygun-etiket.turuncu { background-color: #f97316; }
+
+
+/* Genişliği 420px ve daha dar olan ekranlar için özel stiller */
+@media (max-width: 420px) {
+
+  /* Liste elemanlarının iç boşluklarını azaltalım */
+  .diger-ilan-item {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  /* Sıra numarasını biraz küçültelim */
+  .ilan-sira-no {
+    font-size: 1.1rem;
+  }
+
+  /* Başlığı biraz küçültelim */
+  .diger-ilan-baslik {
+    font-size: 0.9rem; /* 14px */
+    margin-bottom: 0.5rem; /* Fiyatla arasını açalım */
+  }
+  
+  /* Fiyatı biraz küçültelim */
+  .diger-ilan-fiyat {
+    font-size: 1rem; /* 16px */
+  }
+
+  /* Yüzde farkı göstergesini biraz küçültelim */
+  .fiyat-fark-gostergesi {
+    font-size: 0.8rem; /* ~13px */
+  }
+
+  /* Etiketleri (En Uygun vb.) biraz küçültelim */
+  .en-uygun-etiket {
+    padding: 3px 8px;
+    font-size: 0.7rem; /* ~11px */
+  }
+}
