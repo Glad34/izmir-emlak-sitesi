@@ -191,20 +191,24 @@
 /* ======================================================== */
 
 /* Turuncu Sıralama Bilgi Kutusu */
+/* Turuncu Sıralama Bilgi Kutusu - Düzeltilmiş */
 .siralama-bilgi-kutusu {
   display: flex;
   align-items: center;
-  justify-content: flex-end; /* İÇERİĞİ SAĞA YASLAR */
-  gap: 0.5rem; /* İkon ile metin arasını biraz azalttık */
-  background-color: #f97316; /* Turuncu */
+  justify-content: flex-end;
+  gap: 0.5rem;
+  background-color: #f97316;
   color: white;
-  padding: 0.5rem 1rem; /* Dikey boşluğu azalttık */
+  padding: 0.75rem 1rem; /* Başlangıç boşluğu */
   border-radius: 8px;
   font-weight: 600;
   margin-top: -0.5rem;
   margin-bottom: 2rem;
-  font-size: 0.4rem; /* YAZI BOYUTUNU BİRAZ DAHA KÜÇÜLTTÜK (yaklaşık 13px) */
-  text-align: right; /* Metnin sağa yaslanmasını garantiler */
+  text-align: right;
+
+  /* MASAÜSTÜ için varsayılan font boyutu (örneğin 14px) */
+  font-size: 0.875rem; 
+  transition: all 0.2s ease-in-out;
 }
 
 /* Ortalama m² Fiyatı Bilgi Kutusu */
@@ -307,12 +311,11 @@
   }
 }
 
+/* MOBİL için özel (daha küçük) font boyutu */
 @media (max-width: 768px) {
-
-  /* Sıralama bilgi kutusunun font boyutunu daha da küçültelim */
   .siralama-bilgi-kutusu {
-    font-size: 0.75rem !important; /* yaklaşık 12px, !important ezilmeyi engeller */
-    padding: 0.4rem 0.8rem; /* İç boşluğu da biraz azaltalım */
+    font-size: 0.75rem; /* ~12px */
+    padding: 0.5rem 0.8rem;
     gap: 0.4rem;
   }
 }
