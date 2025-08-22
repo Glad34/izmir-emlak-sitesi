@@ -306,3 +306,13 @@
     font-size: 0.7rem; /* ~11px */
   }
 }
+
+@media (max-width: 768px) {
+
+  /* Sıralama bilgi kutusunun font boyutunu daha da küçültelim */
+  .siralama-bilgi-kutusu {
+    font-size: 0.75rem !important; /* yaklaşık 12px, !important ezilmeyi engeller */
+    padding: 0.4rem 0.8rem; /* İç boşluğu da biraz azaltalım */
+    gap: 0.4rem;
+  }
+}
