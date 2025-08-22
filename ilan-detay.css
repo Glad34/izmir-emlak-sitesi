@@ -340,3 +340,97 @@
     gap: 0.4rem;
   }
 }
+
+
+/* ======================================= */
+/* DEĞER ANALİZİ KARTI STİLLERİ            */
+/* ======================================= */
+
+.deger-karti-container {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+/* 1. Fırsat Göstergesi */
+.firsat-gostergesi {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.firsat-gostergesi i {
+  font-size: 1.25rem;
+}
+/* Renk Kodlaması */
+.firsat-gostergesi.firsat-iyi { background-color: #10b981; } /* Yeşil */
+.firsat-gostergesi.firsat-normal { background-color: #3b82f6; } /* Mavi */
+.firsat-gostergesi.firsat-kotu { background-color: #ef4444; } /* Kırmızı */
+
+
+/* 2. Analiz Detayları */
+.deger-analizi-detay {
+  display: grid;
+  grid-template-columns: 1fr; /* Mobilde alt alta */
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+@media (min-width: 1024px) { /* Sadece geniş ekranlarda yan yana */
+    .deger-analizi-detay {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.faktor-kolonu .faktor-baslik {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+.faktor-baslik.arti { color: #10b981; }
+.faktor-baslik.eksi { color: #ef4444; }
+
+.faktor-kolonu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.faktor-kolonu li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed #e5e7eb;
+}
+.faktor-kolonu li:last-child {
+  border-bottom: none;
+}
+
+.faktor-kolonu li span {
+  font-weight: 600;
+}
+
+/* 3. Sonuç Cümlesi */
+.sonuc-cumlesi {
+  padding: 1rem;
+  background-color: #f9fafb;
+  font-size: 0.875rem;
+  text-align: center;
+  color: #374151;
+  font-style: italic;
+  line-height: 1.6;
+}
+.sonuc-cumlesi strong {
+  font-weight: 700;
+  font-style: normal;
+}
