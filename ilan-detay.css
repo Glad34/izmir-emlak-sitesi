@@ -51,53 +51,51 @@
 /* RESPONSIVE SEKME (TAB) STİLLERİ         */
 /* ======================================= */
 
+/* ======================================= */
+/* ESNEK VE YAN YANA DURAN SEKME (TAB) STİLLERİ */
+/* ======================================= */
+
 .tab-buttons {
-  display: flex;
-  flex-direction: column; /* MOBİL İÇİN VARSAYILAN: ALT ALTA DİZ */
+  display: grid;
+  /* Sütunları içeriğe göre otomatik ayarla, hepsi sığmazsa küçült */
+  grid-template-columns: repeat(3, minmax(0, 1fr)); 
   border-bottom: 1px solid #e5e7eb;
 }
 
 .tab-button {
-  padding: 1rem 1.5rem;
+  padding: 1rem 0.5rem; /* Yan boşlukları dar tutarak yer kazanalım */
   font-weight: 600;
   color: #6b7280;
-  text-align: center;
   border-bottom: 3px solid transparent;
   transition: all 0.3s ease;
-  cursor: pointer; /* Tıklanabilir olduğunu belirtir */
-  border-left: 3px solid transparent; /* Aktif durum için kenarlık alanı */
+  white-space: nowrap;  /* Metinlerin alt satıra kaymasını engelle */
+  text-align: center;
+  
+  /* Taşma durumunda metnin sonuna "..." ekle (güvenlik önlemi) */
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* Font boyutunu dar ekranlarda biraz küçültelim */
+  font-size: 0.9rem; /* Yaklaşık 14.4px */
 }
 
 /* Aktif olan butonun stili */
 .tab-button.active {
   color: #3b82f6;
-  background-color: #eff6ff; /* Hafif mavi arka plan */
-  border-left-color: #3b82f6; /* Sol kenarda mavi çizgi */
-  border-bottom-color: transparent; /* Alt çizgiyi kaldır */
+  border-bottom-color: #3b82f6;
 }
 
 .tab-button:not(.active):hover {
-  background-color: #f9fafb; /* Üzerine gelince hafif gri */
+  background-color: #f9fafb;
 }
 
-
 /* ============================================================== */
-/* MASAÜSTÜ GÖRÜNÜMÜ (Ekran 768px'den geniş olduğunda)           */
+/* MASAÜSTÜ GÖRÜNÜMÜ (Ekran 640px'den geniş olduğunda)           */
 /* ============================================================== */
-@media (min-width: 768px) {
-  .tab-buttons {
-    flex-direction: row; /* MASAÜSTÜNDE YAN YANA DİZ */
-  }
-
+@media (min-width: 640px) {
   .tab-button {
-    flex-grow: 1; /* Butonların tüm boş alanı eşit paylaşmasını sağla */
-    border-left: none; /* Sol çizgiyi masaüstünde kaldır */
-  }
-  
-  /* Masaüstünde aktif butonun alt çizgisi görünsün */
-  .tab-button.active {
-    border-bottom-color: #3b82f6;
-    background-color: transparent; /* Arka plan rengini kaldır */
+    /* Daha geniş ekranlarda font boyutunu normale döndür */
+    font-size: 1rem; /* 16px */
   }
 }
 /* --- Medya Sorguları Bu Çözümde Gerekli Değildir --- */
