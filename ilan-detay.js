@@ -163,13 +163,12 @@ function populatePage(data, isLoggedIn, token) {
   // YENİ: DEĞER ANALİZİ VE FIRSAT SKORU HESAPLAMA
   // ===============================================
 
+  // --- DEĞER ANALİZİ VE FIRSAT SKORU HESAPLAMA (DÜZELTİLMİŞ) ---
   const degerKarti = document.getElementById('deger-karti');
-  
-  // 1. Puanlama Tablosu
   const puanlar = {
-      binaYasi: { "0-1": 15, "2-5": 10, "6-10": 5, "11-20": 0, "21+": -10 },
-      bulunduguKat: { "Ara Kat": 10, "Çatı Katı": 5, "Dubleks": 5, "Zemin Kat": -5, "Villa": 20 },
-      manzara: { "Deniz": 20, "Boğaz": 20, "Doğa": 5, "Şehir": 5 },
+      binaYasi: { "0": 15, "1": 15, "2-5 arası": 10, "6-10 arası": 5, "11-20 arası": 0, "21 ve üzeri": -10 },
+      bulunduguKat: { "Ara Kat": 10, "Çatı Katı": 5, "Dubleks": 5, "Zemin Kat": -5, "Bahçe Katı": -5, "Villa": 20 },
+      denizManzarasi: { "Var": 20 },
       siteIcerisinde: { "Evet": 12 },
       otopark: { "Var": 8 },
       asansor: { "Var": 5 },
@@ -182,7 +181,6 @@ function populatePage(data, isLoggedIn, token) {
       }
   };
 
-  // 2. Faktörleri ve Puanları Hesapla
   let toplamPuan = 0;
   const pozitifFaktorlerListesi = document.getElementById('pozitif-faktorler');
   const negatifFaktorlerListesi = document.getElementById('negatif-faktorler');
@@ -198,18 +196,12 @@ function populatePage(data, isLoggedIn, token) {
       toplamPuan += puan;
   }
 
-  // Faktörleri işleme
-  const yas = parseInt(ilan['Bina Yaşı']);
-  if (!isNaN(yas)) {
-      if (yas <= 1) addFactor("Sıfır Bina", puanlar.binaYasi["0-1"]);
-      else if (yas <= 5) addFactor("Yeni Bina (2-5 Yaş)", puanlar.binaYasi["2-5"]);
-      else if (yas <= 10) addFactor("Genç Bina (6-10 Yaş)", puanlar.binaYasi["6-10"]);
-      else if (yas > 20) addFactor("Eski Bina (21+ Yaş)", puanlar.binaYasi["21+"]);
-  }
+  const yasAraligi = ilan['Bina Yaşı'];
+  if (puanlar.binaYasi[yasAraligi] !== undefined) addFactor(`Bina Yaşı (${yasAraligi})`, puanlar.binaYasi[yasAraligi]);
   if (puanlar.bulunduguKat[ilan['Bulunduğu Kat']]) addFactor(ilan['Bulunduğu Kat'], puanlar.bulunduguKat[ilan['Bulunduğu Kat']]);
-  if (puanlar.manzara[ilan['Manzara']]) addFactor(`${ilan['Manzara']} Manzaralı`, puanlar.manzara[ilan['Manzara']]);
+  if (ilan['Deniz Manzarası'] === 'Var') addFactor("Deniz Manzaralı", puanlar.denizManzarasi["Var"]);
   if (ilan['Site İçerisinde'] === 'Evet') addFactor("Site İçerisinde", puanlar.siteIcerisinde["Evet"]);
-  if (ilan['Otopark'] === 'Var') addFactor("Otoparklı", puanlar.otopark["Var"]);
+  if (ilan['Otopark'] && ilan['Otopark'] !== 'Yok') addFactor("Otoparklı", puanlar.otopark["Var"]);
   if (ilan['Asansör'] === 'Var') addFactor("Asansörlü", puanlar.asansor["Var"]);
   if (ilan['Balkon'] === 'Var') addFactor("Balkonlu", puanlar.balkon["Var"]);
   if (ilan['Eşyalı'] === 'Evet') addFactor("Eşyalı", puanlar.esyali["Evet"]);
@@ -219,11 +211,10 @@ function populatePage(data, isLoggedIn, token) {
   const oran = puanlar.odaM2Orani[odaSayisi];
   if (oran && !isNaN(netM2)) {
       if (netM2 >= oran.ideal[0] && netM2 <= oran.ideal[1]) addFactor(`İdeal ${odaSayisi}`, oran.puan);
-      else if (netM2 < oran.ideal[0] && oran.dusukPuan) addFactor(`Sıkışık ${odaSayisi}`, oran.dusukPuan);
-      else if (netM2 > oran.ideal[1] && oran.yuksekPuan) addFactor(`Geniş ${odaSayisi}`, oran.yuksekPuan);
+      else if (netM2 < oran.ideal[0] && oran.dusukPuan !== undefined) addFactor(`Sıkışık ${odaSayisi}`, oran.dusukPuan);
+      else if (netM2 > oran.ideal[1] && oran.yuksekPuan !== undefined) addFactor(`Geniş ${odaSayisi}`, oran.yuksekPuan);
   }
 
-  // 3. Fırsat Skorunu Hesapla ve Göster
   const endeksM2Fiyati = parseInt(String(ilan["Endeks m² Fiyatı"]).replace(/[^\d]/g, ''));
   const gercekFiyat = parseInt(String(ilan.Fiyat).replace(/[^\d]/g, ''));
   
@@ -231,16 +222,15 @@ function populatePage(data, isLoggedIn, token) {
       const olmasiGerekenM2Fiyati = endeksM2Fiyati * (1 + (toplamPuan / 100));
       const gercekM2Fiyati = gercekFiyat / netM2;
       const firsatSkoru = Math.round(((olmasiGerekenM2Fiyati - gercekM2Fiyati) / olmasiGerekenM2Fiyati) * 100);
-
       const firsatGostergesi = document.getElementById('firsat-gostergesi');
       const firsatIkonu = document.getElementById('firsat-ikonu');
       const firsatMetni = document.getElementById('firsat-metni');
       
-      if (firsatSkoru > 5) { // %5'ten fazla uygunsa
+      if (firsatSkoru > 5) {
           firsatGostergesi.className = 'firsat-gostergesi firsat-iyi';
           firsatIkonu.className = 'fas fa-check-circle';
           firsatMetni.textContent = `Mükemmel Fırsat! %${firsatSkoru} daha uygun.`;
-      } else if (firsatSkoru < -5) { // %5'ten fazla pahalıysa
+      } else if (firsatSkoru < -5) {
           firsatGostergesi.className = 'firsat-gostergesi firsat-kotu';
           firsatIkonu.className = 'fas fa-triangle-exclamation';
           firsatMetni.textContent = `Yüksek Fiyat! %${Math.abs(firsatSkoru)} daha pahalı.`;
@@ -252,6 +242,11 @@ function populatePage(data, isLoggedIn, token) {
 
       document.getElementById('sonuc-cumlesi').innerHTML = `Bu ilanın özelliklerine göre tahmini m² değeri <strong>${olmasiGerekenM2Fiyati.toLocaleString('tr-TR', {maximumFractionDigits:0})} TL</strong> iken, mevcut m² fiyatı <strong>${gercekM2Fiyati.toLocaleString('tr-TR', {maximumFractionDigits:0})} TL</strong>'dir.`;
       
+      if (negatifFaktorlerListesi.innerHTML !== '') {
+        negatifFaktorlerListesi.previousElementSibling.style.display = 'flex';
+      } else {
+        negatifFaktorlerListesi.previousElementSibling.style.display = 'none';
+      }
       degerKarti.classList.remove('hidden');
   }
 
