@@ -47,36 +47,59 @@
 
 /* --- YENİ SEKME (TAB) STİLLERİ (TAMAMEN ESNEK - NİHAİ SÜRÜM) --- */
 
+/* ======================================= */
+/* RESPONSIVE SEKME (TAB) STİLLERİ         */
+/* ======================================= */
+
 .tab-buttons {
-  display: grid; /* DÜZENİ FLEX'TEN GRID'E DEĞİŞTİRDİK */
-  grid-auto-flow: column; /* Öğeleri sütunlar halinde yan yana akıt */
-  grid-auto-columns: 1fr; /* Her sütunun (butonun) eşit genişlikte olmasını sağla */
+  display: flex;
+  flex-direction: column; /* MOBİL İÇİN VARSAYILAN: ALT ALTA DİZ */
   border-bottom: 1px solid #e5e7eb;
 }
 
 .tab-button {
-  padding: 1rem 0.5rem; /* Yan boşlukları daha da azalttık, esnek yapı bunu telafi edecek */
+  padding: 1rem 1.5rem;
   font-weight: 600;
   color: #6b7280;
+  text-align: center;
   border-bottom: 3px solid transparent;
   transition: all 0.3s ease;
-  white-space: nowrap;  /* Metinlerin alt satıra kaymasını engelle */
-  text-align: center;   /* Metni her zaman ortala */
-  
-  /* Taşma durumunda metnin sonuna "..." ekle (ek bir güvenlik önlemi) */
-  overflow: hidden;
-  text-overflow: ellipsis;
+  cursor: pointer; /* Tıklanabilir olduğunu belirtir */
+  border-left: 3px solid transparent; /* Aktif durum için kenarlık alanı */
 }
 
-.tab-button:hover {
-  background-color: #f9fafb;
-}
-
+/* Aktif olan butonun stili */
 .tab-button.active {
   color: #3b82f6;
-  border-bottom-color: #3b82f6;
+  background-color: #eff6ff; /* Hafif mavi arka plan */
+  border-left-color: #3b82f6; /* Sol kenarda mavi çizgi */
+  border-bottom-color: transparent; /* Alt çizgiyi kaldır */
 }
 
+.tab-button:not(.active):hover {
+  background-color: #f9fafb; /* Üzerine gelince hafif gri */
+}
+
+
+/* ============================================================== */
+/* MASAÜSTÜ GÖRÜNÜMÜ (Ekran 768px'den geniş olduğunda)           */
+/* ============================================================== */
+@media (min-width: 768px) {
+  .tab-buttons {
+    flex-direction: row; /* MASAÜSTÜNDE YAN YANA DİZ */
+  }
+
+  .tab-button {
+    flex-grow: 1; /* Butonların tüm boş alanı eşit paylaşmasını sağla */
+    border-left: none; /* Sol çizgiyi masaüstünde kaldır */
+  }
+  
+  /* Masaüstünde aktif butonun alt çizgisi görünsün */
+  .tab-button.active {
+    border-bottom-color: #3b82f6;
+    background-color: transparent; /* Arka plan rengini kaldır */
+  }
+}
 /* --- Medya Sorguları Bu Çözümde Gerekli Değildir --- */
 
 /* --- Bu kısımlar aynı kalıyor --- */
