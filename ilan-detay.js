@@ -152,7 +152,7 @@ function populatePage(data, isLoggedIn, token) {
     });
 
     if (anaIlaninSirasi !== -1 && siralamaMetni) {
-        siralamaMetni.textContent = `Bu ilan, ${ilan['Mahalle']} mahallesindeki en uygun ${anaIlaninSirasi}. fırsattır.`;
+        siralamaMetni.textContent = `${ilan['Mahalle']} mahallesindeki en uygun ${anaIlaninSirasi}. fırsattır.`;
         siralamaPlaceholder.classList.remove('hidden');
     }
     digerIlanlarBolumu.classList.remove('hidden');
