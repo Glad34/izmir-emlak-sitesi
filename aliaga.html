@@ -220,50 +220,50 @@
   const jsonURL = `https://script.google.com/macros/s/AKfycbw3Ye0dEXs5O4nmZ_PDQqJOGvEDM5hL1yP6EyO1lnpRh_Brj0kwJy6GP1ZSDrMPOi-5/exec?ilce=${ilceAdi}`;
 
   async function evVerileriniCek() {
-    // Yükleniyor göstergesini ekle (opsiyonel ama önerilir)
+    // Yükleniyor göstergesini ekle
     evListesi.innerHTML = `
       <div id="loading-indicator" class="col-span-1 md:col-span-2 text-center py-10">
-        <svg class="animate-spin h-8 w-8 text-gray-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
+        <svg class="animate-spin h-8 w-8 text-gray-600 mx-auto" ...></svg>
         <p class="mt-4 text-gray-700">İlanlar yükleniyor...</p>
       </div>`;
 
     try {
-      const response = await fetch(jsonURL);
-      const data = await response.json();
+        // YENİ: Doğrudan yerel JSON dosyasına istek atıyoruz
+        const response = await fetch('/data/ilanlar.json');
+        if (!response.ok) throw new Error('Veri dosyası bulunamadı.');
+        
+        const tumIlanlar = await response.json();
 
-      if (data.error) {
-        throw new Error(data.error);
-      }
+        evler.length = 0;
 
-      evler.length = 0;
+        // YENİ: Veriyi JavaScript içinde kendimiz filtreliyoruz
+        tumIlanlar
+            .filter(ilan => ilan.Konum && ilan.Konum.toLowerCase().includes(ilceAdi))
+            .forEach(row => {
+                // JSON'daki sütun başlıklarının e-tablodaki ile aynı olduğundan emin olun
+                const ilanID = row["İlan ID"]; 
+                const baslik = row["Başlık"] || "";
+                const m2 = parseInt(row["m² (Net)"]); // İlçe sayfasında Net m² kullanıyorduk
+                const fiyat = parseInt(String(row.Fiyat).replace(/[^\d]/g, ''));
+                const resim = row["Görsel Linki"] || "images/placeholder.jpg";
 
-      data.forEach(row => {
-        const ilanID = row["İlan ID"]; 
-        const baslik = row.baslik || "";
-        const m2 = parseInt(row.m2);
-        const fiyat = parseInt(String(row.fiyat).replace(/[^\d]/g, ''));
-        const resim = row.resim || "images/placeholder.jpg";
+                if (ilanID && !isNaN(m2) && !isNaN(fiyat)) {
+                    evler.push({
+                        id: ilanID,
+                        fiyat: fiyat,
+                        m2: m2,
+                        adres: baslik,
+                        resim: resim
+                    });
+                }
+            });
 
-        if (ilanID && !isNaN(m2) && !isNaN(fiyat)) {
-          evler.push({
-            id: ilanID,
-            fiyat: fiyat,
-            m2: m2,
-            adres: baslik,
-            resim: resim
-          });
-        }
-      });
-
-      guncelleListe();
+        guncelleListe();
     } catch (error) {
-      console.error("Veri çekilirken hata oluştu:", error);
-      evListesi.innerHTML = `<p class='col-span-1 md:col-span-2 text-center text-red-600'>Hata: İlanlar yüklenemedi. (${error.message})</p>`;
+        console.error("Veri çekilirken hata oluştu:", error);
+        evListesi.innerHTML = `<p class='col-span-1 md:col-span-2 text-center text-red-600'>Hata: İlanlar yüklenemedi. (${error.message})</p>`;
     }
-  }
+}
 
   function updateSliderPosition(input, label) {
     const value = ((input.value - input.min) / (input.max - input.min)) * 100;
