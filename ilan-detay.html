@@ -137,45 +137,35 @@
 <!-- ======================================= -->
 <!-- YENİ: DEĞER ANALİZİ KARTI               -->
 <!-- ======================================= -->
+<!-- DEĞER ANALİZİ KARTI (YENİ VE NÖTR TASARIM) -->
 <section id="deger-karti" class="deger-karti-container hidden">
-  <!-- 1. Fırsat Göstergesi (Ana Sonuç) -->
+  <!-- 1. Başlık -->
+  <div class="deger-karti-baslik">
+    <i class="fas fa-magnifying-glass-chart"></i>
+    <span>Değer Analizi</span>
+  </div>
+  
+  <!-- 2. Ana Sonuç Göstergesi -->
   <div id="firsat-gostergesi" class="firsat-gostergesi">
-    <i id="firsat-ikonu" class="fas"></i>
-    <span id="firsat-metni"></span>
+    <!-- Metin ve yüzde JS ile buraya eklenecek -->
   </div>
-  
-  <!-- 2. Analiz Detayları -->
+
+  <!-- 3. Değer Faktörleri (Tek Liste) -->
   <div class="deger-analizi-detay">
-    <!-- Değeri Artıranlar -->
-    <div class="faktor-kolonu">
-      <h4 class="faktor-baslik arti"><i class="fas fa-arrow-trend-up"></i> Değeri Artıranlar</h4>
-      <ul id="pozitif-faktorler">
-        <!-- Pozitif faktörler JS ile buraya eklenecek -->
-      </ul>
-    </div>
-    <!-- Değeri Düşürenler -->
-    <div class="faktor-kolonu">
-      <h4 class="faktor-baslik eksi"><i class="fas fa-arrow-trend-down"></i> Değeri Düşürenler</h4>
-      <ul id="negatif-faktorler">
-        <!-- Negatif faktörler JS ile buraya eklenecek -->
-      </ul>
-    </div>
+    <h4 class="faktor-baslik">Değer Faktörleri</h4>
+    <ul id="faktorler-listesi">
+      <!-- Pozitif ve negatif faktörler JS ile buraya eklenecek -->
+    </ul>
   </div>
   
-  <!-- 3. Sonuç Cümlesi -->
+  <!-- 4. Sonuç Cümlesi -->
   <p id="sonuc-cumlesi" class="sonuc-cumlesi"></p>
 
-  <!-- ... mevcut #sonuc-cumlesi <p> etiketinden sonra ... -->
-
-<!-- YENİ: "Nasıl Hesaplanır?" Linki -->
-<div class="nasil-hesaplanir-link">
-  <a href="#" id="hesaplama-detay-ac">
-    <i class="fas fa-circle-question"></i>
-    <span>Bu analiz nasıl hesaplanıyor?</span>
-  </a>
-</div>
+  <!-- "Nasıl Hesaplanır?" Linki -->
+  <div class="nasil-hesaplanir-link">
+    <a href="#" id="hesaplama-detay-ac"><i class="fas fa-circle-question"></i><span>Bu analiz nasıl hesaplanıyor?</span></a>
+  </div>
 </section>
-
 
           <!-- ======================================= -->
 <!-- YENİ: AYNI MAHALLEDEKİ DİĞER İLANLAR    -->

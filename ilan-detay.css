@@ -343,7 +343,7 @@
 
 
 /* ======================================= */
-/* DEĞER ANALİZİ KARTI STİLLERİ            */
+/* DEĞER ANALİZİ KARTI STİLLERİ (YENİ)     */
 /* ======================================= */
 
 .deger-karti-container {
@@ -354,73 +354,68 @@
   overflow: hidden;
 }
 
-/* 1. Fırsat Göstergesi */
-.firsat-gostergesi {
+/* Kart Başlığı */
+.deger-karti-baslik {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 700;
+  color: #374151;
+}
+
+/* Ana Sonuç Göstergesi */
+.firsat-gostergesi {
   padding: 1rem;
-  color: white;
-  font-weight: 600;
-  font-size: 0.95rem;
+  text-align: center;
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.6;
 }
-.firsat-gostergesi i {
-  font-size: 1.25rem;
+.firsat-gostergesi strong {
+  font-size: 1.5rem; /* 24px */
+  font-weight: 700;
 }
-/* Renk Kodlaması */
-.firsat-gostergesi.firsat-iyi { background-color: #10b981; } /* Yeşil */
-.firsat-gostergesi.firsat-normal { background-color: #3b82f6; } /* Mavi */
-.firsat-gostergesi.firsat-kotu { background-color: #ef4444; } /* Kırmızı */
+.firsat-gostergesi strong.ustunde { color: #ef4444; } /* Kırmızı */
+.firsat-gostergesi strong.altinda { color: #10b981; } /* Yeşil */
+.firsat-gostergesi strong.uygun { color: #3b82f6; } /* Mavi */
 
-
-/* 2. Analiz Detayları */
+/* Değer Faktörleri */
 .deger-analizi-detay {
-  display: grid;
-  grid-template-columns: 1fr; /* Mobilde alt alta */
-  gap: 1rem;
   padding: 1rem;
+  border-top: 1px solid #e5e7eb;
   border-bottom: 1px solid #e5e7eb;
 }
-@media (min-width: 1024px) { /* Sadece geniş ekranlarda yan yana */
-    .deger-analizi-detay {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-.faktor-kolonu .faktor-baslik {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.faktor-baslik {
   font-weight: 700;
   margin-bottom: 0.75rem;
   font-size: 0.9rem;
+  color: #1f2937;
 }
-.faktor-baslik.arti { color: #10b981; }
-.faktor-baslik.eksi { color: #ef4444; }
-
-.faktor-kolonu ul {
+#faktorler-listesi {
   list-style: none;
   padding: 0;
   margin: 0;
   font-size: 0.875rem;
   color: #4b5563;
 }
-
-.faktor-kolonu li {
+#faktorler-listesi li {
   display: flex;
   justify-content: space-between;
   padding: 0.5rem 0;
   border-bottom: 1px dashed #e5e7eb;
 }
-.faktor-kolonu li:last-child {
+#faktorler-listesi li:last-child {
   border-bottom: none;
 }
-
-.faktor-kolonu li span {
+#faktorler-listesi .faktor-puan {
   font-weight: 600;
 }
+#faktorler-listesi .faktor-puan.pozitif { color: #10b981; }
+#faktorler-listesi .faktor-puan.negatif { color: #ef4444; }
 
-/* 3. Sonuç Cümlesi */
+/* Sonuç Cümlesi */
 .sonuc-cumlesi {
   padding: 1rem;
   background-color: #f9fafb;
@@ -430,10 +425,7 @@
   font-style: italic;
   line-height: 1.6;
 }
-.sonuc-cumlesi strong {
-  font-weight: 700;
-  font-style: normal;
-}
+.sonuc-cumlesi strong { font-weight: 700; font-style: normal; }
 
 
 /* ======================================= */
