@@ -461,6 +461,11 @@
 }
 
 /* Modal Arka Planı */
+
+.modal-overlay.hidden {
+  display: none;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
