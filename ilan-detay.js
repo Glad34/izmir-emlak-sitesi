@@ -218,6 +218,12 @@ function populatePage(data, isLoggedIn, token) {
               digerIlanlarListesi.innerHTML += `<a href="ilan-detay.html?id=${siradakiIlan['İlan ID']}" class="diger-ilan-item ${anaIlanSinifi}"><span class="ilan-sira-no">${index + 1}.</span><div class="diger-ilan-bilgi"><h4 class="diger-ilan-baslik">${siradakiIlan['Başlık']}</h4><div class="diger-ilan-detaylar"><p class="diger-ilan-fiyat">${formatliFiyat} TL</p>${farkGostergesiHTML}</div></div>${etiketHTML}</a>`;
           }
       });
+
+      if (anaIlaninSirasi !== -1 && siralamaMetni) {
+        siralamaMetni.textContent = `${ilan['Mahalle']} mahallesindeki en uygun ${anaIlaninSirasi}. fırsattır.`;
+        siralamaPlaceholder.classList.remove('hidden');
+    }
+
       digerIlanlarBolumu.classList.remove('hidden');
   }
 
