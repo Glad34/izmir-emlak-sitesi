@@ -274,16 +274,49 @@ function populatePage(data, isLoggedIn, token) {
 // ilan-detay.js içindeki SADECE bu fonksiyonu değiştirin
 
 function initializePlugins() {
-  // Swiper Galerisini Başlat
-  const thumbsSwiper = new Swiper('.thumbs-swiper', { spaceBetween: 10, slidesPerView: 4, freeMode: true, watchSlidesProgress: true });
-  new Swiper('.main-swiper', { spaceBetween: 10, navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }, pagination: { el: '.swiper-pagination', type: 'fraction' }, thumbs: { swiper: thumbsSwiper } });
+  // --- SWIPER GALERİSİNİ BAŞLAT ---
+  const thumbsSwiper = new Swiper('.thumbs-swiper', {
+    spaceBetween: 10,
+    slidesPerView: 4,
+    freeMode: true,
+    watchSlidesProgress: true,
+  });
+
+  new Swiper('.main-swiper', {
+    spaceBetween: 10,
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+    pagination: {
+      el: '.swiper-pagination',
+      type: 'fraction',
+    },
+    thumbs: {
+      swiper: thumbsSwiper,
+    },
+  });
   
-  // Sekmeleri (Tabs) Başlat
+  // --- SEKMELERİ (TABS) BAŞLAT ---
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabPanes = document.querySelectorAll('.tab-pane');
-  tabButtons.forEach(button => { button.addEventListener('click', () => { const tabId = button.getAttribute('data-tab'); tabButtons.forEach(btn => btn.classList.remove('active')); tabPanes.forEach(pane => pane.classList.remove('active')); button.classList.add('active'); document.getElementById(tabId).classList.add('active'); }); });
 
-  // --- YENİ EKLENEN KISIM: HESAPLAMA POP-UP MANTIĞI ---
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const tabId = button.getAttribute('data-tab');
+
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      tabPanes.forEach(pane => pane.classList.remove('active'));
+
+      button.classList.add('active');
+      const activePane = document.getElementById(tabId);
+      if (activePane) {
+        activePane.classList.add('active');
+      }
+    });
+  });
+
+  // --- HESAPLAMA POP-UP (MODAL) MANTIĞI ---
   const modal = document.getElementById('hesaplama-modal');
   const openBtn = document.getElementById('hesaplama-detay-ac');
   const closeBtn = document.getElementById('hesaplama-detay-kapat');
