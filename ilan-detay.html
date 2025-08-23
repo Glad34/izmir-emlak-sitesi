@@ -164,6 +164,16 @@
   
   <!-- 3. Sonuç Cümlesi -->
   <p id="sonuc-cumlesi" class="sonuc-cumlesi"></p>
+
+  <!-- ... mevcut #sonuc-cumlesi <p> etiketinden sonra ... -->
+
+<!-- YENİ: "Nasıl Hesaplanır?" Linki -->
+<div class="nasil-hesaplanir-link">
+  <a href="#" id="hesaplama-detay-ac">
+    <i class="fas fa-circle-question"></i>
+    <span>Bu analiz nasıl hesaplanıyor?</span>
+  </a>
+</div>
 </section>
 
 
@@ -229,5 +239,55 @@
 
 <!-- Diğerleri -->
 <script src="chatbot/chatbot.js"></script>
+
+
+
+ <!-- ... mevcut kodlarınızın sonu ... -->
+
+<!-- ======================================= -->
+<!-- YENİ: HESAPLAMA DETAYI POP-UP (MODAL)   -->
+<!-- ======================================= -->
+<div id="hesaplama-modal" class="modal-overlay hidden">
+  <div class="modal-icerik">
+    <!-- Modal Başlığı ve Kapatma Butonu -->
+    <div class="modal-header">
+      <h3 class="modal-baslik">Değer Analizi Nasıl Çalışır?</h3>
+      <button id="hesaplama-detay-kapat" class="modal-kapat-btn">&times;</button>
+    </div>
+    
+    <!-- Modal İçeriği -->
+    <div class="modal-govde">
+      <p>Size en doğru bilgiyi sunmak için, bir ilanın değerini 3 adımda analiz ediyoruz:</p>
+      
+      <div class="adim">
+        <div class="adim-sayi">1</div>
+        <div class="adim-aciklama">
+          <h4>Standart m² Fiyatı Belirlenir</h4>
+          <p>Her mahalle ve konut tipi için, piyasa verilerine dayalı bir <strong>"Endeks m² Fiyatı"</strong> referans alınır. Bu, standart bir evin tahmini değeridir.</p>
+        </div>
+      </div>
+      
+      <div class="adim">
+        <div class="adim-sayi">2</div>
+        <div class="adim-aciklama">
+          <h4>Özellikler Puanlanır</h4>
+          <p>İlanın özellikleri (bina yaşı, manzara, site, otopark vb.) standart bir eve göre pozitif (+) veya negatif (-) olarak puanlanır.</p>
+        </div>
+      </div>
+      
+      <div class="adim">
+        <div class="adim-sayi">3</div>
+        <div class="adim-aciklama">
+          <h4>Fırsat Skoru Hesaplanır</h4>
+          <p>İlanın "olması gereken tahmini m² değeri", gerçek m² fiyatıyla karşılaştırılarak <strong>"Fırsat Skoru"</strong> oluşturulur. Bu skor, ilanın fiyatının ne kadar adil olduğunu gösterir.</p>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<!-- ... mevcut script etiketleriniz ... -->
+
 </body>
 </html>

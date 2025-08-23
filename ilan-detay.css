@@ -434,3 +434,134 @@
   font-weight: 700;
   font-style: normal;
 }
+
+
+/* ======================================= */
+/* "NASIL HESAPLANIR?" POP-UP STİLLERİ     */
+/* ======================================= */
+
+/* Link Stili */
+.nasil-hesaplanir-link {
+  padding: 0.75rem 1rem;
+  background-color: #f9fafb;
+  text-align: center;
+}
+.nasil-hesaplanir-link a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.nasil-hesaplanir-link a:hover {
+  color: #3b82f6;
+}
+
+/* Modal Arka Planı */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* Modal İçerik Kutusu */
+.modal-icerik {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 500px;
+  animation: slide-down 0.4s ease-out;
+}
+
+/* Modal Başlığı */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+.modal-baslik {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+.modal-kapat-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  font-weight: 300;
+  line-height: 1;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+.modal-kapat-btn:hover {
+  color: #374151;
+}
+
+/* Modal Gövdesi */
+.modal-govde {
+  padding: 1.5rem;
+  color: #4b5563;
+}
+.modal-govde > p {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+/* Adım Adım Açıklama Stilleri */
+.adim {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.adim:last-child {
+  margin-bottom: 0;
+}
+.adim-sayi {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background-color: #eff6ff;
+  color: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.adim-aciklama h4 {
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+.adim-aciklama p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* Modal Açılış Animasyonu */
+@keyframes slide-down {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

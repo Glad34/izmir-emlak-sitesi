@@ -271,10 +271,41 @@ function populatePage(data, isLoggedIn, token) {
 }
 
 // --- Initialize Plugins Fonksiyonu ---
+// ilan-detay.js içindeki SADECE bu fonksiyonu değiştirin
+
 function initializePlugins() {
+  // Swiper Galerisini Başlat
   const thumbsSwiper = new Swiper('.thumbs-swiper', { spaceBetween: 10, slidesPerView: 4, freeMode: true, watchSlidesProgress: true });
   new Swiper('.main-swiper', { spaceBetween: 10, navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }, pagination: { el: '.swiper-pagination', type: 'fraction' }, thumbs: { swiper: thumbsSwiper } });
+  
+  // Sekmeleri (Tabs) Başlat
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabPanes = document.querySelectorAll('.tab-pane');
   tabButtons.forEach(button => { button.addEventListener('click', () => { const tabId = button.getAttribute('data-tab'); tabButtons.forEach(btn => btn.classList.remove('active')); tabPanes.forEach(pane => pane.classList.remove('active')); button.classList.add('active'); document.getElementById(tabId).classList.add('active'); }); });
+
+  // --- YENİ EKLENEN KISIM: HESAPLAMA POP-UP MANTIĞI ---
+  const modal = document.getElementById('hesaplama-modal');
+  const openBtn = document.getElementById('hesaplama-detay-ac');
+  const closeBtn = document.getElementById('hesaplama-detay-kapat');
+
+  if (modal && openBtn && closeBtn) {
+    // Açma düğmesine tıklanınca
+    openBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.classList.remove('hidden');
+    });
+
+    // Kapatma düğmesine tıklanınca
+    closeBtn.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+
+    // Pop-up dışındaki gri alana tıklanınca
+    modal.addEventListener('click', (e) => {
+      // Sadece dıştaki .modal-overlay'e tıklandıysa kapat
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+      }
+    });
+  }
 }
