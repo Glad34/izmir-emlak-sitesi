@@ -43,13 +43,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // --- Veri Çekme Fonksiyonu ---
 async function fetchIlanData(id, isLoggedIn, token) {
-  const jsonURL = `https://script.google.com/macros/s/AKfycbxvcb8fhRi7rKoesBNL8MXotlujebxiPN9eiFAKj1Z0l6ogHdiULYr_40ohculEKbj8/exec?ilanID=${id}`;
   try {
-    const response = await fetch(jsonURL);
-    if (!response.ok) throw new Error('Sunucu hatası!');
-    const data = await response.json();
-    if (data.error) throw new Error(data.error);
+    // YENİ: Doğrudan yerel JSON dosyasına istek atıyoruz
+    const response = await fetch('/data/ilanlar.json');
+    if (!response.ok) throw new Error('Veri dosyası bulunamadı.');
+
+    const tumIlanlar = await response.json();
+
+    // YENİ: Ana ilanı ve aynı mahalledeki diğer ilanları JavaScript içinde kendimiz buluyoruz
+    const anaIlan = tumIlanlar.find(ilan => ilan['İlan ID'] == id);
+
+    if (!anaIlan) {
+        throw new Error("Belirtilen ID ile ilan bulunamadı.");
+    }
+    
+    // YENİ: Diğer ilanları filtreliyoruz
+    const digerIlanlar = tumIlanlar.filter(ilan => 
+        ilan.Mahalle === anaIlan.Mahalle && 
+        ilan['Konut Tipi'] === anaIlan['Konut Tipi'] &&
+        ilan['İlan ID'] != id
+    );
+    
+    // YENİ: Veriyi populatePage'e Apps Script'ten geliyormuş gibi aynı formatla gönderiyoruz
+    const data = {
+        anaIlan: anaIlan,
+        digerIlanlar: digerIlanlar
+    };
+
     populatePage(data, isLoggedIn, token);
+
   } catch (error) {
     stopLoadingAnimation();
     console.error("Veri çekilirken hata oluştu:", error);
