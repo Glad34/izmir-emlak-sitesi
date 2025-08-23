@@ -1,17 +1,35 @@
 // ==========================================================
-// İlan Detay Script'i - SON NİHAİ VERSİYON
+// İlan Detay Script'i - KONUT TİPİ FİLTRESİ VE YENİ PUANLAMA
 // ==========================================================
 
 // --- Yükleme Animasyonu Bölümü ---
-const loadingMessages = [ "İlan bilgileri getiriliyor...", "En güncel fotoğraflar yükleniyor...", "Konum bilgileri haritaya işleniyor...", "Fiyat analizi yapılıyor...", "Sizin için en iyi detayı hazırlıyoruz...", "Neredeyse hazır, harika bir ilana bakıyorsunuz!" ];
+const loadingMessages = [
+    "İlan bilgileri getiriliyor...", "En güncel fotoğraflar yükleniyor...",
+    "Konum bilgileri haritaya işleniyor...", "Fiyat analizi yapılıyor...",
+    "Sizin için en iyi detayı hazırlıyoruz...", "Neredeyse hazır, harika bir ilana bakıyorsunuz!"
+];
 let messageInterval;
-function startLoadingAnimation() { const el = document.getElementById("loading-text"); if (!el) return; let i = 0; messageInterval = setInterval(() => { i = (i + 1) % loadingMessages.length; el.textContent = loadingMessages[i]; }, 2000); }
-function stopLoadingAnimation() { clearInterval(messageInterval); }
+
+function startLoadingAnimation() {
+    const loadingTextElement = document.getElementById("loading-text");
+    if (!loadingTextElement) return;
+    let currentIndex = 0;
+    messageInterval = setInterval(() => {
+        currentIndex = (currentIndex + 1) % loadingMessages.length;
+        loadingTextElement.textContent = loadingMessages[currentIndex];
+    }, 2000);
+}
+
+function stopLoadingAnimation() {
+    clearInterval(messageInterval);
+}
 
 // --- Ana Sayfa Yükleme Mantığı ---
 document.addEventListener("DOMContentLoaded", async () => {
   startLoadingAnimation();
-  while (typeof window.getAuthClient !== 'function') { await new Promise(resolve => setTimeout(resolve, 50)); }
+  while (typeof window.getAuthClient !== 'function') {
+      await new Promise(resolve => setTimeout(resolve, 50));
+  }
   const { isAuthenticated, accessToken } = await window.getAuthClient();
   const params = new URLSearchParams(window.location.search);
   const ilanID = params.get('id');
@@ -25,7 +43,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // --- Veri Çekme Fonksiyonu ---
 async function fetchIlanData(id, isLoggedIn, token) {
-  const jsonURL = `https://script.google.com/macros/s/AKfycbxUYOWqQMLnYxNGib11RYqkGvMB_njDK6VYG26aNx-YunB4RL01-mppElMEb98LPYZO/exec?ilanID=${id}`;
+  const jsonURL = `https://script.google.com/macros/s/AKfycbxvcb8fhRi7rKoesBNL8MXotlujebxiPN9eiFAKj1Z0l6ogHdiULYr_40ohculEKbj8/exec?ilanID=${id}`;
   try {
     const response = await fetch(jsonURL);
     if (!response.ok) throw new Error('Sunucu hatası!');
@@ -52,7 +70,7 @@ function populatePage(data, isLoggedIn, token) {
   const fiyatSayisi = parseInt(String(ilan['Fiyat']).replace(/[^\d]/g, ''));
   document.getElementById('ilan-fiyat').textContent = !isNaN(fiyatSayisi) ? `${fiyatSayisi.toLocaleString('tr-TR')} TL` : "Belirtilmemiş";
   document.getElementById('ilan-aciklama').innerHTML = ilan['Açıklama'].replace(/\n/g, '<br>');
-  const ozellikler = { "İlan Tipi": ilan['İlan Tipi'], "Oda Sayısı": ilan['Oda Sayısı'], "m² (Brüt)": ilan['m² (Brüt)'], "Bina Yaşı": ilan['Bina Yaşı'], "Isıtma": ilan['Isıtma'], "Banyo Sayısı": ilan['Banyo Sayısı'], "Balkon": ilan['Balkon'], "Eşyalı": ilan['Eşyalı'], "Site İçerisinde": ilan['Site İçerisinde'], "Krediye Uygun": ilan['Krediye Uygun'], "Aidat (TL)": ilan['Aidat (TL)'], "Bulunduğu Kat": ilan['Bulunduğu Kat'] };
+  const ozellikler = { "İlan Tipi": ilan['İlan Tipi'], "Oda Sayısı": ilan['Oda Sayısı'], "m² (Brüt)": ilan['m² (Brüt)'], "Bina Yaşı": ilan['Bina Yaşı'], "Isıtma": ilan['Isıtma'], "Banyo Sayısı": ilan['Banyo Sayısı'], "Balkon": ilan['Balkon'], "Eşyalı": ilan['Eşyalı'], "Site İçerisinde": ilan['Site İçerisinde'],"Havuz": ilan['Havuz'], "Krediye Uygun": ilan['Krediye Uygun'], "Aidat (TL)": ilan['Aidat (TL)'], "Bulunduğu Kat": ilan['Bulunduğu Kat'] };
   const ozelliklerListesiTab = document.getElementById('ilan-ozellikler-tab');
   ozelliklerListesiTab.innerHTML = '';
   Object.entries(ozellikler).forEach(([key, value]) => { if (value && String(value).trim() !== "") { ozelliklerListesiTab.innerHTML += `<li class="flex justify-between items-center text-sm py-2 border-b"><span class="text-gray-600">${key}</span><span class="font-semibold text-gray-800">${value}</span></li>`; } });
@@ -68,108 +86,14 @@ function populatePage(data, isLoggedIn, token) {
   
   initializePlugins();
 
-  // --- DİĞER İLANLAR VE GELİŞMİŞ ANALİZLER (DÜZELTİLDİ) ---
-  const digerIlanlarBolumu = document.getElementById('diger-ilanlar-bolumu');
-  const digerIlanlarListesi = document.getElementById('diger-ilanlar-listesi');
-  const mahalleAdiSpan = document.getElementById('mahalle-adi');
-  const siralamaPlaceholder = document.getElementById('ilan-siralama-placeholder');
-  const siralamaMetni = document.getElementById('siralama-metni');
-  const ortalamaFiyatKutusu = document.getElementById('ortalama-fiyat-kutusu');
-  const ortalamaFiyatElementi = document.getElementById('ortalama-fiyat');
-
-  // Mahallede başka ilan varsa (kendisi hariç en az 1 tane)
-  if (digerIlanlar && digerIlanlar.length > 0) {
-    mahalleAdiSpan.textContent = ilan['Mahalle'];
-    
-    // Analiz için tüm ilanları birleştirelim
-    const tumIlanlar = [ ...digerIlanlar, { "İlan ID": ilan['İlan ID'], "Başlık": ilan['Başlık'], "Fiyat": ilan['Fiyat'], "m² (Net)": ilan['m² (Net)'], "Endeks m² Fiyatı": ilan['Endeks m² Fiyatı'] } ];
-    
-    // --- YENİ HESAPLAMA MANTIĞI ---
-    
-    // 1. Ortalama Endeks m² Fiyatını Hesapla
-    const endeksDegerleri = tumIlanlar
-        .map(i => parseInt(String(i["Endeks m² Fiyatı"]).replace(/[^\d]/g, '')))
-        .filter(val => !isNaN(val) && val > 0);
-    
-    let ortalamaEndeksM2Fiyati = 0;
-    if (endeksDegerleri.length > 0) {
-        const toplamEndeks = endeksDegerleri.reduce((acc, val) => acc + val, 0);
-        ortalamaEndeksM2Fiyati = toplamEndeks / endeksDegerleri.length;
-
-        ortalamaFiyatKutusu.querySelector('p').innerHTML = `Mahalledeki Ortalama Endeks m² Fiyatı: <strong>${ortalamaEndeksM2Fiyati.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} TL/m²</strong>`;
-        ortalamaFiyatKutusu.classList.remove('hidden');
-    }
-    
-    // İlanları ana fiyata göre sırala
-    tumIlanlar.sort((a, b) => parseInt(String(a.Fiyat).replace(/[^\d]/g, '')) - parseInt(String(b.Fiyat).replace(/[^\d]/g, '')));
-
-    digerIlanlarListesi.innerHTML = '';
-    let anaIlaninSirasi = -1;
-
-    // Sıralanmış listeyi oluştur
-    tumIlanlar.forEach((siradakiIlan, index) => {
-        if (siradakiIlan['İlan ID'] == ilan['İlan ID']) {
-            anaIlaninSirasi = index + 1;
-        }
-
-        const fiyat = parseInt(String(siradakiIlan.Fiyat).replace(/[^\d]/g, ''));
-        const netM2 = parseInt(siradakiIlan['m² (Net)']);
-        const formatliFiyat = fiyat.toLocaleString('tr-TR');
-        
-        let farkGostergesiHTML = '';
-        // 2. Her ilanın gerçek m² fiyatını ortalama endekse göre karşılaştır
-        if (netM2 > 0 && ortalamaEndeksM2Fiyati > 0) {
-            const mevcutM2Fiyati = fiyat / netM2;
-            const farkYuzdesi = Math.round(((mevcutM2Fiyati - ortalamaEndeksM2Fiyati) / ortalamaEndeksM2Fiyati) * 100);
-            
-            if (farkYuzdesi > 0) {
-                farkGostergesiHTML = `<div class="fiyat-fark-gostergesi yukari"><span>%${farkYuzdesi}</span><i class="fas fa-arrow-up"></i></div>`;
-            } else if (farkYuzdesi < 0) {
-                farkGostergesiHTML = `<div class="fiyat-fark-gostergesi asagi"><span>%${Math.abs(farkYuzdesi)}</span><i class="fas fa-arrow-down"></i></div>`;
-            }
-        }
-
-        let etiketHTML = '';
-        if (index === 0) etiketHTML = `<span class="en-uygun-etiket yesil">En Uygun</span>`;
-        else if (index === 1) etiketHTML = `<span class="en-uygun-etiket turuncu">2. Uygun</span>`;
-        else if (index === 2) etiketHTML = `<span class="en-uygun-etiket turuncu">3. Uygun</span>`;
-
-        const anaIlanSinifi = (siradakiIlan['İlan ID'] == ilan['İlan ID']) ? 'ana-ilan-vurgu' : '';
-
-        digerIlanlarListesi.innerHTML += `
-            <a href="ilan-detay.html?id=${siradakiIlan['İlan ID']}" class="diger-ilan-item ${anaIlanSinifi}">
-                <span class="ilan-sira-no">${index + 1}.</span>
-                <div class="diger-ilan-bilgi">
-                    <h4 class="diger-ilan-baslik">${siradakiIlan['Başlık']}</h4>
-                    <div class="diger-ilan-detaylar">
-                        <p class="diger-ilan-fiyat">${formatliFiyat} TL</p>
-                        ${farkGostergesiHTML}
-                    </div>
-                </div>
-                ${etiketHTML}
-            </a>
-        `;
-    });
-
-    if (anaIlaninSirasi !== -1 && siralamaMetni) {
-        siralamaMetni.textContent = `${ilan['Mahalle']} mahallesindeki en uygun ${anaIlaninSirasi}. fırsattır.`;
-        siralamaPlaceholder.classList.remove('hidden');
-    }
-    digerIlanlarBolumu.classList.remove('hidden');
-  }
-
-
-  // ===============================================
-  // YENİ: DEĞER ANALİZİ VE FIRSAT SKORU HESAPLAMA
-  // ===============================================
-
-  // --- DEĞER ANALİZİ VE FIRSAT SKORU HESAPLAMA (DÜZELTİLMİŞ) ---
+  // --- DEĞER ANALİZİ VE FIRSAT SKORU HESAPLAMA ---
   const degerKarti = document.getElementById('deger-karti');
   const puanlar = {
       binaYasi: { "0": 15, "1": 15, "2-5 arası": 10, "6-10 arası": 5, "11-20 arası": 0, "21 ve üzeri": -10 },
       bulunduguKat: { "Ara Kat": 10, "Çatı Katı": 5, "Dubleks": 5, "Zemin Kat": -5, "Bahçe Katı": -5, "Villa": 20 },
       denizManzarasi: { "Var": 20 },
       siteIcerisinde: { "Evet": 12 },
+      havuz: { "Var": 8 },
       otopark: { "Var": 8 },
       asansor: { "Var": 5 },
       balkon: { "Var": 3 },
@@ -188,11 +112,8 @@ function populatePage(data, isLoggedIn, token) {
   negatifFaktorlerListesi.innerHTML = '';
 
   function addFactor(aciklama, puan) {
-      if (puan > 0) {
-          pozitifFaktorlerListesi.innerHTML += `<li>${aciklama}<span>+${puan}%</span></li>`;
-      } else if (puan < 0) {
-          negatifFaktorlerListesi.innerHTML += `<li>${aciklama}<span>${puan}%</span></li>`;
-      }
+      if (puan > 0) pozitifFaktorlerListesi.innerHTML += `<li>${aciklama}<span>+${puan}%</span></li>`;
+      else if (puan < 0) negatifFaktorlerListesi.innerHTML += `<li>${aciklama}<span>${puan}%</span></li>`;
       toplamPuan += puan;
   }
 
@@ -201,6 +122,7 @@ function populatePage(data, isLoggedIn, token) {
   if (puanlar.bulunduguKat[ilan['Bulunduğu Kat']]) addFactor(ilan['Bulunduğu Kat'], puanlar.bulunduguKat[ilan['Bulunduğu Kat']]);
   if (ilan['Deniz Manzarası'] === 'Var') addFactor("Deniz Manzaralı", puanlar.denizManzarasi["Var"]);
   if (ilan['Site İçerisinde'] === 'Evet') addFactor("Site İçerisinde", puanlar.siteIcerisinde["Evet"]);
+  if (ilan['Havuz'] === 'Var') addFactor("Havuzlu", puanlar.havuz["Var"]);
   if (ilan['Otopark'] && ilan['Otopark'] !== 'Yok') addFactor("Otoparklı", puanlar.otopark["Var"]);
   if (ilan['Asansör'] === 'Var') addFactor("Asansörlü", puanlar.asansor["Var"]);
   if (ilan['Balkon'] === 'Var') addFactor("Balkonlu", puanlar.balkon["Var"]);
@@ -250,6 +172,55 @@ function populatePage(data, isLoggedIn, token) {
       degerKarti.classList.remove('hidden');
   }
 
+  // --- DİĞER İLANLAR BÖLÜMÜ ---
+  const digerIlanlarBolumu = document.getElementById('diger-ilanlar-bolumu');
+  const digerIlanlarListesi = document.getElementById('diger-ilanlar-listesi');
+  const mahalleAdiSpan = document.getElementById('mahalle-adi');
+  const ortalamaFiyatKutusu = document.getElementById('ortalama-fiyat-kutusu');
+
+  mahalleAdiSpan.textContent = `${ilan['Mahalle']} / ${ilan['Konut Tipi']}`;
+  const tumIlanlar = [ ...digerIlanlar, { "İlan ID": ilan['İlan ID'], "Başlık": ilan['Başlık'], "Fiyat": ilan['Fiyat'], "m² (Net)": ilan['m² (Net)'], "Endeks m² Fiyatı": ilan['Endeks m² Fiyatı'] } ];
+  const ilanlarVeM2Fiyatlari = tumIlanlar.map(i => {
+      const fiyat = parseInt(String(i.Fiyat).replace(/[^\d]/g, ''));
+      const netM2 = parseInt(i['m² (Net)']);
+      const m2Fiyati = (netM2 > 0) ? fiyat / netM2 : null;
+      return { ...i, m2Fiyati };
+  }).filter(i => i.m2Fiyati !== null);
+
+  if (ilanlarVeM2Fiyatlari.length > 0) {
+      const toplamEndeksM2Fiyati = ilanlarVeM2Fiyatlari.reduce((acc, i) => {
+          const endeks = parseInt(String(i["Endeks m² Fiyatı"]).replace(/[^\d]/g, ''));
+          return acc + (isNaN(endeks) ? 0 : endeks);
+      }, 0);
+      const ortalamaEndeksM2Fiyati = toplamEndeksM2Fiyati / ilanlarVeM2Fiyatlari.length;
+      
+      ortalamaFiyatKutusu.querySelector('p').innerHTML = `Mahalledeki Ortalama Endeks m² Fiyatı: <strong>${ortalamaEndeksM2Fiyati.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} TL/m²</strong>`;
+      ortalamaFiyatKutusu.classList.remove('hidden');
+
+      tumIlanlar.sort((a, b) => parseInt(String(a.Fiyat).replace(/[^\d]/g, '')) - parseInt(String(b.Fiyat).replace(/[^\d]/g, '')));
+      digerIlanlarListesi.innerHTML = '';
+      
+      tumIlanlar.forEach((siradakiIlan, index) => {
+          const mevcutIlanDetay = ilanlarVeM2Fiyatlari.find(i => i['İlan ID'] == siradakiIlan['İlan ID']);
+          if (mevcutIlanDetay) {
+              const formatliFiyat = parseInt(String(siradakiIlan.Fiyat).replace(/[^\d]/g, '')).toLocaleString('tr-TR');
+              let farkGostergesiHTML = '';
+              if (mevcutIlanDetay.m2Fiyati && ortalamaEndeksM2Fiyati > 0) {
+                  const farkYuzdesi = Math.round(((mevcutIlanDetay.m2Fiyati - ortalamaEndeksM2Fiyati) / ortalamaEndeksM2Fiyati) * 100);
+                  if (farkYuzdesi > 0) farkGostergesiHTML = `<div class="fiyat-fark-gostergesi yukari"><span>%${farkYuzdesi}</span><i class="fas fa-arrow-up"></i></div>`;
+                  else if (farkYuzdesi < 0) farkGostergesiHTML = `<div class="fiyat-fark-gostergesi asagi"><span>%${Math.abs(farkYuzdesi)}</span><i class="fas fa-arrow-down"></i></div>`;
+              }
+              let etiketHTML = '';
+              if (index === 0) etiketHTML = `<span class="en-uygun-etiket yesil">En Uygun</span>`;
+              else if (index === 1) etiketHTML = `<span class="en-uygun-etiket turuncu">2. Uygun</span>`;
+              else if (index === 2) etiketHTML = `<span class="en-uygun-etiket turuncu">3. Uygun</span>`;
+              const anaIlanSinifi = (siradakiIlan['İlan ID'] == ilan['İlan ID']) ? 'ana-ilan-vurgu' : '';
+              digerIlanlarListesi.innerHTML += `<a href="ilan-detay.html?id=${siradakiIlan['İlan ID']}" class="diger-ilan-item ${anaIlanSinifi}"><span class="ilan-sira-no">${index + 1}.</span><div class="diger-ilan-bilgi"><h4 class="diger-ilan-baslik">${siradakiIlan['Başlık']}</h4><div class="diger-ilan-detaylar"><p class="diger-ilan-fiyat">${formatliFiyat} TL</p>${farkGostergesiHTML}</div></div>${etiketHTML}</a>`;
+          }
+      });
+      digerIlanlarBolumu.classList.remove('hidden');
+  }
+
   // --- Favori Butonu Mantığı ---
   const favoriBtn = document.getElementById('favori-ekle-btn');
   if (isLoggedIn && favoriBtn) { favoriBtn.classList.remove('hidden'); }
@@ -286,7 +257,7 @@ function populatePage(data, isLoggedIn, token) {
   document.getElementById('ilan-icerik').classList.remove('hidden');
 }
 
-// --- Initialize Plugins Fonksiyonu (Değişiklik yok) ---
+// --- Initialize Plugins Fonksiyonu ---
 function initializePlugins() {
   const thumbsSwiper = new Swiper('.thumbs-swiper', { spaceBetween: 10, slidesPerView: 4, freeMode: true, watchSlidesProgress: true });
   new Swiper('.main-swiper', { spaceBetween: 10, navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }, pagination: { el: '.swiper-pagination', type: 'fraction' }, thumbs: { swiper: thumbsSwiper } });
