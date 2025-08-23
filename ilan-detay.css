@@ -486,8 +486,13 @@
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   width: 100%;
-  max-width: 500px;
-  animation: slide-down 0.4s ease-out;
+  max-width: 480px; /* GENİŞLİĞİ BİRAZ AZALTTIK */
+  height: 90vh; /* YÜKSEKLİĞİ EKRANIN %90'I İLE SINIRLADIK */
+  max-height: 550px; /* MAKSİMUM YÜKSEKLİĞİ BELİRLEDİK */
+  animation: slide-down 0.6s ease-out;
+  /* İçeriğin esnek bir şekilde yerleşmesi için flex yapısı ekledik */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Modal Başlığı */
@@ -521,6 +526,8 @@
 .modal-govde {
   padding: 1.5rem;
   color: #4b5563;
+  overflow-y: auto; /* İÇERİK SIĞMAZSA KAYDIRMA ÇUBUĞU ÇIKARIR */
+  flex-grow: 1; /* Esneyerek başlık ve altbilgi dışındaki tüm boş alanı doldurur */
 }
 .modal-govde > p {
   margin-bottom: 1.5rem;
