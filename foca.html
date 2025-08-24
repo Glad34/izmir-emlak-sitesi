@@ -282,7 +282,6 @@
         evListesi.innerHTML = `<p class='col-span-1 md:col-span-2 text-center text-red-600'>Hata: İlanlar yüklenemedi. (${error.message})</p>`;
     }
 }
-
   function updateSliderPosition(input, label) {
     const value = ((input.value - input.min) / (input.max - input.min)) * 100;
     label.style.left = `calc(${value}% + (${8 - value * 0.15}px))`;
@@ -460,29 +459,54 @@
 
 
 <div id="footer-placeholder"></div>
-<div id="chatbot-popup" class="chatbot-hidden"> 
-  
-  <!-- Bu sizin mevcut chatbot yapınız -->
-  <div id="chat-widget"> 
+<!-- =======================
+CHATBOT HTML YAPISI (RE/MAX GÜNCELLEMESİ)
+======================== -->
+<div id="chatbot-popup" class="chatbot-hidden">
+  <div id="chat-widget">
+    
+    <!-- Başlık Bölümü -->
     <div id="chat-header">
-      <img src="images/REMAX LOGO 2.png" alt="Danışman">
+      <img src="images/danisman.png" alt="Onur Başaran, Gayrimenkul Danışmanı">
       <div>
         <h1>Onur Başaran</h1>
-        <h2>Gayrimenkul Danışmanı</h2>
-        <span>Çevrimiçi</span>
+        <h2>Yatırım Uzmanı & Gayrimenkul Danışmanı</h2>
+        <span>Şu an aktif <span class="online-indicator"></span></span>
       </div>
-      <!-- Kapatma Düğmesini ekleyelim -->
-      <button id="chatbot-kapat-btn" style="background:none; border:none; font-size: 24px; cursor:pointer; color: #555;">&times;</button>
+      <button id="chatbot-kapat-btn">&times;</button>
     </div>
+
+    <!-- YENİ: RE/MAX Marka Bandı -->
+    <div class="remax-brand-bar">
+      <img src="images/remaxlogo1.webp" alt="RE/MAX">
+    </div>
+
+    <!-- Mesajlar Bölümü -->
     <div id="chat-messages">
-      <div class="message ai-message">Merhaba! Hayalinizdeki evi bulmanıza yardımcı olmak için buradayım. Lütfen isteklerinizi yazın.</div>
+      <div class="message ai-message">
+          <p class="greeting-title">Merhaba, ben Onur Başaran!</p>
+          <strong>RE/MAX güvencesiyle,</strong> İzmir'in en seçkin portföyünden hayalinizdeki evi bulmanıza yardımcı olmak için buradayım.
+          <br><br>
+          Bana ne aradığınızı söyleyin, sizin için en iyi fırsatları anında listeleyeyim.
+
+          <!-- YENİ EKLENEN ÖRNEK BÖLÜMÜ -->
+      <div class="message-example">
+        <p><strong>Örneğin:</strong></p>
+        <p>"Güzelbahçe'de, 3 milyon TL'ye kadar, 2+1, denize yakın satılık daire"</p>
+      </div>
+      <!-- BİTİŞ -->
+      </div>
     </div>
+
+    <!-- Yazı Giriş Formu -->
     <form id="chat-input-form">
-      <input type="text" id="user-input" placeholder="Mesajınızı yazın..." autocomplete="off" required>
-      <button type="submit">Gönder</button>
+      <textarea id="user-input" placeholder="İsteklerinizi buraya yazın..." rows="1" required></textarea>
+      <button type="submit" title="Gönder">
+          <i class="fas fa-paper-plane"></i>
+      </button>
     </form>
+    
   </div>
-  
 </div>
 
   
