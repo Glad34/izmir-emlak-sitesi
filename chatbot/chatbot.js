@@ -57,7 +57,8 @@ async function handleFormSubmit(event) {
         // --- BİTİŞ ---
 
 
-        loadingIndicator.textContent = aiResponse.cevap;
+        loadingIndicator.innerHTML = aiResponse.cevap; // Gelen HTML'i işle
+        loadingIndicator.classList.remove('loading'); // İsteğe bağlı: "yazıyor..." animasyonunu durdurmak için
        
         if (aiResponse.status === 'tamamlandi') {
             startPollingForResults();
