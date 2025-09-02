@@ -77,7 +77,7 @@ async function handleFormSubmit(event) {
 
 
 
-        loadingIndicator.textContent = aiResponse.cevap; // Gelen HTML'i işle
+        loadingIndicator.innerHTML = aiResponse.cevap; // Gelen HTML'i işle
         loadingIndicator.classList.remove('loading'); // İsteğe bağlı: "yazıyor..." animasyonunu durdurmak için
        
         if (aiResponse.status === 'tamamlandi') {
