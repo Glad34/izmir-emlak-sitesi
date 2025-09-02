@@ -29,33 +29,28 @@ async function handleFormSubmit(event) {
     const messageText = userInput.value.trim();
     if (messageText === '') return;
 
-    // Önceki butonları temizle (eğer varsa)
-    const existingOptions = document.querySelector('.options-container');
-    if (existingOptions) {
-        existingOptions.remove();
-    }
-
     addMessageToUI(messageText, 'user', false);
     userInput.value = '';
-    userInput.disabled = true; // Yeni cevap gelene kadar input'u kilitle
+    userInput.disabled = true;
 
-    // "Yazıyor..." balonu ekleniyor
     addMessageToUI('...', 'ai', false);
 
     try {
         const aiResponse = await sendMessageToMake(messageText);
-
-        // En son eklenen "Yazıyor..." balonunu ekrandan sil.
         const messages = document.querySelectorAll('.message');
         messages[messages.length - 1].remove();
 
         // Gelen cevabı işle
-        if (typeof aiResponse.cevap === 'object' && aiResponse.cevap.options && Array.isArray(aiResponse.cevap.options)) {
-            // EĞER CEVAP SEÇENEKLER İÇERİYORSA:
+        if (typeof aiResponse.cevap === 'object' && aiResponse.cevap.questions) {
+            // EĞER CEVAP BİR FORM İSE (YENİ SİSTEM):
+            addMessageToUI(aiResponse.cevap.text, 'ai', true); // "Lütfen formu doldurun" metni
+            renderForm(aiResponse.cevap.questions); // Formu ekrana çiz
+        } else if (typeof aiResponse.cevap === 'object' && aiResponse.cevap.options) {
+            // EĞER CEVAP BASİT SEÇENEKLER İSE:
             addMessageToUI(aiResponse.cevap.text, 'ai', true);
             renderOptions(aiResponse.cevap.options);
         } else {
-            // EĞER CEVAP SADECE METİNSE (ESKİ SİSTEM):
+            // EĞER CEVAP SADECE METİNSE:
             addMessageToUI(aiResponse.cevap, 'ai', true);
         }
 
@@ -75,8 +70,11 @@ async function handleFormSubmit(event) {
         }
         addMessageToUI('Üzgünüm, bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'ai', false);
     } finally {
-        userInput.disabled = false; // Input kilidini aç
-        userInput.focus(); // Input'a odaklan
+        // Form gösterilmediyse input'u tekrar aktif et
+        if (!document.querySelector('.dynamic-form-container')) {
+            userInput.disabled = false;
+            userInput.focus();
+        }
     }
 }
 
@@ -106,29 +104,78 @@ function addMessageToUI(content, sender, isHTML) {
 }
 
 /**
- * Verilen seçenekler dizisinden tıklanabilir butonlar oluşturur ve mesaj alanına ekler.
- * @param {string[]} options - Buton olarak gösterilecek metinleri içeren dizi.
+ * Verilen "questions" dizisinden dinamik bir form oluşturur.
+ * @param {Array} questions - Form elemanlarını içeren dizi.
  */
-function renderOptions(options) {
-    const optionsContainer = document.createElement('div');
-    optionsContainer.classList.add('options-container');
+function renderForm(questions) {
+    const formContainer = document.createElement('div');
+    formContainer.classList.add('dynamic-form-container');
 
-    options.forEach(optionText => {
-        const button = document.createElement('button');
-        button.classList.add('quick-reply-button');
-        button.textContent = optionText;
-
-        button.addEventListener('click', () => {
-            userInput.value = optionText;
-            handleFormSubmit(null); // event'i null gönderiyoruz
-        });
-
-        optionsContainer.appendChild(button);
+    let formHTML = '';
+    questions.forEach(q => {
+        formHTML += `<div class="form-group">`;
+        formHTML += `<label for="${q.id}">${q.text}</label>`;
+        if (q.options) {
+            // Seçenekler varsa buton grubu oluştur
+            formHTML += `<div class="form-options" data-id="${q.id}">`;
+            q.options.forEach(opt => {
+                formHTML += `<button type="button" class="quick-reply-button">${opt}</button>`;
+            });
+            formHTML += `</div>`;
+        } else {
+            // Seçenek yoksa metin input'u oluştur
+            formHTML += `<input type="text" id="${q.id}" name="${q.id}" class="form-input">`;
+        }
+        formHTML += `</div>`;
     });
 
-    chatMessages.appendChild(optionsContainer);
-    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll'u en alta kaydır
+    // Gönder butonu
+    formHTML += `<button type="submit" class="form-submit-button">Kriterleri Gönder</button>`;
+    formContainer.innerHTML = formHTML;
+    chatMessages.appendChild(formContainer);
+
+    // Buton tıklama olaylarını yönet
+    formContainer.querySelectorAll('.quick-reply-button').forEach(button => {
+        button.addEventListener('click', () => {
+            // Aynı gruptaki diğer butonların seçimini kaldır
+            const parent = button.parentElement;
+            parent.querySelectorAll('.quick-reply-button').forEach(btn => btn.classList.remove('selected'));
+            // Tıklanan butonu seçili yap
+            button.classList.add('selected');
+        });
+    });
+
+    // Form gönderme olayını yönet
+    formContainer.querySelector('.form-submit-button').addEventListener('click', () => {
+        let collectedData = [];
+        questions.forEach(q => {
+            let value = '';
+            if (q.options) {
+                const selectedButton = formContainer.querySelector(`.form-options[data-id="${q.id}"] .selected`);
+                if (selectedButton) {
+                    value = selectedButton.textContent;
+                }
+            } else {
+                const inputElement = formContainer.querySelector(`#${q.id}`);
+                if (inputElement) {
+                    value = inputElement.value;
+                }
+            }
+            if (value.trim() !== '') {
+                collectedData.push(`${q.text} ${value}`);
+            }
+        });
+
+        if (collectedData.length > 0) {
+            userInput.value = collectedData.join(', ');
+            handleFormSubmit(null);
+        }
+        formContainer.remove(); // Formu gönderdikten sonra kaldır
+    });
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
+
 
 // --- 6. ASENKRON SONUÇ KONTROLÜ VE GÖRSELLEŞTİRME ---
 function startPollingForResults() {
