@@ -1,18 +1,18 @@
-console.log("🔥 chatbot.js SON SÜRÜM YÜKLENDİ VE ÇALIŞIYOR.");
+console.log("🔥 chatbot.js V3 (STABİL SÜRÜM) YÜKLENDİ.");
 
 // --- 1. AYARLAR ---
 const MAKE_DIALOG_WEBHOOK_URL = 'https://hook.eu2.make.com/c5dt1cwtpat7kk6i6oxilacno0yxnuif';
 const MAKE_STATUS_CHECK_URL = 'https://hook.eu2.make.com/jwfmybzglr2gjbgynuyeep7163nldzzj';
 
-// --- 2. HTML ELEMENTLERİNİN SEÇİLMESİ ---
+// --- 2. HTML ELEMENTLERİ ---
 const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-input-form');
 const userInput = document.getElementById('user-input');
 
-// --- 3. UYGULAMA DURUMU (STATE) YÖNETİMİ ---
+// --- 3. STATE YÖNETİMİ ---
 let conversationHistory = [];
 
-// --- 4. KONUŞMA KİMLİĞİ (CONVERSATION ID) VE GEÇMİŞ YÖNETİMİ ---
+// --- 4. OTURUM YÖNETİMİ ---
 function getOrCreateConversationId() {
     let id = sessionStorage.getItem('chatConversationId');
     if (!id) {
@@ -53,48 +53,33 @@ async function handleFormSubmit(event) {
 
     addMessageToHistoryAndUI(messageText, 'user', false);
     userInput.value = '';
-    addMessageToHistoryAndUI('...', 'ai', false);
-
-    // --- YENİ EKLENEN KISIM: İŞARET BAYRAĞI ---
-    // Make.com'dan bir cevap beklediğimizi tarayıcıya bildiriyoruz.
-    sessionStorage.setItem('isWaitingForAI', 'true');
-    // --- BİTİŞ ---
+    addMessageToHistoryAndUI('...', 'ai', false, true); // 'isPending' olarak işaretle
 
     try {
-        const aiResponse = await sendMessageToMake(messageText);
-        
-        const chatbotPopup = document.getElementById('chatbot-popup');
-        if (chatbotPopup && chatbotPopup.classList.contains('chatbot-hidden')) {
-            chatbotPopup.classList.remove('chatbot-hidden');
-        }
-
+        // --- GÜNCELLENDİ: Artık 'text' gönderiyoruz ---
+        const aiResponse = await sendMessageToMake({ text: messageText });
         updateLastMessage(aiResponse.cevap, true);
-
         if (aiResponse.status === 'tamamlandi') {
             startPollingForResults();
         }
     } catch (error) {
         console.error('Asistanla iletişimde hata:', error);
-        const errorMessage = 'Üzgünüm, bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
-        updateLastMessage(errorMessage, false);
-    } finally {
-        // --- YENİ EKLENEN KISIM: İŞARET BAYRAĞI TEMİZLEME ---
-        // İşlem bittiğinde (başarılı ya da hatalı), bayrağı kaldırıyoruz.
-        sessionStorage.removeItem('isWaitingForAI');
-        // --- BİTİŞ ---
+        updateLastMessage('Üzgünüm, bir hata oluştu. Lütfen daha sonra tekrar deneyin.', false);
     }
 }
 
-async function sendMessageToMake(text) {
-    const payload = { text: text, conversation_id: conversationId };
+// --- GÜNCELLENDİ: Artık tek bir obje alıyor ---
+async function sendMessageToMake(payloadBody) {
+    // Her isteğe conversation_id'yi otomatik ekle
+    const fullPayload = { ...payloadBody, conversation_id: conversationId };
+    
     const response = await fetch(MAKE_DIALOG_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(fullPayload)
     });
     if (!response.ok) throw new Error(`Network hatası: ${response.status}`);
-    const data = await response.json();
-    return data;
+    return await response.json();
 }
 
 function addMessageToUI(content, sender, isHTML) {
@@ -110,8 +95,8 @@ function addMessageToUI(content, sender, isHTML) {
     return messageElement;
 }
 
-function addMessageToHistoryAndUI(content, sender, isHTML) {
-    conversationHistory.push({ content, sender, isHTML });
+function addMessageToHistoryAndUI(content, sender, isHTML, isPending = false) {
+    conversationHistory.push({ content, sender, isHTML, isPending });
     saveHistoryToSession();
     return addMessageToUI(content, sender, isHTML);
 }
@@ -121,9 +106,9 @@ function updateLastMessage(newContent, isHTML) {
         const lastMessage = conversationHistory[conversationHistory.length - 1];
         lastMessage.content = newContent;
         lastMessage.isHTML = isHTML;
+        lastMessage.isPending = false; // Artık beklemede değil
         saveHistoryToSession();
     }
-
     const lastMessageElement = chatMessages.lastElementChild;
     if (lastMessageElement) {
         if (isHTML) {
@@ -131,47 +116,35 @@ function updateLastMessage(newContent, isHTML) {
         } else {
             lastMessageElement.textContent = newContent;
         }
-        lastMessageElement.classList.remove('loading');
     }
 }
 
-// --- YENİ FONKSİYON: Yarım Kalan İşi Tamamlama ---
+// --- GÜNCELLENDİ: "Yeniden Gönder" yerine "Son Durumu Sor" ---
 async function resolveStuckState() {
-    // Eğer bir cevap beklemiyorsak, hiçbir şey yapma.
-    if (sessionStorage.getItem('isWaitingForAI') !== 'true') {
+    const lastMessage = conversationHistory[conversationHistory.length - 1];
+    
+    // Eğer son mesaj 'beklemede' değilse, hiçbir şey yapma.
+    if (!lastMessage || !lastMessage.isPending) {
         return;
     }
 
-    console.log("Yarım kalmış bir işlem tespit edildi. Çözümleniyor...");
-
-    // En son mesajın kullanıcı mesajı olduğundan emin ol (genellikle sondan ikinci mesaj).
-    const lastUserMessage = conversationHistory.slice().reverse().find(m => m.sender === 'user');
-
-    if (!lastUserMessage) {
-        console.error("Çözümlenecek kullanıcı mesajı bulunamadı.");
-        sessionStorage.removeItem('isWaitingForAI'); // Hata durumunda bayrağı temizle
-        return;
-    }
-
-    // Yarım kalan isteği tekrar gönder ve süreci tamamla.
+    console.log("Takılı kalmış bir işlem tespit edildi. Son durum soruluyor...");
+    
     try {
-        const aiResponse = await sendMessageToMake(lastUserMessage.content);
+        // Make.com'a SADECE conversation_id göndererek son mesajı istiyoruz.
+        // 'text' alanı göndermiyoruz.
+        const aiResponse = await sendMessageToMake({}); 
         updateLastMessage(aiResponse.cevap, true);
         if (aiResponse.status === 'tamamlandi') {
             startPollingForResults();
         }
     } catch (error) {
-        console.error('Yarım kalan işlem çözümlenirken hata:', error);
-        const errorMessage = 'Önceki mesaja cevap alınırken bir hata oluştu.';
-        updateLastMessage(errorMessage, false);
-    } finally {
-        sessionStorage.removeItem('isWaitingForAI'); // İşlem bittiğinde bayrağı kaldır.
+        console.error('Takılı kalan durum çözümlenirken hata:', error);
+        updateLastMessage('Önceki mesaja cevap alınırken bir hata oluştu.', false);
     }
 }
-// --- BİTİŞ ---
 
-// Diğer fonksiyonlar (startPollingForResults, renderIlanSlider) aynı kalabilir.
-// ... (startPollingForResults ve renderIlanSlider fonksiyonları buraya gelecek) ...
+// ... (startPollingForResults ve renderIlanSlider fonksiyonları aynı kalabilir) ...
 function startPollingForResults() {
     let pollCount = 0;
     const maxPolls = 24;
@@ -252,10 +225,7 @@ function renderIlanSlider(ilanSunumuBase64) {
 // --- 8. BAŞLANGIÇ ---
 async function initializeChat() {
     loadHistoryFromSession();
-    // --- GÜNCELLENDİ ---
-    // Sayfa yüklendiğinde, yarım kalan bir iş olup olmadığını kontrol et ve çöz.
     await resolveStuckState();
-    // --- BİTİŞ ---
 }
 
 initializeChat();
