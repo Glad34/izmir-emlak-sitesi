@@ -17,7 +17,38 @@ function generateSitemap() {
   xml += `  </url>\n`;
 
   // Balçova gibi kategori sayfaları (örnek olarak ekliyorum)
-  const kategoriler = ["balcova", "cesme", "guzelbahce"];
+  const kategoriler = [
+  "balcova",
+  "bayindir",
+  "bayrakli",
+  "bergama",
+  "beydag",
+  "bornova",
+  "buca",
+  "cesme",
+  "cigli",
+  "dikili",
+  "foca",
+  "gaziemir",
+  "guzelbahce",
+  "karabaglar",
+  "karaburun",
+  "karsiyaka",
+  "kemalpasa",
+  "kinik",
+  "kiraz",
+  "konak",
+  "menderes",
+  "menemen",
+  "narlidere",
+  "odemis",
+  "seferihisar",
+  "selcuk",
+  "tire",
+  "torbali",
+  "uralsi",
+  "aliaga"
+];
   kategoriler.forEach((kategori) => {
     xml += `  <url>\n`;
     xml += `    <loc>${baseUrl}/${kategori}.html</loc>\n`;
@@ -37,8 +68,8 @@ function generateSitemap() {
   xml += `</urlset>`;
 
   // sitemap.xml olarak kaydet
-  fs.writeFileSync(path.join(__dirname, "sitemap.xml"), xml, "utf8");
-  console.log("✅ sitemap.xml oluşturuldu!");
+  fs.writeFileSync(path.join(__dirname, "sitemap-ilanlar.xml"), xml, "utf8");
+  console.log("✅ sitemap-ilanlar.xml oluşturuldu!");
 }
 
 generateSitemap();
