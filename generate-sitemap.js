@@ -2,74 +2,39 @@
 const fs = require("fs");
 const path = require("path");
 
-// ilanlar.json dosyanı oku
+// 1) İlan verilerini oku
 const ilanlar = require("./data/ilanlar.json");
 
-function generateSitemap() {
-  const baseUrl = "https://hizlievbul.com";
+// 2) Temel ayarlar
+const BASE_URL = "https://hizlievbul.com";
+
+// 3) XML üret
+function buildXml() {
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
   xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
 
-  // Ana sayfa
-  xml += `  <url>\n`;
-  xml += `    <loc>${baseUrl}/</loc>\n`;
-  xml += `    <priority>1.0</priority>\n`;
-  xml += `  </url>\n`;
-
-  // Balçova gibi kategori sayfaları (örnek olarak ekliyorum)
-  const kategoriler = [
-  "balcova",
-  "bayindir",
-  "bayrakli",
-  "bergama",
-  "beydag",
-  "bornova",
-  "buca",
-  "cesme",
-  "cigli",
-  "dikili",
-  "foca",
-  "gaziemir",
-  "guzelbahce",
-  "karabaglar",
-  "karaburun",
-  "karsiyaka",
-  "kemalpasa",
-  "kinik",
-  "kiraz",
-  "konak",
-  "menderes",
-  "menemen",
-  "narlidere",
-  "odemis",
-  "seferihisar",
-  "selcuk",
-  "tire",
-  "torbali",
-  "uralsi",
-  "aliaga"
-];
-  kategoriler.forEach((kategori) => {
-    xml += `  <url>\n`;
-    xml += `    <loc>${baseUrl}/${kategori}.html</loc>\n`;
-    xml += `    <priority>0.8</priority>\n`;
-    xml += `  </url>\n`;
-  });
-
-  // İlan detayları
   ilanlar.forEach((ilan) => {
+    const id = ilan["İlan ID"];
+    if (!id) return;
+
     xml += `  <url>\n`;
-    xml += `    <loc>${baseUrl}/ilan-detay.html?id=${ilan["İlan ID"]}</loc>\n`;
+    xml += `    <loc>${BASE_URL}/ilan-detay.html?id=${id}</loc>\n`;
+    // İstersen son güncelleme tarihini bugün yaz:
     xml += `    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>\n`;
     xml += `    <priority>0.6</priority>\n`;
     xml += `  </url>\n`;
   });
 
-  xml += `</urlset>`;
-
-  // sitemap.xml olarak kaydet
-  fs.writeFileSync(path.join(__dirname, "sitemap-ilanlar.xml"), xml, "utf8");
-  console.log("✅ sitemap-ilanlar.xml oluşturuldu!");
+  xml += `</urlset>\n`;
+  return xml;
 }
 
-generateSitemap();
+// 4) Dosyaya yaz
+function writeFile() {
+  const xml = buildXml();
+  const outPath = path.join(__dirname, "sitemap-ilanlar.xml"); // <-- sadece ilanlar
+  fs.writeFileSync(outPath, xml, "utf8");
+  console.log("✅ sitemap-ilanlar.xml oluşturuldu (yalnızca ilan detayları).");
+}
+
+writeFile();
