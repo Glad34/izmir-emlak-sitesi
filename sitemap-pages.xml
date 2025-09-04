@@ -109,7 +109,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hizlievbul.com/tiyre.html</loc>
+    <loc>https://hizlievbul.com/tire.html</loc>
     <priority>0.8</priority>
   </url>
   <url>
@@ -117,7 +117,19 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hizlievbul.com/uralsi.html</loc>
+    <loc>https://hizlievbul.com/urla.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hizlievbul.com/alacati.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hizlievbul.com/aliaga.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hizlievbul.com/mordogan.html</loc>
     <priority>0.8</priority>
   </url>
 </urlset>
