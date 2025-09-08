@@ -7,5 +7,5 @@
 # Chatbot isteklerini Google Apps Script'e yönlendirir.
 [[redirects]]
   from = "/api/chatbot"
-  to = "https://script.google.com/macros/s/AKfycbxmODZr13UmoacRNBHJBD-cMp2wWVWmTDBxfSNi3j5-AjVWKlalldfQIBnuo_nI8cdH/exec" # EN SON ALDIĞINIZ APPS SCRIPT URL'Sİ
+  to = "https://script.google.com/macros/s/AKfycbxuoRjovvfdq0z9_Ym92dVhcPtOL8oWkQvxOTM70Rde2KfVecSbi2joGxvkXY8Mho5u/exec" # EN SON ALDIĞINIZ APPS SCRIPT URL'Sİ
   status = 200 # Bu, isteği bir proxy gibi davranarak yönlendirir.
