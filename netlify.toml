@@ -2,10 +2,3 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
-
-# YENİ EKLENEN PROXY YÖNLENDİRME KURALI
-# Chatbot isteklerini Google Apps Script'e yönlendirir.
-[[redirects]]
-  from = "/api/chatbot"
-  to = "https://script.google.com/macros/s/AKfycbzzjdIncY_g9SGaK5eSxo6NdSgTGWEy9ODiOlPc_qSjjmJEdGL5UrX1-6csLBXRgbY/exec" # EN SON ALDIĞINIZ APPS SCRIPT URL'Sİ
-  status = 200 # Bu, isteği bir proxy gibi davranarak yönlendirir.

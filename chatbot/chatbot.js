@@ -1,16 +1,20 @@
-console.log("🔥 chatbot.js V5 (GOOGLE APPS SCRIPT ENTEGRASYONU) YÜKLENDİ.");
+console.log("🔥 chatbot.js V4 (POPUP FİX) YÜKLENDİ.");
+
 
 // --- 1. AYARLAR ---
-// ÖNEMLİ: Google Apps Script'ten kopyaladığınız Web Uygulaması URL'sini bu satıra yapıştırın.
-const GAS_WEB_APP_URL = '/api/chatbot';
+const MAKE_DIALOG_WEBHOOK_URL = 'https://hook.eu2.make.com/c5dt1cwtpat7kk6i6oxilacno0yxnuif';
+const MAKE_STATUS_CHECK_URL = 'https://hook.eu2.make.com/jwfmybzglr2gjbgynuyeep7163nldzzj';
+
 
 // --- 2. HTML ELEMENTLERİ ---
 const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-input-form');
 const userInput = document.getElementById('user-input');
 
+
 // --- 3. STATE YÖNETİMİ ---
 let conversationHistory = [];
+
 
 // --- 4. OTURUM YÖNETİMİ ---
 function getOrCreateConversationId() {
@@ -22,9 +26,11 @@ function getOrCreateConversationId() {
     return id;
 }
 
+
 function saveHistoryToSession() {
     sessionStorage.setItem('chatHistory', JSON.stringify(conversationHistory));
 }
+
 
 function loadHistoryFromSession() {
     const savedHistory = sessionStorage.getItem('chatHistory');
@@ -40,62 +46,66 @@ function loadHistoryFromSession() {
     }
 }
 
+
 const conversationId = getOrCreateConversationId();
+
 
 // --- 5. OLAY DİNLEYİCİ ---
 chatForm.addEventListener('submit', handleFormSubmit);
 
+
 // --- 6. ANA FONKSİYONLAR ---
 
+
+// --- YENİ YARDIMCI FONKSİYON ---
+// Chatbot penceresi kapalıysa otomatik olarak açar.
 function openChatPopupIfNeeded() {
     const chatbotPopup = document.getElementById('chatbot-popup');
     if (chatbotPopup && chatbotPopup.classList.contains('chatbot-hidden')) {
         chatbotPopup.classList.remove('chatbot-hidden');
     }
 }
+// --- BİTİŞ ---
+
 
 async function handleFormSubmit(event) {
     if (event) event.preventDefault();
     const messageText = userInput.value.trim();
     if (messageText === '') return;
 
+
     addMessageToHistoryAndUI(messageText, 'user', false);
     userInput.value = '';
-    addMessageToHistoryAndUI('...', 'ai', false, true); 
+    addMessageToHistoryAndUI('...', 'ai', false, true);
+
 
     try {
-        const aiResponse = await sendMessageToGAS({ text: messageText });
+        const aiResponse = await sendMessageToMake({ text: messageText });
         updateLastMessage(aiResponse.cevap, true);
-        openChatPopupIfNeeded();
-        
+        openChatPopupIfNeeded(); // --- GÜNCELLENDİ ---
         if (aiResponse.status === 'tamamlandi') {
             startPollingForResults();
         }
     } catch (error) {
         console.error('Asistanla iletişimde hata:', error);
         updateLastMessage('Üzgünüm, bir hata oluştu. Lütfen daha sonra tekrar deneyin.', false);
-        openChatPopupIfNeeded();
+        openChatPopupIfNeeded(); // --- GÜNCELLENDİ ---
     }
 }
 
-async function sendMessageToGAS(payloadBody) {
-    // Apps Script'in bekledeği doğru formatta payload oluşturuluyor.
-    const fullPayload = {
-        action: 'handleMessage',
-        text: payloadBody.text,
-        history: conversationHistory.slice(0, -2), 
-        conversationId: conversationId // 'conversation_id' -> 'conversationId' olarak düzeltildi.
-    };
-    
-    const response = await fetch(GAS_WEB_APP_URL, {
+
+async function sendMessageToMake(payloadBody) {
+    const fullPayload = { ...payloadBody, conversation_id: conversationId };
+   
+    const response = await fetch(MAKE_DIALOG_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(fullPayload),
-        redirect: 'follow' 
+        body: JSON.stringify(fullPayload)
     });
     if (!response.ok) throw new Error(`Network hatası: ${response.status}`);
     return await response.json();
 }
+
 
 function addMessageToUI(content, sender, isHTML) {
     const messageElement = document.createElement('div');
@@ -110,11 +120,13 @@ function addMessageToUI(content, sender, isHTML) {
     return messageElement;
 }
 
+
 function addMessageToHistoryAndUI(content, sender, isHTML, isPending = false) {
     conversationHistory.push({ content, sender, isHTML, isPending });
     saveHistoryToSession();
     return addMessageToUI(content, sender, isHTML);
 }
+
 
 function updateLastMessage(newContent, isHTML) {
     if (conversationHistory.length > 0) {
@@ -134,6 +146,32 @@ function updateLastMessage(newContent, isHTML) {
     }
 }
 
+
+async function resolveStuckState() {
+    const lastMessage = conversationHistory[conversationHistory.length - 1];
+    if (!lastMessage || !lastMessage.isPending) {
+        return;
+    }
+
+
+    console.log("Takılı kalmış bir işlem tespit edildi. Son durum soruluyor...");
+   
+    try {
+        const aiResponse = await sendMessageToMake({});
+        updateLastMessage(aiResponse.cevap, true);
+        openChatPopupIfNeeded(); // --- GÜNCELLENDİ ---
+        if (aiResponse.status === 'tamamlandi') {
+            startPollingForResults();
+        }
+    } catch (error) {
+        console.error('Takılı kalan durum çözümlenirken hata:', error);
+        updateLastMessage('Önceki mesaja cevap alınırken bir hata oluştu.', false);
+        openChatPopupIfNeeded(); // --- GÜNCELLENDİ ---
+    }
+}
+
+
+// ... (startPollingForResults ve renderIlanSlider fonksiyonları buraya gelecek, içlerinde de değişiklik var) ...
 function startPollingForResults() {
     let pollCount = 0;
     const maxPolls = 24;
@@ -141,19 +179,14 @@ function startPollingForResults() {
         if (pollCount >= maxPolls) {
             clearInterval(intervalId);
             addMessageToHistoryAndUI("Sonuçların hazırlanması beklenenden uzun sürdü.", 'ai', false);
-            openChatPopupIfNeeded();
+            openChatPopupIfNeeded(); // --- GÜNCELLENDİ ---
             return;
         }
         try {
-            const response = await fetch(GAS_WEB_APP_URL, {
+            const response = await fetch(MAKE_STATUS_CHECK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // Apps Script'in bekledeği doğru formatta payload oluşturuluyor.
-                body: JSON.stringify({ 
-                    action: 'checkResults', 
-                    conversationId: conversationId // 'conversation_id' -> 'conversationId' olarak düzeltildi.
-                }),
-                redirect: 'follow'
+                body: JSON.stringify({ conversation_id: conversationId })
             });
             const data = await response.json();
            
@@ -164,27 +197,30 @@ function startPollingForResults() {
         } catch (error) {
             console.error("Sonuç kontrolü sırasında hata:", error);
             clearInterval(intervalId);
-            addMessageToHistoryAndUI("Sonuçlar alınırken bir hata oluştu.", "ai", false);
-            openChatPopupIfNeeded();
+            addMessageToHistoryAndUI("Sonuçlar alınırken bir veri formatı hatası oluştu.", "ai", false);
+            openChatPopupIfNeeded(); // --- GÜNCELLENDİ ---
         }
         pollCount++;
     }, 5000);
 }
 
+
 function renderIlanSlider(ilanSunumuBase64) {
     if (!ilanSunumuBase64) {
         addMessageToHistoryAndUI("Size uygun ilan bulunamadı.", 'ai', false);
-        openChatPopupIfNeeded();
+        openChatPopupIfNeeded(); // --- GÜNCELLENDİ ---
         return;
     }
     try {
+        // ... (slider oluşturma kodunun geri kalanı aynı) ...
         const ilanSunumuJSON = atob(ilanSunumuBase64);
         const veriObjesi = JSON.parse(ilanSunumuJSON);
         const ilanlarDizisi = veriObjesi.ilanlar;
 
+
         if (!Array.isArray(ilanlarDizisi) || ilanlarDizisi.length === 0) {
             addMessageToHistoryAndUI("Taleplerinize uygun bir ilan bulunamadı.", 'ai', false);
-            openChatPopupIfNeeded();
+            openChatPopupIfNeeded(); // --- GÜNCELLENDİ ---
             return;
         }
        
@@ -215,18 +251,24 @@ function renderIlanSlider(ilanSunumuBase64) {
         `;
                
         addMessageToHistoryAndUI(htmlContent, 'ai', true);
-        openChatPopupIfNeeded();
+        openChatPopupIfNeeded(); // --- GÜNCELLENDİ ---
+
 
     } catch (error) {
         console.error("İlan slider'ı oluşturulurken hata:", error);
         addMessageToHistoryAndUI("Sonuçlar görüntülenirken bir sorun oluştu.", 'ai', false);
-        openChatPopupIfNeeded();
+        openChatPopupIfNeeded(); // --- GÜNCELLENDİ ---
     }
 }
 
+
+
+
 // --- 8. BAŞLANGIÇ ---
-function initializeChat() {
+async function initializeChat() {
     loadHistoryFromSession();
+    await resolveStuckState();
 }
+
 
 initializeChat();
