@@ -2,7 +2,7 @@ console.log("🔥 chatbot.js V5 (GOOGLE APPS SCRIPT ENTEGRASYONU) YÜKLENDİ.");
 
 // --- 1. AYARLAR ---
 // ÖNEMLİ: Google Apps Script'ten kopyaladığınız Web Uygulaması URL'sini bu satıra yapıştırın.
-const GAS_WEB_APP_URL = '/api/chatbot';
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzzjdIncY_g9SGaK5eSxo6NdSgTGWEy9ODiOlPc_qSjjmJEdGL5UrX1-6csLBXRgbY/exec';
 
 // --- 2. HTML ELEMENTLERİ ---
 const chatMessages = document.getElementById('chat-messages');
