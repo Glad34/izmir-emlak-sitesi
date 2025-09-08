@@ -79,11 +79,12 @@ async function handleFormSubmit(event) {
 }
 
 async function sendMessageToGAS(payloadBody) {
+    // Apps Script'in bekledeği doğru formatta payload oluşturuluyor.
     const fullPayload = {
         action: 'handleMessage',
         text: payloadBody.text,
         history: conversationHistory.slice(0, -2), 
-        conversation_id: conversationId
+        conversationId: conversationId // 'conversation_id' -> 'conversationId' olarak düzeltildi.
     };
     
     const response = await fetch(GAS_WEB_APP_URL, {
@@ -147,9 +148,10 @@ function startPollingForResults() {
             const response = await fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                // Apps Script'in bekledeği doğru formatta payload oluşturuluyor.
                 body: JSON.stringify({ 
                     action: 'checkResults', 
-                    conversation_id: conversationId 
+                    conversationId: conversationId // 'conversation_id' -> 'conversationId' olarak düzeltildi.
                 }),
                 redirect: 'follow'
             });
