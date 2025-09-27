@@ -1,9 +1,8 @@
-# netlify.toml - DOĞRU VE TAM VERSİYON
+# netlify.toml - BASİTLEŞTİRİLMİŞ VE NİHAİ VERSİYON
 
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
-  included_files = ["data/ilanlar.json"]
 
 [[redirects]]
   from = "/api/*"
