@@ -1,12 +1,11 @@
-# netlify.toml - GÜNCELLENMİŞ VERSİYON
+# netlify.toml - DOĞRU VE TAM VERSİYON
 
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
-  # YENİ EKLENEN SATIR:
   included_files = ["data/ilanlar.json"]
 
 [[redirects]]
-  from = "
+  from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
