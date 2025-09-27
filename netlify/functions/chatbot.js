@@ -69,14 +69,16 @@ KESİN JSON ÇIKTI FORMATI
 `;
 
 // === GELİŞMİŞ filterListings FONKSİYONU (NOKTA TEMİZLEME EKLENDİ) ===
+// ESKİ filterListings FONKSİYONUNU SİLİP, YERİNE BUNU YAPIŞTIRIN
+
 function filterListings(strategy) {
   console.log("Filtreleme başladı. Strateji:", JSON.stringify(strategy, null, 2));
-  const kriterler = strategy.arama_stratejisi.musteri_kriterleri;
-  const bolge = strategy.arama_stratejisi.arama_bolgeleri[0];
+  // Düzeltme: Artık iç içe objeler beklemiyoruz. Doğrudan stratejiden okuyoruz.
+  const kriterler = strategy.arama_stratejisi;
 
   const filtered = allListings.filter(ilan => {
     // 1. ESNEK BÜTÇE FİLTRESİ
-    const butceStr = (bolge.fiyat_max || "").replace(/\./g, ''); // Noktaları temizle
+    const butceStr = (kriterler.bütçe || "").replace(/\./g, ''); // 'fiyat_max' yerine 'bütçe'
     if (butceStr) {
       let maxButce = 0;
       if (butceStr.includes('0 - 5000000')) { maxButce = 5000000; }
@@ -92,7 +94,7 @@ function filterListings(strategy) {
     }
 
     // 2. ARTAN ODA SAYISI FİLTRESİ
-    const minOdaSayisi = (kriterler.oda_sayisi || "").replace(' ve üzeri', '');
+    const minOdaSayisi = (kriterler.oda_sayısı || "").replace(' ve üzeri', ''); // 'oda_sayisi' yerine 'oda_sayısı'
     if (minOdaSayisi) {
       const startIndex = ODA_SAYISI_HIYERARSISI.indexOf(minOdaSayisi);
       if (startIndex > -1) {
@@ -110,14 +112,16 @@ function filterListings(strategy) {
         if (konutTipi === 'villa' && ilanTipi !== 'villa') return false;
     }
 
-    // 4. KONUM FİLTRESİ
-    const ilce = (bolge.bolge_adi || "").toLowerCase();
-    const mahalle = (bolge.konum_mahalle || "").toLowerCase();
+    // 4. KONUM FİLTRESİ (İLÇE VE MAHALLE)
+    const konumStr = (kriterler.konum || "").toLowerCase();
+    // Bu basit bir ayırıcı, daha karmaşık durumlar için geliştirilebilir.
+    const [ilce, mahalle] = konumStr.split(' ').map(s => s.trim());
+
     if (ilce && (!ilan.Konum || !ilan.Konum.toLowerCase().includes(ilce))) return false;
-    if (mahalle && mahalle !== "tümü" && (!ilan.Mahalle || !ilan.Mahalle.toLowerCase().includes(mahalle))) return false;
+    if (mahalle && (!ilan.Mahalle || !ilan.Mahalle.toLowerCase().includes(mahalle))) return false;
 
     // 5. EK KRİTERLER
-    const ekKriterler = (kriterler.ozel_kriterler_metin || "").toLowerCase();
+    const ekKriterler = (kriterler.ek_notlar || "").toLowerCase(); // 'ozel_kriterler_metin' yerine 'ek_notlar'
     if (ekKriterler.includes("balkon")) {
         if ((ilan.Balkon || "").toLowerCase() === 'yok' || (ilan.Balkon || "") === "N/A") return false;
     }
