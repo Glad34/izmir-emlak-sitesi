@@ -1,4 +1,4 @@
-// netlify/functions/chatbot.js - EKSİKSİZ VE NİHAİ KOD
+// netlify/functions/chatbot.js - EKSİKSİZ VE NİHAİ KOD (BÜTÇE HATASI DÜZELTİLDİ)
 
 require('dotenv').config();
 const { OpenAI } = require('openai');
@@ -13,7 +13,7 @@ const ODA_SAYISI_HIYERARSISI = ["1+1", "2+1", "2.5+1", "3+1", "3.5+1", "3+2", "4
 const DAIRE_TIPLERI = ["daire", "rezidans"];
 const MUSTAKIL_TIPLERI = ["villa", "müstakil ev", "köşk & konak", "yazlık", "yalı dairesi", "çiftlik evi"];
 
-// === GELİŞMİŞ SYSTEM PROMPT ===
+// === GELİŞMİŞ SYSTEM PROMPT (BÜTÇE SEÇENEKLERİ DÜZELTİLDİ) ===
 const systemPrompt = `
 KİMLİK
 Adın: Onur Başaran, proaktif ve akıllı bir Yapay Zeka Gayrimenkul Asistanı.
@@ -35,7 +35,18 @@ Her adımdaki görevi tamamla, bilgileri 'arama_stratejisi'ne kaydet ve bir sonr
     JSON Çıktısı: adim:"konum_sor", eylem:"soru_sor", cevap:"Harika bir seçim! Lütfen arama yapmak istediğiniz ilçe ve varsa mahalle bilgisini yazar mısınız? (Örn: Narlıdere, Yenikale)", secenekler:null
 
 5.  **butce_sor:** Müşterinin bütçesini sor.
-    JSON Çıktısı: adim:"butce_sor", eylem:"soru_sor", cevap:"Bütçe aralığınız nedir?", secenekler:["0 - 5 Müşteri 'Onayla' dedikten sonra, backend'in vereceği ilan sayısını bekle ve bu sayıya göre Akıllı Öneri yap.
+    JSON Çıktısı: adim:"butce_sor", eylem:"soru_sor", cevap:"Bütçe aralığınız nedir?", secenekler:["0 - 5.000.000 TL", "5.000.000 - 10.000.000 TL", "10.000.000 - 20.000.000 TL", "20.000.000 TL ve Üzeri"]
+
+6.  **oda_sor:** Müşterinin istediği minimum oda sayısını sor.
+    JSON Çıktısı: adim:"oda_sor", eylem:"soru_sor", cevap:"En az kaç odalı bir yer düşünüyorsunuz?", secenekler:["1+1", "2+1", "3+1", "4+1 ve üzeri"]
+
+7.  **ekstra_sor:** Müşterinin ek kriterlerini sor.
+    JSON Çıktısı: adim:"ekstra_sor", eylem:"soru_sor", cevap:"Neredeyse tamamız! Varsa, olmazsa olmaz dediğiniz ek özellikleri (balkon, otopark, bina yaşı vb.) yazabilirsiniz. Yoksa 'yok' yazmanız yeterli.", secenekler:null
+
+8.  **onay_goster:** Toplanan tüm bilgileri özetle ve müşteriden onay iste.
+    JSON Çıktısı: adim:"onay_goster", eylem:"soru_sor", cevap:"Harika! Kriterlerinizi özetliyorum:\\nİsim: [İsim]\\nAmaç: [Amaç]\\nKonut Tipi: [Tip]\\nKonum: [Konum]\\nBütçe: [Bütçe]\\nOda Sayısı: En az [Oda Sayısı]\\nEk Notlar: [Ek Notlar]\\n\\nBu bilgilerle aramayı başlatmamı onaylıyor musunuz?", secenekler:["Onayla ve İlanları Getir", "Filtreyi Değiştir"]
+
+9.  **onay_sonrasi:** Müşteri 'Onayla' dedikten sonra, backend'in vereceği ilan sayısını bekle ve bu sayıya göre Akıllı Öneri yap.
     *   Eğer İlan Sayısı Yeterliyse (5+): "Harika! Kriterlerinize uygun [X] adet ilan buldum." de. Seçenekler: ["İlanları Göster", "Filtreyi Değiştir"]. eylem: "soru_sor".
     *   Eğer İlan Sayısı Azsa (1-4): "[X] adet ilan bulabildim. Sonuçları artırmak için aramayı genişletelim mi?" de. Seçenekler: ["Evet, Genişletelim", "Hayır, Bu Şekilde Göster"]. eylem: "soru_sor".
     *   Eğer Hiç İlan Yoksa (0): "Maalesef bu kriterlere uygun hiç ilan bulamadım." de. Seçenekler: ["Filtreyi Değiştir"]. eylem: "soru_sor".
@@ -57,7 +68,7 @@ KESİN JSON ÇIKTI FORMATI
 }
 `;
 
-// === GELİŞMİŞ filterListings FONKSİYONU ===
+// === GELİŞMİŞ filterListings FONKSİYONU (NOKTA TEMİZLEME EKLENDİ) ===
 function filterListings(strategy) {
   console.log("Filtreleme başladı. Strateji:", JSON.stringify(strategy, null, 2));
   const kriterler = strategy.arama_stratejisi.musteri_kriterleri;
@@ -65,12 +76,12 @@ function filterListings(strategy) {
 
   const filtered = allListings.filter(ilan => {
     // 1. ESNEK BÜTÇE FİLTRESİ
-    const butceStr = (bolge.fiyat_max || "");
+    const butceStr = (bolge.fiyat_max || "").replace(/\./g, ''); // Noktaları temizle
     if (butceStr) {
       let maxButce = 0;
-      if (butceStr.includes('0 - 5')) { maxButce = 5000000; }
-      else if (butceStr.includes('5 - 10')) { maxButce = 10000000; }
-      else if (butceStr.includes('10 - 20')) { maxButce = 20000000; }
+      if (butceStr.includes('0 - 5000000')) { maxButce = 5000000; }
+      else if (butceStr.includes('5000000 - 10000000')) { maxButce = 10000000; }
+      else if (butceStr.includes('10000000 - 20000000')) { maxButce = 20000000; }
       else if (butceStr.includes('Üzeri')) { maxButce = Infinity; }
 
       if (maxButce !== Infinity && maxButce > 0) {
@@ -99,13 +110,13 @@ function filterListings(strategy) {
         if (konutTipi === 'villa' && ilanTipi !== 'villa') return false;
     }
 
-    // 4. KONUM FİLTRESİ (İLÇE VE MAHALLE)
+    // 4. KONUM FİLTRESİ
     const ilce = (bolge.bolge_adi || "").toLowerCase();
     const mahalle = (bolge.konum_mahalle || "").toLowerCase();
     if (ilce && (!ilan.Konum || !ilan.Konum.toLowerCase().includes(ilce))) return false;
     if (mahalle && mahalle !== "tümü" && (!ilan.Mahalle || !ilan.Mahalle.toLowerCase().includes(mahalle))) return false;
 
-    // 5. EK KRİTERLER (Kullanıcının serbest metinle yazdığı)
+    // 5. EK KRİTERLER
     const ekKriterler = (kriterler.ozel_kriterler_metin || "").toLowerCase();
     if (ekKriterler.includes("balkon")) {
         if ((ilan.Balkon || "").toLowerCase() === 'yok' || (ilan.Balkon || "") === "N/A") return false;
@@ -121,14 +132,13 @@ function filterListings(strategy) {
   return filtered;
 }
 
-// === ANA HANDLER FONKSİYONU (YENİ AKIŞ İLE) ===
+// === ANA HANDLER FONKSİYONU ===
 exports.handler = async function (event, context) {
     try {
         const { message, history } = JSON.parse(event.body);
         const isNewConversation = !history && !message;
         const promptMessage = isNewConversation ? "Yeni bir konuşma başlat." : message;
 
-        // Adım 1: AI'dan mevcut duruma göre ne yapacağını öğren
         const initialResponse = await openai.chat.completions.create({
           model: "gpt-4-turbo",
           messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `KONUŞMA GEÇMİŞİ:${history}\n\nSon Soru:${promptMessage}` }],
@@ -137,11 +147,9 @@ exports.handler = async function (event, context) {
 
         let aiResponse = JSON.parse(initialResponse.choices[0].message.content);
 
-        // Adım 2: Eğer AI 'onay_sonrasi' adımına geldiyse, filtrele ve sonucu AI'ye geri besle
         if (aiResponse.adim === 'onay_sonrasi') {
             const foundListings = filterListings(aiResponse);
             const ilanSayisi = foundListings.length;
-
             const reportPrompt = `SİSTEM NOTU: Filtreleme yapıldı ve ${ilanSayisi} adet ilan bulundu. Şimdi GÖREV AKIŞI'ndaki 'onay_sonrasi' adımını bu bilgiye göre uygula ve kullanıcıya seçenek sun.`;
             
             const finalResponse = await openai.chat.completions.create({
@@ -152,7 +160,6 @@ exports.handler = async function (event, context) {
             aiResponse = JSON.parse(finalResponse.choices[0].message.content);
         }
         
-        // Adım 3: Eğer AI son sunum adımındaysa, ilanları gerçekten ekle
         if (aiResponse.eylem === "sunum_yap") {
             const foundListings = filterListings(aiResponse);
             aiResponse.ilan_sonuclari = {
@@ -162,8 +169,8 @@ exports.handler = async function (event, context) {
                 }))
             };
             aiResponse.cevap = `Harika! Kriterlerinize uygun ${foundListings.length} ilan arasından öne çıkanlar şunlar. Tüm listeyi size gönderebilmem için telefon numaranızı paylaşır mısınız?`;
-            aiResponse.secenekler = null; // Telefon isteme adımında butonları kaldır
-            aiResponse.adim = "telefon_iste"; // Frontend'in metin girişini açması için
+            aiResponse.secenekler = null;
+            aiResponse.adim = "telefon_iste";
         }
 
         return { statusCode: 200, body: JSON.stringify(aiResponse) };
