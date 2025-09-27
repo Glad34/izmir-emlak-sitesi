@@ -1,4 +1,4 @@
-// chatbot/chatbot-ui.js dosyasının TAMAMI
+// chatbot/chatbot-ui.js - EKSİKSİZ VE NİHAİ KOD
 
 document.addEventListener('DOMContentLoaded', () => {
     const userInput = document.getElementById('user-input');
@@ -8,10 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let conversationHistory = "";
     let isWaitingForUserInput = true;
 
-    // Başlangıç mesajını bot'tan alarak süreci başlat
+    // Chatbot'u başlatmak için backend'e boş bir ilk mesaj gönder
     sendMessage("", true); 
     
-    // FORM GÖNDERME EYLEMİ
+    // KULLANICI METİN GİRİP GÖNDERDİĞİNDE
     chatForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const message = userInput.value.trim();
@@ -21,11 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ANA MESAJ GÖNDERME FONKSİYONU
     async function sendMessage(message, isInitial = false) {
+        // İlk mesaj (boş olan) hariç, kullanıcının yazdığını ekrana ekle
         if (!isInitial) {
             addMessageToUI('user', message);
         }
         userInput.value = '';
-        userInput.disabled = true;
+        userInput.disabled = true; // Cevap gelene kadar metin girişini kilitle
         isWaitingForUserInput = false;
         
         try {
@@ -39,41 +40,48 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) throw new Error('Network response was not ok.');
+            
             const data = await response.json();
 
+            // Konuşma geçmişini, bir sonraki istekte göndermek üzere güncelle
             conversationHistory += `Kullanıcı: ${message}\nAsistan: ${data.cevap}\n`;
 
+            // AI'nın cevabını ekrana ekle
             addMessageToUI('ai', data.cevap);
+            
+            // Gelen cevaba göre butonları, ilanları veya metin girişini yönet
             handleAiResponse(data);
 
         } catch (error) {
             console.error('Fetch error:', error);
             addMessageToUI('ai', 'Üzgünüm, bir sorunla karşılaştım.');
-            userInput.disabled = false;
+            userInput.disabled = false; // Hata durumunda metin girişini tekrar aç
             isWaitingForUserInput = true;
         }
     }
     
-    // YENİ: AI CEVABINI İŞLEYEN FONKSİYON
+    // AI CEVABINI İŞLEYEN ANA MANTIK
     function handleAiResponse(data) {
-        clearOptions(); // Önceki butonları temizle
+        clearOptions(); // Önceki adımdan kalan butonları temizle
 
-        if (data.soru_tipi === 'buttons' && data.secenekler) {
+        // Eğer backend seçenekler gönderdiyse, butonları oluştur
+        if (data.secenekler && data.secenekler.length > 0) {
             userInput.placeholder = "Lütfen bir seçenek seçin...";
             renderButtons(data.secenekler);
         } else {
+            // Backend buton göndermediyse, metin girişini tekrar aktif et
             userInput.placeholder = "İsteklerinizi buraya yazın...";
             userInput.disabled = false;
             isWaitingForUserInput = true;
         }
 
+        // Eğer backend ilan sonuçları gönderdiyse, ilan kartlarını oluştur
         if (data.ilan_sonuclari && data.ilan_sonuclari.sunum.length > 0) {
             addListingsToUI(data.ilan_sonuclari);
-            // Sonrasında telefon isteme mantığı buraya eklenebilir.
         }
     }
     
-    // YENİ: BUTONLARI EKRANA ÇİZEN FONKSİYON
+    // BUTONLARI OLUŞTURAN FONKSİYON
     function renderButtons(options) {
         const optionsContainer = document.createElement('div');
         optionsContainer.id = 'chat-options-container';
@@ -83,8 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
             button.textContent = optionText;
             button.classList.add('chat-option-button');
             button.addEventListener('click', () => {
+                // Butona tıklandığında, metnini mesaj olarak gönder
                 sendMessage(optionText);
-                clearOptions();
+                clearOptions(); // Butonlara tıklandıktan sonra onları kaldır
             });
             optionsContainer.appendChild(button);
         });
@@ -100,17 +109,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ARAYÜZE MESAJ EKLEME FONKSİYONU
+    // ARAYÜZE METİN MESAJI EKLEME FONKSİYONU
     function addMessageToUI(sender, text) {
         const messageWrapper = document.createElement('div');
         messageWrapper.classList.add('message', `${sender}-message`);
         const messageParagraph = document.createElement('p');
-        messageParagraph.innerHTML = text.replace(/\n/g, '<br>'); // Satır atlamalarını <br>'ye çevir
+        // AI'nın özet metnindeki \n'leri HTML'deki <br>'ye çevirerek satır atlamalarını sağla
+        messageParagraph.innerHTML = text.replace(/\\n/g, '<br>');
         messageWrapper.appendChild(messageParagraph);
         messagesContainer.appendChild(messageWrapper);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    // İLANLARI EKLEME FONKSİYONU
-    function addListingsToUI(results) { /* Bu fonksiyon aynı kalabilir */ }
+    // İLAN KARTLARINI OLUŞTURAN FONKSİYON
+    function addListingsToUI(results) {
+        const listingsContainer = document.createElement('div');
+        listingsContainer.classList.add('listings-preview');
+        
+        let listingsHTML = '';
+        // Backend'den gelen 'sunum' dizisindeki her ilan için bir kart oluştur
+        results.sunum.forEach(ilan => {
+            listingsHTML += `
+                <a href="${ilan.link}" target="_blank" class="ilan-card">
+                    <img src="${ilan.resim}" alt="${ilan.baslik}">
+                    <div class="ilan-info">
+                        <p class="ilan-baslik">${ilan.baslik}</p>
+                        <p class="ilan-fiyat">${ilan.fiyat}</p>
+                    </div>
+                </a>
+            `;
+        });
+        
+        listingsContainer.innerHTML = listingsHTML;
+        messagesContainer.appendChild(listingsContainer);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
 });

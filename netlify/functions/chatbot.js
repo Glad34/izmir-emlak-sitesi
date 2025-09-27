@@ -1,94 +1,63 @@
-// netlify/functions/chatbot.js - TAM KOD
+// netlify/functions/chatbot.js - EKSİKSİZ VE NİHAİ KOD
 
 require('dotenv').config();
 const { OpenAI } = require('openai');
-// YUKARIDA SİLDİĞİNİZ SATIRLARIN YERİNE BUNU EKLEYİN:
-const allListings = require('./ilan-data.js');
+const allListings = require('./ilan-data.js'); // Veriyi doğrudan koddan alıyoruz
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-
-
-// ODA SAYISI HİYERARŞİSİNİ KOD İÇİNDE TANIMLAYALIM
+// === FİLTRELEME İÇİN YARDIMCI VERİLER ===
 const ODA_SAYISI_HIYERARSISI = ["1+1", "2+1", "2.5+1", "3+1", "3.5+1", "3+2", "4+1", "4+2", "4.5+1", "5+1", "5+2", "6+2", "7+1", "7+2", "8+1", "10+1"];
+const DAIRE_TIPLERI = ["daire", "rezidans"];
+const MUSTAKIL_TIPLERI = ["villa", "müstakil ev", "köşk & konak", "yazlık", "yalı dairesi", "çiftlik evi"];
 
-// === YENİ VE DETAYLI SYSTEM PROMPT ===
+// === GELİŞMİŞ SYSTEM PROMPT ===
 const systemPrompt = `
 KİMLİK
-Adın: Onur Başaran, Yapay Zeka Gayrimenkul Asistanı.
-Görevin: Müşteriyi adım adım yönlendirerek bir emlak arama formu doldurmak. Her etkileşimde, mevcut adımı tamamla, bilgiyi 'arama_stratejisi'ne kaydet ve bir sonraki adıma geç. Cevabın daima aşağıda belirtilen JSON formatında olmalıdır. Your response must be in JSON format.
+Adın: Onur Başaran, proaktif ve akıllı bir Yapay Zeka Gayrimenkul Asistanı.
+Ana Görevin: Müşteriyi adım adım yönlendirerek bir emlak arama formu doldurmak, ardından filtreleme sonuçlarını analiz ederek kullanıcıya en iyi seçenekleri sunmak. Cevabın daima aşağıda belirtilen JSON formatında olmalıdır. Your response must be in JSON format.
 
-GÖREV AKIŞI (ADIM ADIM)
-Kullanıcıdan gelen her cevabı analiz et, ilgili alana kaydet ve listedeki bir sonraki soruyu sor. Tüm adımlar tamamlanana kadar sırayı takip et.
+GÖREV AKIŞI
+Her adımdaki görevi tamamla, bilgileri 'arama_stratejisi'ne kaydet ve bir sonraki adıma geç.
 
-1.  **isim_sor (Başlangıç Adımı):**
-    *   Görev: Müşterinin ismini sor.
-    *   JSON Çıktısı: status:"devam", sonraki_adim:"amac_sor", soru_tipi:"text", cevap:"Harika bir başlangıç yapalım! İsminizi öğrenebilir miyim?", secenekler:null
+1.  **isim_sor (Başlangıç):** Müşterinin ismini sor.
+    JSON Çıktısı: adim:"isim_sor", eylem:"soru_sor", cevap:"Harika bir başlangıç yapalım! İsminizi öğrenebilir miyim?", secenekler:null
 
-2.  **amac_sor:**
-    *   Görev: Müşterinin amacını sor.
-    *   JSON Çıktısı: status:"devam", sonraki_adim:"tip_sor", soru_tipi:"buttons", cevap:"Memnun oldum [Müşteri İsmi]! Peki, bu aramayı ne amaçla yapıyorsunuz?", secenekler:["Oturum Amaçlı", "Yatırım Amaçlı"]
+2.  **amac_sor:** Müşterinin amacını sor.
+    JSON Çıktısı: adim:"amac_sor", eylem:"soru_sor", cevap:"Memnun oldum [Müşteri İsmi]! Peki, bu aramayı ne amaçla yapıyorsunuz?", secenekler:["Oturum Amaçlı", "Yatırım Amaçlı"]
 
-3.  **tip_sor:**
-    *   Görev: Müşterinin aradığı konut tipini sor.
-    *   JSON Çıktısı: status:"devam", sonraki_adim:"konum_sor", soru_tipi:"buttons", cevap:"Anlaşıldı. Ne tür bir mülk arıyorsunuz?", secenekler:["Daire", "Müstakil Ev", "Villa"]
+3.  **tip_sor:** Müşterinin aradığı konut tipini sor.
+    JSON Çıktısı: adim:"tip_sor", eylem:"soru_sor", cevap:"Anlaşıldı. Ne tür bir mülk arıyorsunuz?", secenekler:["Daire", "Müstakil Ev", "Villa"]
 
-4.  **konum_sor:**
-    *   Görev: Müşterinin aradığı ilçe ve mahalleyi sor.
-    *   JSON Çıktısı: status:"devam", sonraki_adim:"butce_sor", soru_tipi:"text", cevap:"Harika bir seçim! Lütfen arama yapmak istediğiniz ilçe ve varsa mahalle bilgisini yazar mısınız? (Örn: Narlıdere, Yenikale)", secenekler:null
+4.  **konum_sor:** Müşterinin aradığı ilçe ve mahalleyi sor.
+    JSON Çıktısı: adim:"konum_sor", eylem:"soru_sor", cevap:"Harika bir seçim! Lütfen arama yapmak istediğiniz ilçe ve varsa mahalle bilgisini yazar mısınız? (Örn: Narlıdere, Yenikale)", secenekler:null
 
-5.  **butce_sor:**
-    *   Görev: Müşterinin bütçesini sor.
-    *   JSON Çıktısı: status:"devam", sonraki_adim:"oda_sor", soru_tipi:"buttons", cevap:"Bütçe aralığınız nedir?", secenekler:["0 - 5 Milyon TL", "5 - 10 Milyon TL", "10 - 20 Milyon TL", "20 Milyon TL ve Üzeri"]
+5.  **butce_sor:** Müşterinin bütçesini sor.
+    JSON Çıktısı: adim:"butce_sor", eylem:"soru_sor", cevap:"Bütçe aralığınız nedir?", secenekler:["0 - 5 Müşteri 'Onayla' dedikten sonra, backend'in vereceği ilan sayısını bekle ve bu sayıya göre Akıllı Öneri yap.
+    *   Eğer İlan Sayısı Yeterliyse (5+): "Harika! Kriterlerinize uygun [X] adet ilan buldum." de. Seçenekler: ["İlanları Göster", "Filtreyi Değiştir"]. eylem: "soru_sor".
+    *   Eğer İlan Sayısı Azsa (1-4): "[X] adet ilan bulabildim. Sonuçları artırmak için aramayı genişletelim mi?" de. Seçenekler: ["Evet, Genişletelim", "Hayır, Bu Şekilde Göster"]. eylem: "soru_sor".
+    *   Eğer Hiç İlan Yoksa (0): "Maalesef bu kriterlere uygun hiç ilan bulamadım." de. Seçenekler: ["Filtreyi Değiştir"]. eylem: "soru_sor".
 
-6.  **oda_sor:**
-    *   Görev: Müşterinin istediği minimum oda sayısını sor.
-    *   JSON Çıktısı: status:"devam", sonraki_adim:"ekstra_sor", soru_tipi:"buttons", cevap:"En az kaç odalı bir yer düşünüyorsunuz?", secenekler:["1+1", "2+1", "3+1", "4+1 ve üzeri"]
+10. **sunum_yap:** Kullanıcı sonuçları görmeyi onaylarsa ("İlanları Göster" veya "Hayır, Bu Şekilde Göster" derse), backend'e son talimatı ver.
+    JSON Çıktısı: adim:"sunum_yap", eylem:"sunum_yap", cevap:"Harika! Öne çıkan ilanlar şunlar...", secenekler:null
 
-7.  **ekstra_sor:**
-    *   Görev: Müşterinin ek kriterlerini sor.
-    *   JSON Çıktısı: status:"devam", sonraki_adim:"onay_goster", soru_tipi:"text", cevap:"Neredeyse tamamız! Varsa, olmazsa olmaz dediğiniz ek özellikleri (balkon, otopark, bina yaşı vb.) yazabilirsiniz. Yoksa 'yok' yazmanız yeterli.", secenekler:null
-
-8.  **onay_goster:**
-    *   Görev: Toplanan tüm bilgileri özetle ve müşteriden onay iste. Cevap metnini toplanan bilgilerle oluştur.
-    *   JSON Çıktısı: status:"devam", sonraki_adim:"filtrele", soru_tipi:"buttons", cevap:"Harika! Kriterlerinizi özetliyorum:\\nİsim: [İsim]\\nAmaç: [Amaç]\\nKonut Tipi: [Tip]\\nKonum: [Konum]\\nBütçe: [Bütçe]\\nOda Sayısı: En az [Oda Sayısı]\\nEk Notlar: [Ek Notlar]\\n\\nBu bilgilerle aramayı başlatmamı onaylıyor musunuz?", secenekler:["Onayla ve İlanları Getir", "Kriterleri Değiştir"]
-
-9.  **filtrele:**
-    *   Görev: Müşteri onaylarsa, filtreleme için son JSON'ı hazırla.
-    *   JSON Çıktısı: status:"tamamlandi", filtre:"Var", sonraki_adim:null, soru_tipi:null, cevap:"Onayınız için teşekkürler! Sizin için en uygun ilanları hazırlıyorum...", secenekler:null
-
-EĞER KULLANICI "Kriterleri Değiştir" DERSE, akışı "isim_sor" adımına geri döndür ve her şeyi baştan sorarak bilgileri güncelle.
+EĞER KULLANICI "Filtreyi Değiştir" DERSE, akışı "isim_sor" adımına geri döndür ve her şeyi baştan sorarak bilgileri güncelle.
 
 KESİN JSON ÇIKTI FORMATI
 {
 "status": "devam" | "tamamlandi",
 "filtre": "devam" | "Var" | "Yok",
-"sonraki_adim": "amac_sor",
-"soru_tipi": "text" | "buttons",
+"adim": "amac_sor",
+"eylem": "soru_sor" | "sonuc_raporla" | "sunum_yap",
 "cevap": "Müşteriye gösterilecek mesaj.",
 "secenekler": ["Seçenek 1", "Seçenek 2"] | null,
-"arama_stratejisi": {
-    "musteri_kriterleri": {
-        "isim": null,
-        "amac": null,
-        "konut_tipi": null,
-        "oda_sayisi": null,
-        "ozel_kriterler_metin": null
-    },
-    "arama_bolgeleri": [
-        {
-            "bolge_adi": null,
-            "konum_mahalle": "Tümü",
-            "fiyat_max": null
-        }
-    ]
-}
+"arama_stratejisi": { ... }
 }
 `;
 
-// === GÜNCELLENMİŞ filterListings FONKSİYONU ===
+// === GELİŞMİŞ filterListings FONKSİYONU ===
 function filterListings(strategy) {
   console.log("Filtreleme başladı. Strateji:", JSON.stringify(strategy, null, 2));
   const kriterler = strategy.arama_stratejisi.musteri_kriterleri;
@@ -96,7 +65,7 @@ function filterListings(strategy) {
 
   const filtered = allListings.filter(ilan => {
     // 1. ESNEK BÜTÇE FİLTRESİ
-    const butceStr = bolge.fiyat_max || ""; // Örn: "5 - 10 Milyon TL"
+    const butceStr = (bolge.fiyat_max || "");
     if (butceStr) {
       let maxButce = 0;
       if (butceStr.includes('0 - 5')) { maxButce = 5000000; }
@@ -105,16 +74,14 @@ function filterListings(strategy) {
       else if (butceStr.includes('Üzeri')) { maxButce = Infinity; }
 
       if (maxButce !== Infinity && maxButce > 0) {
-          const esneklikPayi = maxButce >= 10000000 ? 1000000 : 500000;
-          maxButce += esneklikPayi; // Bütçeye esneklik payı ekle
+        const esneklikPayi = maxButce >= 10000000 ? 1000000 : 500000;
+        maxButce += esneklikPayi;
       }
-
-      const ilanFiyati = parseInt(ilan.Fiyat);
-      if (ilanFiyati > maxButce) return false;
+      if (parseInt(ilan.Fiyat) > maxButce) return false;
     }
 
     // 2. ARTAN ODA SAYISI FİLTRESİ
-    const minOdaSayisi = (kriterler.oda_sayisi || "").replace(' ve üzeri', ''); // Örn: "2+1"
+    const minOdaSayisi = (kriterler.oda_sayisi || "").replace(' ve üzeri', '');
     if (minOdaSayisi) {
       const startIndex = ODA_SAYISI_HIYERARSISI.indexOf(minOdaSayisi);
       if (startIndex > -1) {
@@ -122,78 +89,87 @@ function filterListings(strategy) {
         if (!kabulEdilenOdaSayilari.includes(ilan['Oda Sayısı'])) return false;
       }
     }
-    
-    // 3. DİĞER FİLTRELER
-    if (bolge.bolge_adi && (!ilan.Konum || !ilan.Konum.toLowerCase().includes(bolge.bolge_adi.toLowerCase()))) return false;
-    if (bolge.konum_mahalle && bolge.konum_mahalle !== "Tümü" && (!ilan.Mahalle || !ilan.Mahalle.toLowerCase().includes(bolge.konum_mahalle.toLowerCase()))) return false;
-    if (kriterler.konut_tipi && ilan['Konut Tipi'] !== kriterler.konut_tipi) return false;
 
-    return true; // Tüm filtrelerden geçti
+    // 3. GRUPLANMIŞ KONUT TİPİ FİLTRESİ
+    const konutTipi = (kriterler.konut_tipi || "").toLowerCase();
+    if (konutTipi) {
+        const ilanTipi = (ilan['Konut Tipi'] || "").toLowerCase();
+        if (konutTipi === 'daire' && !DAIRE_TIPLERI.includes(ilanTipi)) return false;
+        if (konutTipi === 'müstakil ev' && !MUSTAKIL_TIPLERI.includes(ilanTipi)) return false;
+        if (konutTipi === 'villa' && ilanTipi !== 'villa') return false;
+    }
+
+    // 4. KONUM FİLTRESİ (İLÇE VE MAHALLE)
+    const ilce = (bolge.bolge_adi || "").toLowerCase();
+    const mahalle = (bolge.konum_mahalle || "").toLowerCase();
+    if (ilce && (!ilan.Konum || !ilan.Konum.toLowerCase().includes(ilce))) return false;
+    if (mahalle && mahalle !== "tümü" && (!ilan.Mahalle || !ilan.Mahalle.toLowerCase().includes(mahalle))) return false;
+
+    // 5. EK KRİTERLER (Kullanıcının serbest metinle yazdığı)
+    const ekKriterler = (kriterler.ozel_kriterler_metin || "").toLowerCase();
+    if (ekKriterler.includes("balkon")) {
+        if ((ilan.Balkon || "").toLowerCase() === 'yok' || (ilan.Balkon || "") === "N/A") return false;
+    }
+    if (ekKriterler.includes("otopark")) {
+        if ((ilan.Otopark || "").toLowerCase() === 'yok') return false;
+    }
+    
+    return true;
   });
 
   console.log(`Filtreleme tamamlandı. Bulunan ilan sayısı: ${filtered.length}`);
   return filtered;
 }
 
-// === ANA HANDLER FONKSİYONU ===
+// === ANA HANDLER FONKSİYONU (YENİ AKIŞ İLE) ===
 exports.handler = async function (event, context) {
-    console.log("---------- FONKSİYON BAŞLADI ----------");
-    console.log("Gelen istek gövdesi:", event.body);
-
-    if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, body: 'Method Not Allowed' };
-    }
-
     try {
         const { message, history } = JSON.parse(event.body);
-        
-        // Yeni konuşma başlangıcını yönet
         const isNewConversation = !history && !message;
         const promptMessage = isNewConversation ? "Yeni bir konuşma başlat." : message;
 
-        const fullPrompt = `KONUŞMA GEÇMİŞİ:${history}\n\nSon Soru:${promptMessage}`;
-        
-        console.log("OpenAI API'sine istek gönderiliyor...");
-
-        const completion = await openai.chat.completions.create({
+        // Adım 1: AI'dan mevcut duruma göre ne yapacağını öğren
+        const initialResponse = await openai.chat.completions.create({
           model: "gpt-4-turbo",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: fullPrompt }
-          ],
+          messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `KONUŞMA GEÇMİŞİ:${history}\n\nSon Soru:${promptMessage}` }],
           response_format: { type: "json_object" }
         });
 
-        console.log("OpenAI'den cevap başarıyla alındı.");
-        let aiResponse = JSON.parse(completion.choices[0].message.content);
+        let aiResponse = JSON.parse(initialResponse.choices[0].message.content);
 
-        if (aiResponse.filtre === "Var") {
-          const foundListings = filterListings(aiResponse);
-          aiResponse.ilan_sonuclari = {
-            toplam_sayi: foundListings.length,
-            sunum: foundListings.slice(0, 2).map(ilan => ({
-              id: ilan['İlan ID'],
-              baslik: ilan.Başlık,
-              fiyat: new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(ilan.Fiyat),
-              resim: ilan['Görsel Linki'],
-              link: `ilan-detay.html?id=${ilan['İlan ID']}`
-            }))
-          };
+        // Adım 2: Eğer AI 'onay_sonrasi' adımına geldiyse, filtrele ve sonucu AI'ye geri besle
+        if (aiResponse.adim === 'onay_sonrasi') {
+            const foundListings = filterListings(aiResponse);
+            const ilanSayisi = foundListings.length;
+
+            const reportPrompt = `SİSTEM NOTU: Filtreleme yapıldı ve ${ilanSayisi} adet ilan bulundu. Şimdi GÖREV AKIŞI'ndaki 'onay_sonrasi' adımını bu bilgiye göre uygula ve kullanıcıya seçenek sun.`;
+            
+            const finalResponse = await openai.chat.completions.create({
+                model: "gpt-4-turbo",
+                messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `KONUŞMA GEÇMİŞİ:${history}\n\nSon Soru:${promptMessage}\n\n${reportPrompt}` }],
+                response_format: { type: "json_object" }
+            });
+            aiResponse = JSON.parse(finalResponse.choices[0].message.content);
+        }
+        
+        // Adım 3: Eğer AI son sunum adımındaysa, ilanları gerçekten ekle
+        if (aiResponse.eylem === "sunum_yap") {
+            const foundListings = filterListings(aiResponse);
+            aiResponse.ilan_sonuclari = {
+                toplam_sayi: foundListings.length,
+                sunum: foundListings.slice(0, 2).map(ilan => ({
+                  id: ilan['İlan ID'], baslik: ilan.Başlık, fiyat: new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(ilan.Fiyat), resim: ilan['Görsel Linki'], link: `ilan-detay.html?id=${ilan['İlan ID']}`
+                }))
+            };
+            aiResponse.cevap = `Harika! Kriterlerinize uygun ${foundListings.length} ilan arasından öne çıkanlar şunlar. Tüm listeyi size gönderebilmem için telefon numaranızı paylaşır mısınız?`;
+            aiResponse.secenekler = null; // Telefon isteme adımında butonları kaldır
+            aiResponse.adim = "telefon_iste"; // Frontend'in metin girişini açması için
         }
 
-        return {
-          statusCode: 200,
-          body: JSON.stringify(aiResponse),
-        };
+        return { statusCode: 200, body: JSON.stringify(aiResponse) };
 
     } catch (error) {
-        console.error("---------- HATA OLUŞTU ----------");
-        console.error("Hatanın tam metni:", error);
-        console.error("------------------------------");
-
-        return {
-          statusCode: 500,
-          body: JSON.stringify({ error: 'Sunucu tarafında bir hata oluştu.' }),
-        };
+        console.error("HATA OLUŞTU:", error);
+        return { statusCode: 500, body: JSON.stringify({ error: 'Sunucu tarafında bir hata oluştu.' }) };
     }
 };

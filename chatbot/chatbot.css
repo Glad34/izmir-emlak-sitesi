@@ -168,3 +168,9 @@
     color: white;
     border-color: #007bff;
 }
+
+.listings-preview {
+    display: flex;
+    flex-direction: row; /* Kartları yan yana dizer */
+    gap: 10px;
+}
