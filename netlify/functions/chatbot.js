@@ -2,16 +2,14 @@
 
 require('dotenv').config();
 const { OpenAI } = require('openai');
-const fs = require('fs');
-const path = require('path');
+// YUKARIDA SİLDİĞİNİZ SATIRLARIN YERİNE BUNU EKLEYİN:
+const allListings = require('./ilan-data.js');
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Netlify'ın included_files kuralı, dosyanın fonksiyon kök dizininde olmasını sağlar.
-const listingsPath = path.resolve(__dirname, 'ilanlar.json');
-const allListings = JSON.parse(fs.readFileSync(listingsPath, 'utf8'));
+
 
 // ODA SAYISI HİYERARŞİSİNİ KOD İÇİNDE TANIMLAYALIM
 const ODA_SAYISI_HIYERARSISI = ["1+1", "2+1", "2.5+1", "3+1", "3.5+1", "3+2", "4+1", "4+2", "4.5+1", "5+1", "5+2", "6+2", "7+1", "7+2", "8+1", "10+1"];
