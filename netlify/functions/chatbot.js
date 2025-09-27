@@ -71,14 +71,16 @@ KESİN JSON ÇIKTI FORMATI
 // === GELİŞMİŞ filterListings FONKSİYONU (NOKTA TEMİZLEME EKLENDİ) ===
 // ESKİ filterListings FONKSİYONUNU SİLİP, YERİNE BUNU YAPIŞTIRIN
 
+// === KURŞUN GEÇİRMEZ filterListings FONKSİYONU ===
+// Mevcut filterListings fonksiyonunu silip, yerine bunu yapıştırın.
+
 function filterListings(strategy) {
   console.log("Filtreleme başladı. Strateji:", JSON.stringify(strategy, null, 2));
-  // Düzeltme: Artık iç içe objeler beklemiyoruz. Doğrudan stratejiden okuyoruz.
   const kriterler = strategy.arama_stratejisi;
 
   const filtered = allListings.filter(ilan => {
     // 1. ESNEK BÜTÇE FİLTRESİ
-    const butceStr = (kriterler.bütçe || "").replace(/\./g, ''); // 'fiyat_max' yerine 'bütçe'
+    const butceStr = (kriterler.bütçe || kriterler.butce || "").replace(/\./g, '');
     if (butceStr) {
       let maxButce = 0;
       if (butceStr.includes('0 - 5000000')) { maxButce = 5000000; }
@@ -86,42 +88,70 @@ function filterListings(strategy) {
       else if (butceStr.includes('10000000 - 20000000')) { maxButce = 20000000; }
       else if (butceStr.includes('Üzeri')) { maxButce = Infinity; }
 
-      if (maxButce !== Infinity && maxButce > 0) {
+      if (maxButce > 0 && maxButce !== Infinity) {
         const esneklikPayi = maxButce >= 10000000 ? 1000000 : 500000;
         maxButce += esneklikPayi;
       }
-      if (parseInt(ilan.Fiyat) > maxButce) return false;
+      if (parseInt(ilan.Fiyat) > maxButce) {
+        console.log(`İlan ${ilan['İlan ID']} bütçe nedeniyle elendi. Fiyat: ${ilan.Fiyat}, Max Bütçe: ${maxButce}`);
+        return false;
+      }
     }
 
     // 2. ARTAN ODA SAYISI FİLTRESİ
-    const minOdaSayisi = (kriterler.oda_sayısı || "").replace(' ve üzeri', ''); // 'oda_sayisi' yerine 'oda_sayısı'
+    const minOdaSayisi = (kriterler.oda_sayısı || kriterler.oda_sayisi || "").replace(' ve üzeri', '');
     if (minOdaSayisi) {
       const startIndex = ODA_SAYISI_HIYERARSISI.indexOf(minOdaSayisi);
       if (startIndex > -1) {
         const kabulEdilenOdaSayilari = ODA_SAYISI_HIYERARSISI.slice(startIndex);
-        if (!kabulEdilenOdaSayilari.includes(ilan['Oda Sayısı'])) return false;
+        if (!kabulEdilenOdaSayilari.includes(ilan['Oda Sayısı'])) {
+            console.log(`İlan ${ilan['İlan ID']} oda sayısı nedeniyle elendi. İstenen min: ${minOdaSayisi}, İlanın: ${ilan['Oda Sayısı']}`);
+            return false;
+        }
       }
     }
 
     // 3. GRUPLANMIŞ KONUT TİPİ FİLTRESİ
-    const konutTipi = (kriterler.konut_tipi || "").toLowerCase();
+    const konutTipi = (kriterler.konut_tipi || kriterler.tip || "").toLowerCase();
     if (konutTipi) {
         const ilanTipi = (ilan['Konut Tipi'] || "").toLowerCase();
-        if (konutTipi === 'daire' && !DAIRE_TIPLERI.includes(ilanTipi)) return false;
-        if (konutTipi === 'müstakil ev' && !MUSTAKIL_TIPLERI.includes(ilanTipi)) return false;
-        if (konutTipi === 'villa' && ilanTipi !== 'villa') return false;
+        let tipUygun = false;
+        if (konutTipi === 'daire' && DAIRE_TIPLERI.includes(ilanTipi)) tipUygun = true;
+        else if (konutTipi === 'müstakil ev' && MUSTAKIL_TIPLERI.includes(ilanTipi)) tipUygun = true;
+        else if (konutTipi === 'villa' && ilanTipi === 'villa') tipUygun = true;
+        
+        if (!tipUygun) {
+            console.log(`İlan ${ilan['İlan ID']} konut tipi nedeniyle elendi. İstenen: ${konutTipi}, İlanın: ${ilanTipi}`);
+            return false;
+        }
     }
 
-    // 4. KONUM FİLTRESİ (İLÇE VE MAHALLE)
+    // 4. SAĞLAM KONUM FİLTRESİ
     const konumStr = (kriterler.konum || "").toLowerCase();
-    // Bu basit bir ayırıcı, daha karmaşık durumlar için geliştirilebilir.
-    const [ilce, mahalle] = konumStr.split(' ').map(s => s.trim());
+    if (konumStr) {
+        const ilceler = ["balçova", "karabağlar", "bayraklı", "bornova", "karşıyaka", "narlıdere", "güzelbahçe", "çiğli", "buca", "konak", "çeşme", "urla"]; // ve diğerleri
+        let ilce = "";
+        let mahalle = konumStr;
 
-    if (ilce && (!ilan.Konum || !ilan.Konum.toLowerCase().includes(ilce))) return false;
-    if (mahalle && (!ilan.Mahalle || !ilan.Mahalle.toLowerCase().includes(mahalle))) return false;
+        ilceler.forEach(i => {
+            if (konumStr.includes(i)) {
+                ilce = i;
+                mahalle = konumStr.replace(i, "").trim();
+            }
+        });
 
+        if (ilce && (!ilan.Konum || !ilan.Konum.toLowerCase().includes(ilce))) {
+            console.log(`İlan ${ilan['İlan ID']} ilçe nedeniyle elendi. İstenen: ${ilce}, İlanın: ${ilan.Konum}`);
+            return false;
+        }
+        if (mahalle && (!ilan.Mahalle || !ilan.Mahalle.toLowerCase().includes(mahalle))) {
+            console.log(`İlan ${ilan['İlan ID']} mahalle nedeniyle elendi. İstenen: ${mahalle}, İlanın: ${ilan.Mahalle}`);
+            return false;
+        }
+    }
+    
     // 5. EK KRİTERLER
-    const ekKriterler = (kriterler.ek_notlar || "").toLowerCase(); // 'ozel_kriterler_metin' yerine 'ek_notlar'
+    const ekKriterler = (kriterler.ek_notlar || "").toLowerCase();
     if (ekKriterler.includes("balkon")) {
         if ((ilan.Balkon || "").toLowerCase() === 'yok' || (ilan.Balkon || "") === "N/A") return false;
     }
@@ -129,6 +159,7 @@ function filterListings(strategy) {
         if ((ilan.Otopark || "").toLowerCase() === 'yok') return false;
     }
     
+    console.log(`İlan ${ilan['İlan ID']} tüm filtrelerden geçti.`);
     return true;
   });
 
