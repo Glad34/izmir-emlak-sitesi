@@ -74,28 +74,38 @@ KESİN JSON ÇIKTI FORMATI
 // === KURŞUN GEÇİRMEZ filterListings FONKSİYONU ===
 // Mevcut filterListings fonksiyonunu silip, yerine bunu yapıştırın.
 
+// === NİHAİ filterListings FONKSİYONU (SAĞLAM BÜTÇE AYRIŞTIRMA İLE) ===
+// Mevcut filterListings fonksiyonunu silip, yerine bunu yapıştırın.
+
 function filterListings(strategy) {
   console.log("Filtreleme başladı. Strateji:", JSON.stringify(strategy, null, 2));
   const kriterler = strategy.arama_stratejisi;
 
   const filtered = allListings.filter(ilan => {
-    // 1. ESNEK BÜTÇE FİLTRESİ
-    const butceStr = (kriterler.bütçe || kriterler.butce || "").replace(/\./g, '');
+    // 1. SAĞLAM VE ESNEK BÜTÇE FİLTRESİ
+    const butceStr = (kriterler.bütçe || kriterler.butce || "");
     if (butceStr) {
-      let maxButce = 0;
-      if (butceStr.includes('0 - 5000000')) { maxButce = 5000000; }
-      else if (butceStr.includes('5000000 - 10000000')) { maxButce = 10000000; }
-      else if (butceStr.includes('10000000 - 20000000')) { maxButce = 20000000; }
-      else if (butceStr.includes('Üzeri')) { maxButce = Infinity; }
+        // Metindeki tüm sayıları bulur (örn: "5.000.000 - 10.000.000" -> ["5000000", "10000000"])
+        const sayilar = butceStr.match(/\d{1,3}(?:\.\d{3})*/g)?.map(s => s.replace(/\./g, '')) || [];
+        let maxButce = 0;
 
-      if (maxButce > 0 && maxButce !== Infinity) {
-        const esneklikPayi = maxButce >= 10000000 ? 1000000 : 500000;
-        maxButce += esneklikPayi;
-      }
-      if (parseInt(ilan.Fiyat) > maxButce) {
-        console.log(`İlan ${ilan['İlan ID']} bütçe nedeniyle elendi. Fiyat: ${ilan.Fiyat}, Max Bütçe: ${maxButce}`);
-        return false;
-      }
+        if (butceStr.includes('Üzeri')) {
+            maxButce = Infinity;
+        } else if (sayilar.length > 1) {
+            maxButce = parseInt(sayilar[1]); // Aralığın ikinci sayısını max olarak al
+        } else if (sayilar.length === 1) {
+            maxButce = parseInt(sayilar[0]); // Sadece tek sayı varsa onu max al (örn: "0-5M")
+        }
+        
+        if (maxButce > 0 && maxButce !== Infinity) {
+            const esneklikPayi = maxButce >= 10000000 ? 1000000 : 500000;
+            maxButce += esneklikPayi;
+        }
+
+        if (parseInt(ilan.Fiyat) > maxButce) {
+            console.log(`İlan ${ilan['İlan ID']} bütçe nedeniyle elendi. Fiyat: ${ilan.Fiyat}, Max Bütçe: ${maxButce}`);
+            return false;
+        }
     }
 
     // 2. ARTAN ODA SAYISI FİLTRESİ
@@ -127,9 +137,9 @@ function filterListings(strategy) {
     }
 
     // 4. SAĞLAM KONUM FİLTRESİ
-    const konumStr = (kriterler.konum || "").toLowerCase();
+    const konumStr = (kriterler.konum || "").toLowerCase().replace(',', ' ');
     if (konumStr) {
-        const ilceler = ["balçova", "karabağlar", "bayraklı", "bornova", "karşıyaka", "narlıdere", "güzelbahçe", "çiğli", "buca", "konak", "çeşme", "urla"]; // ve diğerleri
+        const ilceler = ["balçova", "karabağlar", "bayraklı", "bornova", "karşıyaka", "narlıdere", "güzelbahçe", "çiğli", "buca", "konak", "çeşme", "urla"];
         let ilce = "";
         let mahalle = konumStr;
 
