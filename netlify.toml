@@ -1,4 +1,10 @@
-# Mevcut Netlify Functions ayarlarınız (BUNLARA DOKUNMAYIN)
+# Netlify Functions ayarları (Tek ve birleştirilmiş blok)
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+# Yönlendirme kuralları
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200

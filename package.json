@@ -20,7 +20,9 @@
   "homepage": "https://github.com/Glad34/izmir-emlak-sitesi#readme",
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",
+    "dotenv": "^17.2.2",
     "jsonwebtoken": "^9.0.2",
-    "jwks-rsa": "^3.2.0"
+    "jwks-rsa": "^3.2.0",
+    "openai": "^5.23.1"
   }
 }

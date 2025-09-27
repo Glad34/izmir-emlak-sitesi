@@ -1,0 +1,6 @@
+# .gitignore dosyasına eklenecek satır
+/node_modules
+
+.env
+
+.netlify
