@@ -1,4 +1,4 @@
-// netlify/functions/chatbot.js - EKSİKSİZ VE NİHAİ KOD (BÜTÇE HATASI DÜZELTİLDİ)
+// netlify/functions/chatbot.js - EKSİKSİZ VE NİHAİ KOD (KONUM HATASI DÜZELTİLDİ)
 
 require('dotenv').config();
 const { OpenAI } = require('openai');
@@ -13,7 +13,7 @@ const ODA_SAYISI_HIYERARSISI = ["1+1", "2+1", "2.5+1", "3+1", "3.5+1", "3+2", "4
 const DAIRE_TIPLERI = ["daire", "rezidans"];
 const MUSTAKIL_TIPLERI = ["villa", "müstakil ev", "köşk & konak", "yazlık", "yalı dairesi", "çiftlik evi"];
 
-// === GELİŞMİŞ SYSTEM PROMPT (BÜTÇE SEÇENEKLERİ DÜZELTİLDİ) ===
+// === GELİŞMİŞ SYSTEM PROMPT ===
 const systemPrompt = `
 KİMLİK
 Adın: Onur Başaran, proaktif ve akıllı bir Yapay Zeka Gayrimenkul Asistanı.
@@ -57,26 +57,10 @@ Her adımdaki görevi tamamla, bilgileri 'arama_stratejisi'ne kaydet ve bir sonr
 EĞER KULLANICI "Filtreyi Değiştir" DERSE, akışı "isim_sor" adımına geri döndür ve her şeyi baştan sorarak bilgileri güncelle.
 
 KESİN JSON ÇIKTI FORMATI
-{
-"status": "devam" | "tamamlandi",
-"filtre": "devam" | "Var" | "Yok",
-"adim": "amac_sor",
-"eylem": "soru_sor" | "sonuc_raporla" | "sunum_yap",
-"cevap": "Müşteriye gösterilecek mesaj.",
-"secenekler": ["Seçenek 1", "Seçenek 2"] | null,
-"arama_stratejisi": { ... }
-}
+{ "status": "devam", "filtre": "devam", "adim": "amac_sor", "eylem": "soru_sor", "cevap": "...", "secenekler": [], "arama_stratejisi": { ... } }
 `;
 
-// === GELİŞMİŞ filterListings FONKSİYONU (NOKTA TEMİZLEME EKLENDİ) ===
-// ESKİ filterListings FONKSİYONUNU SİLİP, YERİNE BUNU YAPIŞTIRIN
-
-// === KURŞUN GEÇİRMEZ filterListings FONKSİYONU ===
-// Mevcut filterListings fonksiyonunu silip, yerine bunu yapıştırın.
-
-// === NİHAİ filterListings FONKSİYONU (SAĞLAM BÜTÇE AYRIŞTIRMA İLE) ===
-// Mevcut filterListings fonksiyonunu silip, yerine bunu yapıştırın.
-
+// === NİHAİ filterListings FONKSİYONU (DOĞRU KONUM FİLTRESİ İLE) ===
 function filterListings(strategy) {
   console.log("Filtreleme başladı. Strateji:", JSON.stringify(strategy, null, 2));
   const kriterler = strategy.arama_stratejisi;
@@ -85,27 +69,17 @@ function filterListings(strategy) {
     // 1. SAĞLAM VE ESNEK BÜTÇE FİLTRESİ
     const butceStr = (kriterler.bütçe || kriterler.butce || "");
     if (butceStr) {
-        // Metindeki tüm sayıları bulur (örn: "5.000.000 - 10.000.000" -> ["5000000", "10000000"])
         const sayilar = butceStr.match(/\d{1,3}(?:\.\d{3})*/g)?.map(s => s.replace(/\./g, '')) || [];
         let maxButce = 0;
-
-        if (butceStr.includes('Üzeri')) {
-            maxButce = Infinity;
-        } else if (sayilar.length > 1) {
-            maxButce = parseInt(sayilar[1]); // Aralığın ikinci sayısını max olarak al
-        } else if (sayilar.length === 1) {
-            maxButce = parseInt(sayilar[0]); // Sadece tek sayı varsa onu max al (örn: "0-5M")
-        }
+        if (butceStr.includes('Üzeri')) { maxButce = Infinity; }
+        else if (sayilar.length > 1) { maxButce = parseInt(sayilar[1]); }
+        else if (sayilar.length === 1) { maxButce = parseInt(sayilar[0]); }
         
         if (maxButce > 0 && maxButce !== Infinity) {
             const esneklikPayi = maxButce >= 10000000 ? 1000000 : 500000;
             maxButce += esneklikPayi;
         }
-
-        if (parseInt(ilan.Fiyat) > maxButce) {
-            console.log(`İlan ${ilan['İlan ID']} bütçe nedeniyle elendi. Fiyat: ${ilan.Fiyat}, Max Bütçe: ${maxButce}`);
-            return false;
-        }
+        if (parseInt(ilan.Fiyat) > maxButce) return false;
     }
 
     // 2. ARTAN ODA SAYISI FİLTRESİ
@@ -114,10 +88,7 @@ function filterListings(strategy) {
       const startIndex = ODA_SAYISI_HIYERARSISI.indexOf(minOdaSayisi);
       if (startIndex > -1) {
         const kabulEdilenOdaSayilari = ODA_SAYISI_HIYERARSISI.slice(startIndex);
-        if (!kabulEdilenOdaSayilari.includes(ilan['Oda Sayısı'])) {
-            console.log(`İlan ${ilan['İlan ID']} oda sayısı nedeniyle elendi. İstenen min: ${minOdaSayisi}, İlanın: ${ilan['Oda Sayısı']}`);
-            return false;
-        }
+        if (!kabulEdilenOdaSayilari.includes(ilan['Oda Sayısı'])) return false;
       }
     }
 
@@ -129,33 +100,22 @@ function filterListings(strategy) {
         if (konutTipi === 'daire' && DAIRE_TIPLERI.includes(ilanTipi)) tipUygun = true;
         else if (konutTipi === 'müstakil ev' && MUSTAKIL_TIPLERI.includes(ilanTipi)) tipUygun = true;
         else if (konutTipi === 'villa' && ilanTipi === 'villa') tipUygun = true;
-        
-        if (!tipUygun) {
-            console.log(`İlan ${ilan['İlan ID']} konut tipi nedeniyle elendi. İstenen: ${konutTipi}, İlanın: ${ilanTipi}`);
-            return false;
-        }
+        if (!tipUygun) return false;
     }
 
-    // 4. SAĞLAM KONUM FİLTRESİ
-    const konumStr = (kriterler.konum || "").toLowerCase().replace(',', ' ');
+    // 4. DOĞRU KONUM FİLTRESİ
+    const konumStr = (kriterler.konum || "").toLowerCase();
     if (konumStr) {
-        const ilceler = ["balçova", "karabağlar", "bayraklı", "bornova", "karşıyaka", "narlıdere", "güzelbahçe", "çiğli", "buca", "konak", "çeşme", "urla"];
-        let ilce = "";
-        let mahalle = konumStr;
+        const parts = konumStr.split(',').map(part => part.trim());
+        const ilce = parts[0];
+        const mahalle = parts.length > 1 ? parts[1] : null;
 
-        ilceler.forEach(i => {
-            if (konumStr.includes(i)) {
-                ilce = i;
-                mahalle = konumStr.replace(i, "").trim();
-            }
-        });
-
+        // İlçe kontrolü -> JSON'daki 'Konum' alanıyla eşleşmeli
         if (ilce && (!ilan.Konum || !ilan.Konum.toLowerCase().includes(ilce))) {
-            console.log(`İlan ${ilan['İlan ID']} ilçe nedeniyle elendi. İstenen: ${ilce}, İlanın: ${ilan.Konum}`);
             return false;
         }
+        // Mahalle kontrolü -> JSON'daki 'Mahalle' alanıyla eşleşmeli
         if (mahalle && (!ilan.Mahalle || !ilan.Mahalle.toLowerCase().includes(mahalle))) {
-            console.log(`İlan ${ilan['İlan ID']} mahalle nedeniyle elendi. İstenen: ${mahalle}, İlanın: ${ilan.Mahalle}`);
             return false;
         }
     }
@@ -169,7 +129,6 @@ function filterListings(strategy) {
         if ((ilan.Otopark || "").toLowerCase() === 'yok') return false;
     }
     
-    console.log(`İlan ${ilan['İlan ID']} tüm filtrelerden geçti.`);
     return true;
   });
 
