@@ -10,7 +10,7 @@ const openai = new OpenAI({
 });
 
 // Netlify'ın included_files kuralı, dosyanın fonksiyon kök dizininde olmasını sağlar.
-const listingsPath = path.resolve(__dirname, 'ilanlar.json');
+const listingsPath = path.resolve(process.env.LAMBDA_TASK_ROOT, 'ilanlar.json');
 const allListings = JSON.parse(fs.readFileSync(listingsPath, 'utf8'));
 
 // ODA SAYISI HİYERARŞİSİNİ KOD İÇİNDE TANIMLAYALIM
