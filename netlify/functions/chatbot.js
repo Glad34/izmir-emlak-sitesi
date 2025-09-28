@@ -1,4 +1,4 @@
-// netlify/functions/chatbot.js - İSTEKLERİNİZE GÖRE GÜNCELLENMİŞ NİHAİ KOD
+// netlify/functions/chatbot.js - TEKRARLAMA VE DİL HATALARI DÜZELTİLMİŞ NİHAİ KOD
 
 require('dotenv').config();
 const { OpenAI } = require('openai');
@@ -13,16 +13,19 @@ const ODA_SAYISI_HIYERARSISI = ["1+1", "2+1", "2.5+1", "3+1", "3.5+1", "3+2", "4
 const DAIRE_TIPLERI = ["daire", "rezidans"];
 const MUSTAKIL_TIPLERI = ["villa", "müstakil ev", "köşk & konak", "yazlık", "yalı dairesi", "çiftlik evi"];
 
-// === GÜNCELLENMİŞ SYSTEM PROMPT ===
+// === GELİŞMİŞ VE STABİLLEŞTİRİLMİŞ SYSTEM PROMPT ===
 const systemPrompt = `
 KİMLİK
 Adın: Onur Başaran, proaktif ve akıllı bir Yapay Zeka Gayrimenkul Asistanı.
-Ana Görevin: Müşteriyi adım adım yönlendirerek, aşağıda belirtilen KESİN JSON ÇIKTI FORMATI'ndaki 'arama_stratejisi' objesini doldurmak. Her adımda ilgili bilgiyi doğru alana kaydet ve sıradaki soruyu sor. Your response must be in JSON format.
+Ana Görevin: Müşteriyi adım adım yönlendirerek bir emlak arama formu doldurmak, ardından filtreleme sonuçlarını analiz ederek kullanıcıya en iyi seçenekleri sunmak. Cevabın daima aşağıda belirtilen JSON formatında olmalıdır. Your response must be in JSON format.
+
+GENEL KURALLAR
+1.  **TÜRKÇE ZORUNLULUĞU:** Müşteriyle tüm iletişimin İSTİSNASIZ BİR ŞEKİLDE Türkçe olmalıdır. ASLA İngilizce veya başka bir dilde cevap verme.
+2.  **TEKRARLAMA YASAĞI:** Kullanıcının cevabını aldıktan sonra, bilgiyi 'arama_stratejisi'ne kaydet ve GÖREV AKIŞI'ndaki BİR SONRAKİ adıma geç. ASLA aynı soruyu tekrar sorma.
+3.  **JSON FORMATI:** Her zaman KESİN JSON ÇIKTI FORMATI'na uy.
 
 GÖREV AKIŞI
 Her adımdaki görevi tamamla, bilgileri 'arama_stratejisi'ne kaydet ve bir sonraki adıma geç.
-*   **KONUM SORUSU:** Kullanıcı "Narlıdere, Narlı Mahallesi" veya "Narlıdere narlı" yazdığında, bunu 'ilce':"Narlıdere" ve 'mahalle':"Narlı" olarak ayırıp ilgili alanlara kaydet. "mahallesi" kelimesini ekleme. Sadece ilçe yazarsa, mahalle'yi null bırak.
-*   **EKSTRA SORUSU:** Kullanıcı "balkon olsun, otopark farketmez, bina yaşı en fazla 10" gibi bir metin yazdığında, bunu analiz et. 'balkon':'Var', 'otopark':'Tümü', 'bina_yasi_max':'10' gibi ilgili alanları doldur. 'farketmez' veya 'yok' derse o alanı 'Tümü' yap.
 
 1.  **isim_sor (Başlangıç):** Müşterinin ismini sor.
     JSON Çıktısı: adim:"isim_sor", eylem:"soru_sor", cevap:"Harika bir başlangıç yapalım! İsminizi öğrenebilir miyim?", secenekler:null
@@ -46,7 +49,7 @@ Her adımdaki görevi tamamla, bilgileri 'arama_stratejisi'ne kaydet ve bir sonr
     JSON Çıktısı: adim:"ekstra_sor", eylem:"soru_sor", cevap:"Neredeyse tamamız! Varsa, olmazsa olmaz dediğiniz ek özellikleri (balkon, otopark, bina yaşı vb.) yazabilirsiniz. Yoksa 'yok' yazmanız yeterli.", secenekler:null
 
 8.  **onay_goster:** Toplanan tüm bilgileri özetle ve müşteriden onay iste.
-    JSON Çıktısı: adim:"onay_goster", eylem:"soru_sor", cevap:"Harika! Kriterlerinizi özetliyorum:\\nİsim: [İsim]\\nAmaç: [Amaç]\\n... (tüm ayrıntılı kriterleri listele) ...\\n\\nBu bilgilerle aramayı başlatmamı onaylıyor musunuz?", secenekler:["Onayla ve İlanları Getir", "Kriterleri Değiştir"]
+    JSON Çıktısı: adim:"onay_goster", eylem:"soru_sor", cevap:"Harika! Kriterlerinizi özetliyorum:\\nİsim: [İsim]\\nAmaç: [Amaç]\\nKonut Tipi: [Tip]\\nKonum: [Konum]\\nBütçe: [Bütçe]\\nOda Sayısı: En az [Oda Sayısı]\\nEk Notlar: [Ek Notlar]\\n\\nBu bilgilerle aramayı başlatmamı onaylıyor musunuz?", secenekler:["Onayla ve İlanları Getir", "Kriterleri Değiştir"]
 
 9.  **onay_sonrasi:** Müşteri 'Onayla' dedikten sonra, backend'in vereceği ilan sayısını bekle ve bu sayıya göre Akıllı Öneri yap.
     *   Eğer İlan Sayısı Yeterliyse (5+): "Harika! Kriterlerinize uygun [X] adet ilan buldum." de. Seçenekler: ["İlanları Göster", "Filtreyi Değiştir"]. eylem: "soru_sor".
@@ -56,20 +59,14 @@ Her adımdaki görevi tamamla, bilgileri 'arama_stratejisi'ne kaydet ve bir sonr
 10. **sunum_yap:** Kullanıcı sonuçları görmeyi onaylarsa ("İlanları Göster" veya "Hayır, Bu Şekilde Göster" derse), backend'e son talimatı ver.
     JSON Çıktısı: adim:"sunum_yap", eylem:"sunum_yap", cevap:"Harika! Öne çıkan ilanlar şunlar...", secenekler:null
 
-EĞER KULLANICI "Kriterleri Değiştir" DERSE, akışı "isim_sor" adımına geri döndür ve tüm 'arama_stratejisi' alanlarını null yaparak süreci yeniden başlat.
+EĞER KULLANICI "Kriterleri Değiştir" DERSE, akışı "isim_sor" adımına geri döndür ve her şeyi baştan sorarak bilgileri güncelle.
 
 KESİN JSON ÇIKTI FORMATI
-{
-"status": "...", "filtre": "...", "adim": "...", "eylem": "...", "cevap": "...", "secenekler": [],
-"arama_stratejisi": {
-    "isim": null, "amac": null, "konut_tipi": null, "ilce": null, "mahalle": null, "butce": null,
-    "oda_sayisi": null, "balkon": "Tümü", "otopark": "Tümü", "asansor": "Tümü", "bina_yasi_max": "Tümü"
-}
-}
+{ "status": "devam", "filtre": "devam", "adim": "amac_sor", "eylem": "soru_sor", "cevap": "...", "secenekler": [], "arama_stratejisi": { "isim":null, "amac":null, "konut_tipi":null, "konum":null, "butce":null, "oda_sayisi":null, "ek_notlar":null } }
 `;
 
 
-// === GÜNCELLENMİŞ filterListings FONKSİYONU ===
+// === NİHAİ filterListings FONKSİYONU (DOĞRU KONUM FİLTRESİ İLE) ===
 function filterListings(strategy) {
   console.log("Filtreleme başladı. Strateji:", JSON.stringify(strategy, null, 2));
   const k = strategy.arama_stratejisi;
@@ -102,7 +99,7 @@ function filterListings(strategy) {
     }
 
     // 3. GRUPLANMIŞ KONUT TİPİ FİLTRESİ
-    const konutTipi = (k.konut_tipi || "").toLowerCase();
+    const konutTipi = (k.konut_tipi || k.tip || "").toLowerCase();
     if (konutTipi) {
         const ilanTipi = (ilan['Konut Tipi'] || "").toLowerCase();
         let tipUygun = false;
@@ -112,15 +109,34 @@ function filterListings(strategy) {
         if (!tipUygun) return false;
     }
 
-    // 4. DOĞRU VE DETAYLI KONUM FİLTRESİ
-    if (k.ilce && (!ilan.Konum || !ilan.Konum.toLowerCase().includes(k.ilce.toLowerCase()))) return false;
-    if (k.mahalle && (!ilan.Mahalle || !ilan.Mahalle.toLowerCase().includes(k.mahalle.toLowerCase()))) return false;
-    
-    // 5. DETAYLI EK KRİTERLER FİLTRESİ
-    if (k.balkon === 'Var' && ((ilan.Balkon || "").toLowerCase() === 'yok' || (ilan.Balkon || "") === "N/A")) return false;
-    if (k.asansor === 'Var' && ((ilan.Asansör || "").toLowerCase() === 'yok' || (ilan.Asansör || "") === "N/A")) return false;
-    if (k.bina_yasi_max !== 'Tümü' && k.bina_yasi_max && parseInt(ilan['Bina Yaşı']) > parseInt(k.bina_yasi_max)) return false;
+    // 4. DOĞRU KONUM FİLTRESİ
+    const konumStr = (k.konum || "").toLowerCase().replace(',', ' ');
+    if (konumStr) {
+        const ilceler = ["balçova", "karabağlar", "bayraklı", "bornova", "karşıyaka", "narlıdere", "güzelbahçe", "çiğli", "buca", "konak", "çeşme", "urla"];
+        let ilce = "";
+        let mahalle = "";
 
+        ilceler.forEach(i => {
+            if (konumStr.includes(i)) {
+                ilce = i;
+                mahalle = konumStr.replace(i, "").replace("mahallesi", "").trim();
+            }
+        });
+        if (!ilce) ilce = konumStr;
+
+        if (ilce && (!ilan.Konum || !ilan.Konum.toLowerCase().includes(ilce))) return false;
+        if (mahalle && (!ilan.Mahalle || !ilan.Mahalle.toLowerCase().includes(mahalle))) return false;
+    }
+    
+    // 5. EK KRİTERLER
+    const ekKriterler = (k.ek_notlar || "").toLowerCase();
+    if (ekKriterler.includes("balkon")) {
+        if ((ilan.Balkon || "").toLowerCase() === 'yok' || (ilan.Balkon || "") === "N/A") return false;
+    }
+    if (ekKriterler.includes("otopark")) {
+        if ((ilan.Otopark || "").toLowerCase() === 'yok') return false;
+    }
+    
     return true;
   });
 
