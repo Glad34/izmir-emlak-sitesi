@@ -115,7 +115,7 @@ exports.handler = async function (event, context) {
         const promptMessage = isNewConversation ? "Yeni bir konuşma başlat." : message;
 
         const initialResponse = await openai.chat.completions.create({
-          model: "gpt-4-turbo",
+          model: "gpt-3.5-turbo",
           messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `KONUŞMA GEÇMİŞİ:${history}\n\nSon Soru:${promptMessage}` }],
           response_format: { type: "json_object" }
         });
@@ -127,7 +127,7 @@ exports.handler = async function (event, context) {
             const reportPrompt = `SİSTEM NOTU: Filtreleme yapıldı ve ${ilanSayisi} adet ilan bulundu. Şimdi GÖREV AKIŞI'ndaki 'onay_sonrasi (Akıllı Öneri)' adımını bu bilgiye göre uygula.`;
             
             const finalResponse = await openai.chat.completions.create({
-                model: "gpt-4-turbo",
+                model: "gpt-3.5-turbo",
                 messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `KONUŞMA GEÇMİŞİ:${history}\n\nSon Soru:${promptMessage}\n\n${reportPrompt}` }],
                 response_format: { type: "json_object" }
             });
