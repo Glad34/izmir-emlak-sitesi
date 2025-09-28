@@ -174,3 +174,26 @@
     flex-direction: row; /* Kartları yan yana dizer */
     gap: 10px;
 }
+
+/* chatbot.css veya ilgili CSS dosyanıza ekleyin */
+#typing-indicator p span {
+    display: inline-block;
+    animation: typing-blink 1.4s infinite both;
+}
+#typing-indicator p span:nth-child(2) { animation-delay: 0.2s; }
+#typing-indicator p span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing-blink {
+    0% { opacity: 0.2; }
+    20% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+
+/* Kilitliyken gönder butonunu ve metin alanını soluklaştır */
+#chat-input-form button[type="submit"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+#user-input:disabled {
+    background-color: #f8f9fa;
+}
