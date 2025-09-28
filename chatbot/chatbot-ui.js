@@ -1,4 +1,4 @@
-// chatbot/chatbot-ui.js - EKSİKSİZ VE NİHAİ KOD
+// chatbot/chatbot-ui.js - YARIŞ DURUMU (RACE CONDITION) PROBLEMİ ÇÖZÜLMÜŞ KOD
 
 document.addEventListener('DOMContentLoaded', () => {
     const userInput = document.getElementById('user-input');
@@ -8,20 +8,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let conversationHistory = "";
     let currentStrategy = {};
+    let isAwaitingResponse = false; // YENİ: İstek kilidi değişkeni
 
     sendMessage("", true); 
     
     chatForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const message = userInput.value.trim();
-        if (!message || sendButton.disabled) return;
+        // DEĞİŞTİ: Kilit kontrolü eklendi
+        if (!message || sendButton.disabled || isAwaitingResponse) return;
         await sendMessage(message);
     });
 
     async function sendMessage(message, isInitial = false) {
+        // YENİ: Fonksiyonun en başında kilit kontrolü yapılıyor.
+        // Eğer zaten bir yanıt bekleniyorsa, yeni bir istek göndermeyi engelle.
+        if (isAwaitingResponse && !isInitial) {
+            return; 
+        }
+
         if (!isInitial) {
             addMessageToUI('user', message);
         }
+
+        // DEĞİŞTİ: Kilit devreye alınıyor
+        isAwaitingResponse = true; 
         userInput.value = '';
         userInput.disabled = true;
         sendButton.disabled = true;
@@ -60,9 +71,14 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             hideTypingIndicator();
             addMessageToUI('ai', 'Üzgünüm, bir sorunla karşılaştım.');
+            // DEĞİŞTİ: Hata durumunda bile inputlar tekrar açılmalı
             userInput.disabled = false;
             sendButton.disabled = false;
             userInput.placeholder = "İsteklerinizi buraya yazın...";
+        } finally {
+            // YENİ: İstek başarılı da olsa, başarısız da olsa kilit kaldırılıyor.
+            // Bu sayede bot bir hatadan sonra kilitli kalmaz.
+            isAwaitingResponse = false;
         }
     }
     
@@ -74,6 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
             sendButton.disabled = true;
             renderButtons(data.secenekler);
         } else {
+            // DEĞİŞTİ: Kilit artık finally bloğunda yönetildiği için burada
+            // isAwaitingResponse'a dokunmuyoruz ama inputların durumunu yönetmeye devam ediyoruz.
             userInput.placeholder = "İsteklerinizi buraya yazın...";
             userInput.disabled = false;
             sendButton.disabled = false;
@@ -107,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
             button.textContent = optionText;
             button.classList.add('chat-option-button');
             button.addEventListener('click', () => {
-                // Butona tıklandığında, metnini mesaj olarak gönder
+                // DEĞİŞTİ: Kilit kontrolü burada da yapılabilir ama sendMessage'in başına eklemek daha garantidir.
                 sendMessage(optionText);
                 clearOptions();
             });
