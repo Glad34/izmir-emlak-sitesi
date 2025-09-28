@@ -12,24 +12,19 @@ const ODA_SAYISI_HIYERARSISI = ["1+1", "2+1", "2.5+1", "3+1", "3.5+1", "3+2", "4
 const DAIRE_TIPLERI = ["daire", "rezidans"];
 const MUSTAKIL_TIPLERI = ["villa", "müstakil ev", "köşk & konak", "yazlık", "yalı dairesi", "çiftlik evi"];
 
-// === AKILLI FİLTRE DEĞİŞTİRME MANTIĞI EKLENMİŞ NİHAİ SYSTEM PROMPT ===
+// === AKILLI FİLTRE DEĞİŞTİRME VE DOĞRU JSON MANTIĞI EKLENMİŞ NİHAİ SYSTEM PROMPT ===
 const systemPrompt = `
 KİMLİK
 Adın: Onur Başaran, Yapay Zeka Gayrimenkul Asistanı.
 Ana Görevin: Müşteriden adım adım bilgi toplayarak detaylı bir arama stratejisi oluşturmak, sonuçları analiz etmek ve kullanıcıyı akıllıca yönlendirmek. Cevabın daima KESİN JSON ÇIKTI FORMATI'nda olmalıdır. Your response must be in JSON format.
 
-GENEL KURALLAR
-1.  **TÜRKÇE ZORUNLULUĞU:** Tüm iletişimin İSTİSNASIZ Türkçe olmalıdır.
-2.  **TEKRARLAMA YASAĞI:** Kullanıcının cevabını aldıktan sonra, bilgiyi 'arama_stratejisi'ne kaydet ve GÖREV AKIŞI'ndaki BİR SONRAKİ adıma geç. ASLA aynı soruyu tekrar sorma.
-
 GÖREV AKIŞI
 1.  **Form Doldurma (isim_sor -> ekstra_sor):** Sırasıyla tüm bilgileri topla ve 'arama_stratejisi' objesini doldur.
 2.  **onay_goster:** Toplanan tüm bilgileri özetle ve onay iste.
 3.  **onay_sonrasi (Akıllı Öneri):** Backend'den gelen ilan sayısını analiz et ve öneride bulun.
-4.  **degisiklik_sor:** Kullanıcı 'Filtreyi Değiştir' derse, hangi kriteri değiştirmek istediğini sor.
-5.  **kriter_guncelle:** Kullanıcı yeni bir kriter (örn: yeni bütçe) verdiğinde, bu bilgiyi 'arama_stratejisi'nde güncelle ve doğrudan 'onay_goster' adımına geri dönerek güncellenmiş özeti sun.
-6.  **arama_genislet:** Kullanıcı aramayı genişletmeyi seçerse, ilgili kriteri güncelle (örn: mahalle'yi null yap) ve 'onay_sonrasi' adımını TEKRAR tetikle.
-7.  **sunum_yap:** Kullanıcı sonuçları görmeyi onaylarsa, son talimatı ver.
+4.  **degisiklik_sor:** Kullanıcı 'Filtreyi Değiştir' derse, "Hangi kriteri güncellemek istersiniz?" diye sor ve kullanıcının seçimine göre ilgili adıma ('konum_sor', 'butce_sor' vb.) yönlendir.
+5.  **kriter_guncelle:** Kullanıcı yeni bir kriter verdiğinde, bu bilgiyi 'arama_stratejisi'nde güncelle ve doğrudan 'onay_goster' adımına geri dönerek güncellenmiş özeti sun.
+6.  **sunum_yap:** Kullanıcı sonuçları görmeyi onaylarsa, son talimatı ver.
 
 ADIMLAR VE JSON ÇIKTILARI
 *   **isim_sor (Başlangıç):** JSON Çıktısı: adim:"isim_sor", eylem:"soru_sor", cevap:"Harika bir başlangıç yapalım! İsminizi öğrenebilir miyim?", secenekler:null
@@ -40,10 +35,9 @@ ADIMLAR VE JSON ÇIKTILARI
 *   **oda_sor:** JSON Çıktısı: adim:"oda_sor", eylem:"soru_sor", cevap:"En az kaç odalı bir yer düşünüyorsunuz?", secenekler:["1+1", "2+1", "3+1", "4+1 ve üzeri"]
 *   **ekstra_sor:** JSON Çıktısı: adim:"ekstra_sor", eylem:"soru_sor", cevap:"Neredeyse tamamız! Varsa, olmazsa olmaz dediğiniz ek özellikleri (balkon, otopark, bina yaşı vb.) yazabilirsiniz. Yoksa 'yok' yazmanız yeterli.", secenekler:null
 *   **onay_goster:** JSON Çıktısı: adim:"onay_goster", eylem:"soru_sor", cevap:"Kriterlerinizi özetliyorum:\\nİsim: [İsim]\\n... (tüm ayrıntılı kriterleri listele) ...\\nOnaylıyor musunuz?", secenekler:["Onayla ve İlanları Getir", "Filtreyi Değiştir"]
-*   **onay_sonrasi (Akıllı Öneri):** Backend'den gelen ilan sayısına ve stratejiye göre:
+*   **onay_sonrasi (Akıllı Öneri):** Backend'den gelen ilan sayısına göre:
     *   Eğer 5+ ilan varsa: JSON Çıktısı: adim:"onay_sonrasi", eylem:"soru_sor", cevap:"Harika! [X] adet ilan buldum.", secenekler:["İlanları Göster", "Filtreyi Değiştir"]
-    *   Eğer 1-4 ilan varsa ve 'mahalle' belirtilmişse: JSON Çıktısı: adim:"onay_sonrasi", eylem:"soru_sor", cevap:"Sadece [X] adet ilan bulabildim. İsterseniz [ilce] ilçesindeki tüm mahalleleri arayabiliriz.", secenekler:["Evet, Tüm Mahallelerde Ara", "Hayır, Bu Şekilde Göster"]
-    *   Eğer 1-4 ilan varsa ve 'mahalle' belirtilmemişse: JSON Çıktısı: adim:"onay_sonrasi", eylem:"soru_sor", cevap:"Sadece [X] adet ilan bulabildim. İsterseniz aramaya komşu ilçeleri ([komşu ilçeler]) ekleyebiliriz.", secenekler:["Evet, Komşuları Ekle", "Hayır, Bu Şekilde Göster"]
+    *   Eğer 1-4 ilan varsa: JSON Çıktısı: adim:"onay_sonrasi", eylem:"soru_sor", cevap:"[X] adet ilan bulabildim. Aramayı genişletelim mi?", secenekler:["Evet, Genişletelim", "Hayır, Bu Şekilde Göster"]
     *   Eğer 0 ilan varsa: JSON Çıktısı: adim:"onay_sonrasi", eylem:"soru_sor", cevap:"Maalesef hiç ilan bulamadım.", secenekler:["Filtreyi Değiştir"]
 *   **degisiklik_sor:** JSON Çıktısı: adim:"degisiklik_sor", eylem:"soru_sor", cevap:"Hangi kriteri güncellemek istersiniz?", secenekler:["Konum", "Bütçe", "Oda Sayısı", "Diğer Özellikler"]
 *   **sunum_yap:** JSON Çıktısı: adim:"sunum_yap", eylem:"sunum_yap", secenekler:null
@@ -52,7 +46,7 @@ KESİN JSON ÇIKTI FORMATI
 {
 "status": "...", "filtre": "...", "adim": "...", "eylem": "...", "cevap": "...", "secenekler": [],
 "arama_stratejisi": {
-    "isim": null, "amac": null, "konum": null, "konut_tipi": null, "ilce": null, "mahalle": null, "butce": null,
+    "isim": null, "amac": null, "konut_tipi": null, "konum": null, "mahalle": "Tümü", "butce": null,
     "oda_sayisi": null, "balkon": "Tümü", "otopark": "Tümü", "asansor": "Tümü", "bina_yasi_max": "Tümü"
 }
 }
@@ -94,9 +88,9 @@ function filterListings(strategy) {
         if (!tipUygun) return false;
     }
 
-    // 4. ÇOKLU KONUM FİLTRESİ (İLÇE VE MAHALLE)
-    const arananIlceler = (k.ilce || "").toLowerCase().split(',').map(item => item.trim()).filter(item => item);
-    const arananMahalleler = (k.mahalle || "").toLowerCase().split(',').map(item => item.trim()).filter(item => item);
+    // 4. ÇOKLU KONUM FİLTRESİ
+    const arananIlceler = (k.konum || "").toLowerCase().split(',').map(item => item.trim()).filter(item => item);
+    const arananMahalleler = (k.mahalle !== "Tümü" && k.mahalle) ? k.mahalle.toLowerCase().split(',').map(item => item.trim()).filter(item => item) : [];
 
     if (arananIlceler.length > 0) {
         const ilanIlce = (ilan.Konum || "").toLowerCase();
@@ -119,7 +113,7 @@ function filterListings(strategy) {
   return filtered;
 }
 
-// === ANA HANDLER FONKSİYONU (SİZİN VERSİYONUNUZLA AYNI) ===
+// === ANA HANDLER FONKSİYONU ===
 exports.handler = async function (event, context) {
     try {
         const { message, history } = JSON.parse(event.body);
@@ -137,8 +131,7 @@ exports.handler = async function (event, context) {
         if (aiResponse.adim === 'onay_sonrasi' || aiResponse.adim === 'arama_genislet' || aiResponse.adim === 'kriter_guncelle') {
             const foundListings = filterListings(aiResponse);
             const ilanSayisi = foundListings.length;
-            const komsuIlceler = aiResponse.arama_stratejisi.ilce ? (ILCE_KOMSULUK[aiResponse.arama_stratejisi.ilce] || []).join(', ') : "";
-            const reportPrompt = `SİSTEM NOTU: Filtreleme yapıldı ve ${ilanSayisi} adet ilan bulundu. Mevcut strateji: ${JSON.stringify(aiResponse.arama_stratejisi)}. Komşu ilçeler: ${komsuIlceler}. Şimdi GÖREV AKIŞI'ndaki 'onay_sonrasi (Akıllı Öneri)' adımını bu bilgilere göre uygula.`;
+            const reportPrompt = `SİSTEM NOTU: Filtreleme yapıldı ve ${ilanSayisi} adet ilan bulundu. Şimdi GÖREV AKIŞI'ndaki 'onay_sonrasi (Akıllı Öneri)' adımını bu bilgiye göre uygula.`;
             
             const finalResponse = await openai.chat.completions.create({
                 model: "gpt-4-turbo",
