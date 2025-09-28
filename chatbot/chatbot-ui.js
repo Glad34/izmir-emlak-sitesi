@@ -3,87 +3,77 @@
 document.addEventListener('DOMContentLoaded', () => {
     const userInput = document.getElementById('user-input');
     const chatForm = document.getElementById('chat-input-form');
-    const sendButton = chatForm.querySelector('button[type="submit"]'); // Gönder butonunu seçelim
+    const sendButton = chatForm.querySelector('button[type="submit"]');
     const messagesContainer = document.getElementById('chat-messages');
 
     let conversationHistory = "";
-    // isWaitingForUserInput değişkenini kaldırıyoruz, artık butonun durumunu kontrol edeceğiz.
+    let currentStrategy = {};
 
-    // Chatbot'u başlatmak için backend'e boş bir ilk mesaj gönder
     sendMessage("", true); 
     
-    // KULLANICI METİN GİRİP GÖNDERDİĞİNDE
     chatForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const message = userInput.value.trim();
-        // Buton kilitliyse (yani cevap bekleniyorsa) hiçbir şey yapma
         if (!message || sendButton.disabled) return;
         await sendMessage(message);
     });
 
-    // ANA MESAJ GÖNDERME FONKSİYONU
     async function sendMessage(message, isInitial = false) {
         if (!isInitial) {
             addMessageToUI('user', message);
         }
         userInput.value = '';
-        
-        // --- YENİ KİLİTLEME MANTIĞI ---
         userInput.disabled = true;
         sendButton.disabled = true;
         userInput.placeholder = "Yanıt bekleniyor...";
         
-        showTypingIndicator(); // "Yazıyor..." göstergesini ekle
+        showTypingIndicator();
 
         try {
             const response = await fetch('/api/chatbot', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: message, history: conversationHistory })
+                body: JSON.stringify({
+                    message: message,
+                    history: conversationHistory,
+                    current_strategy: currentStrategy 
+                })
             });
 
             if (!response.ok) throw new Error('Network response was not ok.');
             
             const data = await response.json();
             
-            hideTypingIndicator(); // "Yazıyor..." göstergesini kaldır
+            hideTypingIndicator();
 
             conversationHistory += `Kullanıcı: ${message}\nAsistan: ${data.cevap}\n`;
+            currentStrategy = data.arama_stratejisi;
 
             const hasListings = data.ilan_sonuclari && data.ilan_sonuclari.sunum.length > 0;
-
-            if (data.cevap) {
-                addMessageToUI('ai', data.cevap);
-            }
+            if (data.cevap) { addMessageToUI('ai', data.cevap); }
             if (hasListings) {
                 addListingsToUI(data.ilan_sonuclari);
                 addMessageToUI('ai', `Tüm listeyi size gönderebilmem için telefon numaranızı paylaşır mısınız?`);
             }
-
             handleAiResponse(data);
 
         } catch (error) {
-            hideTypingIndicator(); // Hata durumunda da kaldır
+            hideTypingIndicator();
             addMessageToUI('ai', 'Üzgünüm, bir sorunla karşılaştım.');
-            // Hata durumunda kilidi aç
             userInput.disabled = false;
             sendButton.disabled = false;
             userInput.placeholder = "İsteklerinizi buraya yazın...";
         }
     }
     
-    // AI CEVABINI İŞLEYEN ANA MANTIK
     function handleAiResponse(data) {
         clearOptions();
-
         if (data.secenekler && data.secenekler.length > 0) {
             userInput.placeholder = "Lütfen bir seçenek seçin...";
-            // Butonlar varken metin girişi ve gönder butonu kilitli kalır
             userInput.disabled = true;
             sendButton.disabled = true;
             renderButtons(data.secenekler);
         } else {
-            // Buton yoksa, kilidi aç
             userInput.placeholder = "İsteklerinizi buraya yazın...";
             userInput.disabled = false;
             sendButton.disabled = false;
