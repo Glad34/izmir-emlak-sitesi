@@ -3,79 +3,68 @@
 document.addEventListener('DOMContentLoaded', () => {
     const userInput = document.getElementById('user-input');
     const chatForm = document.getElementById('chat-input-form');
+    const sendButton = chatForm.querySelector('button[type="submit"]');
     const messagesContainer = document.getElementById('chat-messages');
 
     let conversationHistory = "";
     let currentStrategy = {};
 
-    // --- YENİ: HIZLI BAŞLANGIÇ FORMU OLUŞTURMA ---
-    function createQuickStartForm() {
-        const initialMessage = document.querySelector('.message.ai-message'); // Mevcut karşılama mesajını bul
-        if (!initialMessage) return;
-
-        const formHTML = `
-            <div id="quick-start-form">
-                <div class="form-group">
-                    <label>Amaç</label>
-                    <select id="qs-amac">
-                        <option value="Oturum Amaçlı">Oturum Amaçlı</option>
-                        <option value="Yatırım Amaçlı">Yatırım Amaçlı</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Mülk Tipi</label>
-                    <select id="qs-tip">
-                        <option value="Daire">Daire</option>
-                        <option value="Müstakil Ev">Müstakil Ev</option>
-                        <option value="Villa">Villa</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Bütçe Aralığı</label>
-                    <select id="qs-butce">
-                        <option value="0 - 5.000.000 TL">0 - 5M TL</option>
-                        <option value="5.000.000 - 10.000.000 TL">5M - 10M TL</option>
-                        <option value="10.000.000 - 20.000.000 TL">10M - 20M TL</option>
-                        <option value="20.000.000 TL ve Üzeri">20M+ TL</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Oda Sayısı (En Az)</label>
-                    <select id="qs-oda">
-                        <option value="1+1">1+1</option>
-                        <option value="2+1">2+1</option>
-                        <option value="3+1">3+1</option>
-                        <option value="4+1 ve üzeri">4+1 ve üzeri</option>
-                    </select>
-                </div>
-                <button id="qs-submit-button">Aramayı Başlat</button>
-            </div>
-        `;
-        
-        initialMessage.insertAdjacentHTML('beforeend', formHTML);
-
-        document.getElementById('qs-submit-button').addEventListener('click', handleQuickStartSubmit);
-    }
-
-    // --- YENİ: HIZLI BAŞLANGIÇ FORMU GÖNDERİLDİĞİNDE ---
-    async function handleQuickStartSubmit() {
-        const amac = document.getElementById('qs-amac').value;
-        const tip = document.getElementById('qs-tip').value;
-        const butce = document.getElementById('qs-butce').value;
-        const oda = document.getElementById('qs-oda').value;
-
-        // Toplanan bilgileri tek bir "kullanıcı mesajı" gibi formatla
-        const message = `Aradığım Kriterler: Amaç: ${amac}, Tip: ${tip}, Bütçe: ${butce}, Oda Sayısı: ${oda}`;
-        
-        // Formu kaldır
-        document.getElementById('quick-start-form').remove();
-        
-        // Süreci bu toplu bilgiyle başlat
-        await sendMessage(message);
-    }
+    sendMessage("", true); 
     
-    // Açılışta formu oluştur
-    createQuickStartForm();
+    chatForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const message = userInput.value.trim();
+        if (!message || sendButton.disabled) return;
+        await sendMessage(message);
+    });
+
+    async function sendMessage(message, isInitial = false) {
+        if (!isInitial) {
+            addMessageToUI('user', message);
+        }
+        userInput.value = '';
+        userInput.disabled = true;
+        sendButton.disabled = true;
+        userInput.placeholder = "Yanıt bekleniyor...";
+        
+        showTypingIndicator();
+
+        try {
+            const response = await fetch('/api/chatbot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: message,
+                    history: conversationHistory,
+                    current_strategy: currentStrategy 
+                })
+            });
+
+            if (!response.ok) throw new Error('Network response was not ok.');
+            
+            const data = await response.json();
+            
+            hideTypingIndicator();
+
+            conversationHistory += `Kullanıcı: ${message}\nAsistan: ${data.cevap}\n`;
+            currentStrategy = data.arama_stratejisi;
+
+            const hasListings = data.ilan_sonuclari && data.ilan_sonuclari.sunum.length > 0;
+            if (data.cevap) { addMessageToUI('ai', data.cevap); }
+            if (hasListings) {
+                addListingsToUI(data.ilan_sonuclari);
+                addMessageToUI('ai', `Tüm listeyi size gönderebilmem için telefon numaranızı paylaşır mısınız?`);
+            }
+            handleAiResponse(data);
+
+        } catch (error) {
+            hideTypingIndicator();
+            addMessageToUI('ai', 'Üzgünüm, bir sorunla karşılaştım.');
+            userInput.disabled = false;
+            sendButton.disabled = false;
+            userInput.placeholder = "İsteklerinizi buraya yazın...";
+        }
+    }
     
     function handleAiResponse(data) {
         clearOptions();
