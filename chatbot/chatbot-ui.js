@@ -1,6 +1,10 @@
 // chatbot/chatbot-ui.js - YARIŞ DURUMU (RACE CONDITION) PROBLEMİ ÇÖZÜLMÜŞ KOD
 
+// chatbot/chatbot-ui.js - TANILAMA (DEBUG) KODU EKLENMİŞ VERSİYON
+
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("Chatbot UI Başlatıldı. DOMContentLoaded tetiklendi."); // Tanılama Mesajı
+
     const userInput = document.getElementById('user-input');
     const chatForm = document.getElementById('chat-input-form');
     const sendButton = chatForm.querySelector('button[type="submit"]');
@@ -8,31 +12,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let conversationHistory = "";
     let currentStrategy = {};
-    let isAwaitingResponse = false; // YENİ: İstek kilidi değişkeni
+    let isAwaitingResponse = false; 
 
     sendMessage("", true); 
     
     chatForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const message = userInput.value.trim();
-        // DEĞİŞTİ: Kilit kontrolü eklendi
-        if (!message || sendButton.disabled || isAwaitingResponse) return;
+        if (!message || sendButton.disabled) return;
         await sendMessage(message);
     });
 
     async function sendMessage(message, isInitial = false) {
-        // YENİ: Fonksiyonun en başında kilit kontrolü yapılıyor.
-        // Eğer zaten bir yanıt bekleniyorsa, yeni bir istek göndermeyi engelle.
+        // ---- TANILAMA BÖLÜMÜ BAŞLANGIÇ ----
+        console.log(`sendMessage çağrıldı. Mesaj: "${message}". isAwaitingResponse durumu: ${isAwaitingResponse}`);
         if (isAwaitingResponse && !isInitial) {
+            console.error("!!! İSTEK ENGELLENDİ: Halen bir önceki isteğin yanıtı bekleniyor.");
             return; 
         }
+        // ---- TANILAMA BÖLÜMÜ SONU ----
 
         if (!isInitial) {
             addMessageToUI('user', message);
         }
 
-        // DEĞİŞTİ: Kilit devreye alınıyor
         isAwaitingResponse = true; 
+        console.log(`>>> KİLİT AKTİF. isAwaitingResponse = ${isAwaitingResponse}`); // Tanılama Mesajı
         userInput.value = '';
         userInput.disabled = true;
         sendButton.disabled = true;
@@ -69,16 +74,15 @@ document.addEventListener('DOMContentLoaded', () => {
             handleAiResponse(data);
 
         } catch (error) {
+            console.error("Bir hata oluştu:", error); // Tanılama Mesajı
             hideTypingIndicator();
             addMessageToUI('ai', 'Üzgünüm, bir sorunla karşılaştım.');
-            // DEĞİŞTİ: Hata durumunda bile inputlar tekrar açılmalı
             userInput.disabled = false;
             sendButton.disabled = false;
             userInput.placeholder = "İsteklerinizi buraya yazın...";
         } finally {
-            // YENİ: İstek başarılı da olsa, başarısız da olsa kilit kaldırılıyor.
-            // Bu sayede bot bir hatadan sonra kilitli kalmaz.
             isAwaitingResponse = false;
+            console.log(`<<< KİLİT KALDIRILDI. isAwaitingResponse = ${isAwaitingResponse}`); // Tanılama Mesajı
         }
     }
     
@@ -90,14 +94,45 @@ document.addEventListener('DOMContentLoaded', () => {
             sendButton.disabled = true;
             renderButtons(data.secenekler);
         } else {
-            // DEĞİŞTİ: Kilit artık finally bloğunda yönetildiği için burada
-            // isAwaitingResponse'a dokunmuyoruz ama inputların durumunu yönetmeye devam ediyoruz.
             userInput.placeholder = "İsteklerinizi buraya yazın...";
             userInput.disabled = false;
             sendButton.disabled = false;
         }
     }
 
+    function renderButtons(options) {
+        const optionsContainer = document.createElement('div');
+        optionsContainer.id = 'chat-options-container';
+        options.forEach(optionText => {
+            const button = document.createElement('button');
+            button.textContent = optionText;
+            button.classList.add('chat-option-button');
+            button.addEventListener('click', () => {
+                sendMessage(optionText);
+                clearOptions();
+            });
+            optionsContainer.appendChild(button);
+        });
+        messagesContainer.appendChild(optionsContainer);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function clearOptions() {
+        const existingContainer = document.getElementById('chat-options-container');
+        if (existingContainer) {
+            existingContainer.remove();
+        }
+    }
+
+    function addMessageToUI(sender, text) {
+        const messageWrapper = document.createElement('div');
+        messageWrapper.classList.add('message', `${sender}-message`);
+        const messageParagraph = document.createElement('p');
+        messageParagraph.innerHTML = text.replace(/\\n/g, '<br>');
+        messageWrapper.appendChild(messageParagraph);
+        messagesContainer.appendChild(messageWrapper);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
     // "Yazıyor..." fonksiyonları
     function showTypingIndicator() {
         if (document.getElementById('typing-indicator')) return;
