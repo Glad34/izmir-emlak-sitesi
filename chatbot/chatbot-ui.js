@@ -1,90 +1,90 @@
-// chatbot/chatbot-ui.js - DOĞRU DOSYANIN YÜKLENDİĞİNİ KANITLAMA TESTİ
-
-// Sayfa yüklendiğinde bu mesajı içeren bir kutu çıkmalı.
-// Eğer bu kutu çıkmıyorsa, tarayıcı kesinlikle eski dosyayı kullanıyordur.
-alert("YENİ CHATBOT KODU BAŞARIYLA YÜKLENDİ!");
-
 document.addEventListener('DOMContentLoaded', () => {
-    // Geri kalan tüm kod, size en son verdiğim kodun aynısıdır.
-    // ... (bir önceki yanıttaki kodun tamamı buraya gelecek) ...
-
     const userInput = document.getElementById('user-input');
     const chatForm = document.getElementById('chat-input-form');
     const sendButton = chatForm.querySelector('button[type="submit"]');
     const messagesContainer = document.getElementById('chat-messages');
+    const chatOverlay = document.getElementById('chat-overlay'); // Yeni eklenen overlay elementi
 
     let conversationHistory = "";
     let currentStrategy = {};
-    let isAwaitingResponse = false; 
 
+    // --- KİLİT YÖNETİM FONKSİYONLARI ---
+    function lockChat() {
+        chatOverlay.classList.remove('hidden'); // Overlay'i görünür yap
+        userInput.disabled = true;
+        sendButton.disabled = true;
+        userInput.placeholder = "Yanıt bekleniyor...";
+    }
+
+    function unlockChat() {
+        chatOverlay.classList.add('hidden'); // Overlay'i gizle
+        // handleAiResponse fonksiyonu input'un durumunu kendi yönetecek.
+    }
+
+    // Buton tıklamaları artık direkt mesaj gönderiyor
     messagesContainer.addEventListener('click', (event) => {
         if (event.target.classList.contains('chat-option-button')) {
-            const selectedOptionText = event.target.textContent;
-            userInput.value = selectedOptionText;
-            userInput.disabled = false;
-            sendButton.disabled = false;
-            userInput.focus();
-            userInput.placeholder = "Seçiminizi göndermek için tıklayın";
+            // Eğer overlay aktifse (yani kilitliyse) hiçbir şey yapma
+            if (!chatOverlay.classList.contains('hidden')) return;
+
+            const message = event.target.textContent;
+            sendMessage(message);
         }
     });
 
+    // Yazılı mesaj gönderme
     chatForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const message = userInput.value.trim();
-        if (!message || sendButton.disabled || isAwaitingResponse) return;
-        
-        clearOptions();
+        if (!message || sendButton.disabled) return;
         await sendMessage(message);
     });
 
     async function sendMessage(message, isInitial = false) {
-        if (isAwaitingResponse && !isInitial) {
-            return; 
-        }
         if (!isInitial) {
             addMessageToUI('user', message);
+            clearOptions();
         }
-        isAwaitingResponse = true; 
-        userInput.value = '';
-        userInput.disabled = true;
-        sendButton.disabled = true;
-        userInput.placeholder = "Yanıt bekleniyor...";
+
+        lockChat(); // İsteği göndermeden hemen önce sohbeti KİLİTLE
         showTypingIndicator();
+
         try {
             const response = await fetch('/api/chatbot', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message: message,
-                    history: conversationHistory,
-                    current_strategy: currentStrategy 
-                })
+                body: JSON.stringify({ message, history: conversationHistory, current_strategy: currentStrategy })
             });
+
             if (!response.ok) throw new Error('Network response was not ok.');
+            
             const data = await response.json();
+            
             hideTypingIndicator();
             conversationHistory += `Kullanıcı: ${message}\nAsistan: ${data.cevap}\n`;
             currentStrategy = data.arama_stratejisi;
+
+            if (data.cevap) addMessageToUI('ai', data.cevap);
+            
             const hasListings = data.ilan_sonuclari && data.ilan_sonuclari.sunum.length > 0;
-            if (data.cevap) { addMessageToUI('ai', data.cevap); }
             if (hasListings) {
                 addListingsToUI(data.ilan_sonuclari);
                 addMessageToUI('ai', `Tüm listeyi size gönderebilmem için telefon numaranızı paylaşır mısınız?`);
             }
+            
             handleAiResponse(data);
+
         } catch (error) {
             hideTypingIndicator();
             addMessageToUI('ai', 'Üzgünüm, bir sorunla karşılaştım.');
-            userInput.disabled = false;
-            sendButton.disabled = false;
-            userInput.placeholder = "İsteklerinizi buraya yazın...";
+            handleAiResponse({ secenekler: null }); // Hata durumunda input'u aç
         } finally {
-            isAwaitingResponse = false;
+            unlockChat(); // İşlem bitince KİLİDİ AÇ
         }
     }
     
     function handleAiResponse(data) {
-        clearOptions(); 
+        clearOptions();
         if (data.secenekler && data.secenekler.length > 0) {
             userInput.placeholder = "Lütfen bir seçenek seçin...";
             userInput.disabled = true;
@@ -98,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderButtons(options) {
+        // ... bu fonksiyonun içi aynı kalabilir ...
         const optionsContainer = document.createElement('div');
         optionsContainer.id = 'chat-options-container';
         options.forEach(optionText => {
@@ -111,18 +112,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function clearOptions() {
+        // ... bu fonksiyonun içi aynı kalabilir ...
         const existingContainer = document.getElementById('chat-options-container');
-        if (existingContainer) {
-            existingContainer.remove();
-        }
+        if (existingContainer) existingContainer.remove();
     }
 
     function addMessageToUI(sender, text) {
+        // ... bu fonksiyonun içi aynı kalabilir ...
         const messageWrapper = document.createElement('div');
         messageWrapper.classList.add('message', `${sender}-message`);
-        const messageParagraph = document.createElement('p');
-        messageParagraph.innerHTML = text.replace(/\\n/g, '<br>');
-        messageWrapper.appendChild(messageParagraph);
+        const p = document.createElement('p');
+        p.innerHTML = text.replace(/\\n/g, '<br>');
+        messageWrapper.appendChild(p);
         messagesContainer.appendChild(messageWrapper);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
