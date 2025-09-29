@@ -1,70 +1,55 @@
-// chatbot/chatbot-ui.js - KULLANICI ÖNERİSİYLE GÜNCELLENMİŞ NİHAİ VE TAM KOD
-// Butonlar artık mesajı direkt göndermez, sadece yazı kutusunu doldurur.
+// chatbot/chatbot-ui.js - DOĞRU DOSYANIN YÜKLENDİĞİNİ KANITLAMA TESTİ
+
+// Sayfa yüklendiğinde bu mesajı içeren bir kutu çıkmalı.
+// Eğer bu kutu çıkmıyorsa, tarayıcı kesinlikle eski dosyayı kullanıyordur.
+alert("YENİ CHATBOT KODU BAŞARIYLA YÜKLENDİ!");
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Gerekli HTML elementlerini seç
+    // Geri kalan tüm kod, size en son verdiğim kodun aynısıdır.
+    // ... (bir önceki yanıttaki kodun tamamı buraya gelecek) ...
+
     const userInput = document.getElementById('user-input');
     const chatForm = document.getElementById('chat-input-form');
     const sendButton = chatForm.querySelector('button[type="submit"]');
     const messagesContainer = document.getElementById('chat-messages');
 
-    // Durum değişkenlerini tanımla
     let conversationHistory = "";
     let currentStrategy = {};
     let isAwaitingResponse = false; 
 
-    // --- YENİ MANTIK: BUTON TIKLAMA DİNLEYİCİSİ ---
-    // Bu listener artık mesaj göndermiyor, sadece input alanını dolduruyor.
     messagesContainer.addEventListener('click', (event) => {
-        // Tıklanan elementin bir seçenek butonu olup olmadığını sınıfından kontrol et
         if (event.target.classList.contains('chat-option-button')) {
             const selectedOptionText = event.target.textContent;
-
-            // 1. Tıklanan butonun metnini input alanına yaz
             userInput.value = selectedOptionText;
-
-            // 2. Input alanını ve gönder butonunu kullanıcı için aktif hale getir
             userInput.disabled = false;
             sendButton.disabled = false;
-
-            // 3. Kullanıcının dikkatini input alanına çek
             userInput.focus();
-            
-            // 4. Placeholder metnini kullanıcıyı yönlendirmek için değiştir (opsiyonel)
             userInput.placeholder = "Seçiminizi göndermek için tıklayın";
         }
     });
 
-    // Yazılı mesaj gönderme formunun dinleyicisi
     chatForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Formun sayfayı yenilemesini engelle
+        event.preventDefault();
         const message = userInput.value.trim();
         if (!message || sendButton.disabled || isAwaitingResponse) return;
         
-        // Mesaj gönderildikten sonra seçenek butonlarını temizle
         clearOptions();
-
         await sendMessage(message);
     });
 
-    // Sunucuya mesaj gönderen ana fonksiyon
     async function sendMessage(message, isInitial = false) {
         if (isAwaitingResponse && !isInitial) {
             return; 
         }
-
         if (!isInitial) {
             addMessageToUI('user', message);
         }
-
         isAwaitingResponse = true; 
         userInput.value = '';
         userInput.disabled = true;
         sendButton.disabled = true;
         userInput.placeholder = "Yanıt bekleniyor...";
-        
         showTypingIndicator();
-
         try {
             const response = await fetch('/api/chatbot', {
                 method: 'POST',
@@ -75,25 +60,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     current_strategy: currentStrategy 
                 })
             });
-
             if (!response.ok) throw new Error('Network response was not ok.');
-            
             const data = await response.json();
-            
             hideTypingIndicator();
-
             conversationHistory += `Kullanıcı: ${message}\nAsistan: ${data.cevap}\n`;
             currentStrategy = data.arama_stratejisi;
-
             const hasListings = data.ilan_sonuclari && data.ilan_sonuclari.sunum.length > 0;
             if (data.cevap) { addMessageToUI('ai', data.cevap); }
             if (hasListings) {
                 addListingsToUI(data.ilan_sonuclari);
                 addMessageToUI('ai', `Tüm listeyi size gönderebilmem için telefon numaranızı paylaşır mısınız?`);
             }
-            
             handleAiResponse(data);
-
         } catch (error) {
             hideTypingIndicator();
             addMessageToUI('ai', 'Üzgünüm, bir sorunla karşılaştım.');
@@ -106,8 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function handleAiResponse(data) {
-        // Not: handleAiResponse artık clearOptions çağırmıyor, çünkü bu işi form submit'i yapıyor.
-        // Ama yeni butonlar gelirse, eskileri yine de temizlemeli. Bu yüzden clearOptions burada kalmalı.
         clearOptions(); 
         if (data.secenekler && data.secenekler.length > 0) {
             userInput.placeholder = "Lütfen bir seçenek seçin...";
@@ -168,9 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function addListingsToUI(results) {
-        // Bu fonksiyonun içi sizin mevcut kodunuzdaki gibi kalabilir.
-    }
+    function addListingsToUI(results) {}
 
     sendMessage("", true); 
 });
