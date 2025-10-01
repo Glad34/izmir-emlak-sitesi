@@ -90,12 +90,25 @@ function populatePage(data, isLoggedIn, token) {
   document.getElementById('ilan-baslik').textContent = ilan['Başlık'];
   document.getElementById('ilan-konum').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${ilan['Konum']}`;
   const fiyatSayisi = parseInt(String(ilan['Fiyat']).replace(/[^\d]/g, ''));
-  document.getElementById('ilan-fiyat').textContent = !isNaN(fiyatSayisi) ? `${fiyatSayisi.toLocaleString('tr-TR')} TL` : "Belirtilmemiş";
+  
   document.getElementById('ilan-aciklama').innerHTML = ilan['Açıklama'].replace(/\n/g, '<br>');
-  const ozellikler = { "İlan Tipi": ilan['İlan Tipi'], "Oda Sayısı": ilan['Oda Sayısı'], "m² (Brüt)": ilan['m² (Brüt)'], "Bina Yaşı": ilan['Bina Yaşı'], "Isıtma": ilan['Isıtma'], "Banyo Sayısı": ilan['Banyo Sayısı'], "Balkon": ilan['Balkon'], "Eşyalı": ilan['Eşyalı'], "Site İçerisinde": ilan['Site İçerisinde'],"Havuz": ilan['Havuz'], "Krediye Uygun": ilan['Krediye Uygun'], "Aidat (TL)": ilan['Aidat (TL)'], "Bulunduğu Kat": ilan['Bulunduğu Kat'] };
+
+
+    const ozellikler = { "İlan Tipi": ilan['İlan Tipi'], "Oda Sayısı": ilan['Oda Sayısı'], "m² (Brüt)": ilan['m² (Brüt)'], "Bina Yaşı": ilan['Bina Yaşı'], "Isıtma": ilan['Isıtma'], "Banyo Sayısı": ilan['Banyo Sayısı'], "Balkon": ilan['Balkon'], "Eşyalı": ilan['Eşyalı'], "Site İçerisinde": ilan['Site İçerisinde'],"Havuz": ilan['Havuz'], "Krediye Uygun": ilan['Krediye Uygun'], "Aidat (TL)": ilan['Aidat (TL)'], "Bulunduğu Kat": ilan['Bulunduğu Kat'] };
   const ozelliklerListesiTab = document.getElementById('ilan-ozellikler-tab');
-  ozelliklerListesiTab.innerHTML = '';
-  Object.entries(ozellikler).forEach(([key, value]) => { if (value && String(value).trim() !== "") { ozelliklerListesiTab.innerHTML += `<li class="flex justify-between items-center text-sm py-2 border-b"><span class="text-gray-600">${key}</span><span class="font-semibold text-gray-800">${value}</span></li>`; } });
+  ozelliklerListesiTab.innerHTML = ''; // Listeyi temizle
+
+  // 1. Fiyatı en başa ekle, değerini bold yap
+  const fiyatDegeri = !isNaN(fiyatSayisi) ? `${fiyatSayisi.toLocaleString('tr-TR')} TL` : "Belirtilmemiş";
+  ozelliklerListesiTab.innerHTML += `<li class="flex justify-between items-center text-sm py-3 border-b border-gray-200"><span class="text-gray-600">Fiyat</span><span class="font-bold text-gray-900">${fiyatDegeri}</span></li>`;
+
+  // 2. Diğer özellikleri döngüyle ekle, değerleri normal yap
+  Object.entries(ozellikler).forEach(([key, value]) => { 
+      if (value && String(value).trim() !== "") { 
+          ozelliklerListesiTab.innerHTML += `<li class="flex justify-between items-center text-sm py-3 border-b border-gray-200"><span class="text-gray-600">${key}</span><span class="text-gray-800">${value}</span></li>`; 
+      } 
+  });
+  
   document.getElementById('harita-iframe').src = ilan['Harita Linki'];
   document.getElementById('danisman-adi').textContent = "Onur Başaran";
   document.getElementById('danisman-tel').href = `https://wa.me/905308775368`;
@@ -321,7 +334,7 @@ function initializePlugins() {
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabPanes = document.querySelectorAll('.tab-pane');
 
-  tabButtons.forEach(button => {
+    tabButtons.forEach(button => {
     button.addEventListener('click', () => {
       const tabId = button.getAttribute('data-tab');
 
@@ -333,6 +346,18 @@ function initializePlugins() {
       if (activePane) {
         activePane.classList.add('active');
       }
+
+      // --- YENİ EKLENEN KAYDIRMA KODU ---
+      if (tabId === 'tab-aciklama' || tabId === 'tab-konum') {
+        const sekmeliBolum = document.getElementById('sekmeli-bolum');
+        if(sekmeliBolum) {
+          // Bir sonraki frame'de kaydırmayı tetikleyerek daha pürüzsüz bir geçiş sağlıyoruz.
+          requestAnimationFrame(() => {
+            sekmeliBolum.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        }
+      }
+      // --- KAYDIRMA KODU BİTİŞ ---
     });
   });
 

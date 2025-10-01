@@ -29,16 +29,16 @@
 
 
     <div id="ilan-icerik" class="hidden">
-      <section class="mb-6">
+      <section class="mb-6 text-center">
   <!-- 1. Satır: Sadece Başlık -->
   <h1 id="ilan-baslik" class="text-1xl font-bold text-gray-800 mt-6 mb-2"></h1>
  
-  <!-- 2. Satır: Konum ve Butonlar yan yana -->
-  <div class="flex justify-between items-center">
-    <!-- Konum (Sol Taraf) -->
+  <!-- 2. Satır: Konum ve Butonlar yan yana (Ortalandı) -->
+  <div class="flex justify-center items-center gap-6">
+    <!-- Konum -->
     <p id="ilan-konum" class="text-gray-600 flex items-center gap-2"><i class="fas fa-map-marker-alt"></i></p>
    
-    <!-- Aksiyon Butonları (Sağ Taraf) -->
+    <!-- Aksiyon Butonları -->
     <div class="flex items-center space-x-3">
       <!-- Paylaş Butonu -->
       <button id="share-btn" class="p-2 rounded-full hover:bg-gray-200 transition" title="Paylaş">
@@ -87,21 +87,21 @@
 
 
           <!-- YENİ SEKMELİ YAPI (TABS) -->
-          <section class="bg-white rounded-lg shadow overflow-hidden">
+          <section id="sekmeli-bolum" class="bg-white rounded-lg shadow overflow-hidden">
             <div class="tab-buttons">
-              <button class="tab-button active" data-tab="tab-aciklama">Detay</button>
-              <button class="tab-button" data-tab="tab-ozellikler">Özellikler</button>
+              <button class="tab-button active" data-tab="tab-ozellikler">İlan Bilgileri</button>
+              <button class="tab-button" data-tab="tab-aciklama">Detay</button>
               <button class="tab-button" data-tab="tab-konum">Konum</button>
             </div>
             <div class="tab-content">
               <!-- Açıklama Sekmesi -->
-              <div id="tab-aciklama" class="tab-pane active">
-                <div id="ilan-aciklama" class="prose max-w-none"></div>
-              </div>
-              <!-- Özellikler Sekmesi -->
-              <div id="tab-ozellikler" class="tab-pane">
-                <ul id="ilan-ozellikler-tab" class="space-y-3"></ul>
-              </div>
+              <div id="tab-aciklama" class="tab-pane">
+  <div id="ilan-aciklama" class="prose max-w-none"></div>
+</div>
+<!-- Özellikler Sekmesi -->
+<div id="tab-ozellikler" class="tab-pane active">
+  <ul id="ilan-ozellikler-tab" class="space-y-3"></ul>
+</div>
               <!-- Konum Sekmesi -->
               <div id="tab-konum" class="tab-pane">
                 <iframe id="harita-iframe"
@@ -120,19 +120,7 @@
 
         <!-- Sağ Taraf: Fiyat ve Danışman (Özellikler buradan taşındı) -->
         <div class="lg:col-span-1 space-y-8">
-          <section class="price-box">
-  <div class="price-header">
-    <i class="fas fa-tags price-icon"></i>
-    <span>İlan Fiyatı</span>
-  </div>
-  <div class="price-amount" id="ilan-fiyat">
-    <!-- Fiyat JS ile buraya eklenecek -->
-  </div>
-  <!-- İsteğe bağlı olarak fiyatla ilgili ek bilgi eklenebilir -->
-  <div class="price-footer">
-    Krediye uygunluk durumu için bilgi alınız.
-  </div>
-</section>
+          
 
 
 <!-- ======================================= -->

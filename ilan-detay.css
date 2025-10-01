@@ -81,10 +81,10 @@
 
 /* Aktif olan butonun stili */
 .tab-button.active {
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
+  background-color: #111827; /* Tailwind gray-900 */
+  color: white;
+  border-bottom-color: transparent; /* Alt çizgiyi kaldır */
 }
-
 .tab-button:not(.active):hover {
   background-color: #f9fafb;
 }
@@ -191,7 +191,7 @@
 .tab-buttons { display: flex; border-bottom: 1px solid #e5e7eb; }
 .tab-button { padding: 1rem 1.5rem; font-weight: 600; color: #6b7280; border-bottom: 3px solid transparent; transition: all 0.3s ease; }
 .tab-button:hover { background-color: #f9fafb; }
-.tab-button.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+
 .tab-content { padding: 1.5rem; }
 .tab-pane { display: none; }
 .tab-pane.active { display: block; }
