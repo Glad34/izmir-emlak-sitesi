@@ -137,7 +137,7 @@ function populatePage(data, isLoggedIn, token) {
   const anaIlanGercekM2Fiyati = (anaIlanNetM2 > 0) ? anaIlanFiyat / anaIlanNetM2 : 0;
 
   if (digerIlanlar && digerIlanlar.length > 0) {
-    mahalleAdiSpan.textContent = `${ilan['Mahalle']} / ${ilan['Konut Tipi']}`;
+    mahalleAdiSpan.textContent = ilan['Mahalle'];
     
     const tumIlanlar = [ ...digerIlanlar, ilan ];
     const endeksliIlanlar = tumIlanlar.map(i => parseInt(String(i["Endeks m² Fiyatı"]).replace(/[^\d]/g, ''))).filter(fiyat => !isNaN(fiyat) && fiyat > 0);
