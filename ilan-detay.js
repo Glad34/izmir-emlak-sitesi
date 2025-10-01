@@ -334,7 +334,7 @@ function initializePlugins() {
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabPanes = document.querySelectorAll('.tab-pane');
 
-    tabButtons.forEach(button => {
+      tabButtons.forEach(button => {
     button.addEventListener('click', () => {
       const tabId = button.getAttribute('data-tab');
 
@@ -347,13 +347,26 @@ function initializePlugins() {
         activePane.classList.add('active');
       }
 
-      // --- YENİ EKLENEN KAYDIRMA KODU ---
+      // --- GÜNCELLENMİŞ VE AKILLI KAYDIRMA KODU ---
       if (tabId === 'tab-aciklama' || tabId === 'tab-konum') {
         const sekmeliBolum = document.getElementById('sekmeli-bolum');
-        if(sekmeliBolum) {
-          // Bir sonraki frame'de kaydırmayı tetikleyerek daha pürüzsüz bir geçiş sağlıyoruz.
-          requestAnimationFrame(() => {
-            sekmeliBolum.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // 1. Header'ı bul. ID'si 'header-placeholder' olan div'i referans alıyoruz.
+        const header = document.getElementById('header-placeholder');
+        
+        if (sekmeliBolum && header) {
+          // 2. Header'ın yüksekliğini al. Eğer yoksa 0 kabul et.
+          const headerHeight = header.offsetHeight || 0;
+          
+          // 3. Sekmeli bölümün sayfanın en üstüne olan mesafesini hesapla.
+          const elementPosition = sekmeliBolum.getBoundingClientRect().top + window.pageYOffset;
+          
+          // 4. Gitmek istediğimiz nihai pozisyonu hesapla (elemanın pozisyonu - header yüksekliği - küçük bir boşluk).
+          const offsetPosition = elementPosition - headerHeight - 15; // 15px ekstra boşluk
+
+          // 5. Sayfayı hesaplanan yeni pozisyona pürüzsüzce kaydır.
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth"
           });
         }
       }

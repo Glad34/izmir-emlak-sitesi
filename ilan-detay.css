@@ -63,32 +63,27 @@
 }
 
 .tab-button {
-  padding: 1rem 0.5rem; /* Yan boşlukları dar tutarak yer kazanalım */
+  padding: 1rem 0.5rem;
   font-weight: 600;
-  color: #6b7280;
+  color: #4b5563; /* Rengi biraz daha koyu bir gri yaptık */
   border-bottom: 3px solid transparent;
-  transition: all 0.3s ease;
-  white-space: nowrap;  /* Metinlerin alt satıra kaymasını engelle */
+  transition: all 0.2s ease;
+  white-space: nowrap;
   text-align: center;
-  
-  /* Taşma durumunda metnin sonuna "..." ekle (güvenlik önlemi) */
   overflow: hidden;
   text-overflow: ellipsis;
-
-  /* Font boyutunu dar ekranlarda biraz küçültelim */
-  font-size: 0.9rem; /* Yaklaşık 14.4px */
+  font-size: 0.9rem;
 }
 
 /* Aktif olan butonun stili */
 .tab-button.active {
-  background-color: #111827; /* Tailwind gray-900 */
-  color: white;
-  border-bottom-color: transparent; /* Alt çizgiyi kaldır */
+  background-color: #111827; /* Siyah arka plan */
+  color: #ffffff;           /* Beyaz yazı */
+  border-bottom-color: transparent;
 }
 .tab-button:not(.active):hover {
-  background-color: #f9fafb;
+  background-color: #f3f4f6; /* Çok açık gri */
 }
-
 /* ============================================================== */
 /* MASAÜSTÜ GÖRÜNÜMÜ (Ekran 640px'den geniş olduğunda)           */
 /* ============================================================== */
@@ -189,7 +184,6 @@
 /* ======================================= */
 
 .tab-buttons { display: flex; border-bottom: 1px solid #e5e7eb; }
-.tab-button { padding: 1rem 1.5rem; font-weight: 600; color: #6b7280; border-bottom: 3px solid transparent; transition: all 0.3s ease; }
 .tab-button:hover { background-color: #f9fafb; }
 
 .tab-content { padding: 1.5rem; }
