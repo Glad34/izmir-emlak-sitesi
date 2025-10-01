@@ -363,7 +363,7 @@ function initializePlugins() {
           const elementPosition = sekmeliBolum.getBoundingClientRect().top + window.scrollY;
           
           // Olması gereken son pozisyon: Elemanın pozisyonu - Header'ın yüksekliği - Ekstra boşluk
-          const offsetPosition = elementPosition - headerHeight - 20; // 20px'lik bir güvenlik boşluğu bırakıyoruz
+          const offsetPosition = elementPosition - headerHeight - 40; // 20px'lik bir güvenlik boşluğu bırakıyoruz
 
           // Sayfayı hesaplanan bu yeni pozisyona pürüzsüzce kaydır
           window.scrollTo({
