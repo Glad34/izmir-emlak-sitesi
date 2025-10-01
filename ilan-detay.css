@@ -183,7 +183,7 @@
 /* SEKME (TAB) STİLLERİ                    */
 /* ======================================= */
 
-.tab-buttons { display: flex; border-bottom: 1px solid #e5e7eb; }
+
 .tab-button:hover { background-color: #f9fafb; }
 
 .tab-content { padding: 1.5rem; }

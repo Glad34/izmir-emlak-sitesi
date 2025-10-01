@@ -338,32 +338,34 @@ function initializePlugins() {
     button.addEventListener('click', () => {
       const tabId = button.getAttribute('data-tab');
 
+      // Önce tüm aktif sınıflarını temizle
       tabButtons.forEach(btn => btn.classList.remove('active'));
       tabPanes.forEach(pane => pane.classList.remove('active'));
 
+      // Sadece tıklanan butonu ve ilgili içeriği aktif yap
       button.classList.add('active');
       const activePane = document.getElementById(tabId);
       if (activePane) {
         activePane.classList.add('active');
       }
 
-      // --- GÜNCELLENMİŞ VE AKILLI KAYDIRMA KODU ---
+      // --- AKILLI KAYDIRMA KODU (HEADER HESAPLAMALI) ---
       if (tabId === 'tab-aciklama' || tabId === 'tab-konum') {
         const sekmeliBolum = document.getElementById('sekmeli-bolum');
-        // 1. Header'ı bul. ID'si 'header-placeholder' olan div'i referans alıyoruz.
-        const header = document.getElementById('header-placeholder');
+        // Header'ı temsil eden div'i ID'si ile bul
+        const header = document.getElementById('header-placeholder'); 
         
         if (sekmeliBolum && header) {
-          // 2. Header'ın yüksekliğini al. Eğer yoksa 0 kabul et.
-          const headerHeight = header.offsetHeight || 0;
+          // Header'ın o anki yüksekliğini al
+          const headerHeight = header.offsetHeight;
           
-          // 3. Sekmeli bölümün sayfanın en üstüne olan mesafesini hesapla.
-          const elementPosition = sekmeliBolum.getBoundingClientRect().top + window.pageYOffset;
+          // Sekmeli bölümün sayfanın en tepesine olan uzaklığını hesapla
+          const elementPosition = sekmeliBolum.getBoundingClientRect().top + window.scrollY;
           
-          // 4. Gitmek istediğimiz nihai pozisyonu hesapla (elemanın pozisyonu - header yüksekliği - küçük bir boşluk).
-          const offsetPosition = elementPosition - headerHeight - 15; // 15px ekstra boşluk
+          // Olması gereken son pozisyon: Elemanın pozisyonu - Header'ın yüksekliği - Ekstra boşluk
+          const offsetPosition = elementPosition - headerHeight - 20; // 20px'lik bir güvenlik boşluğu bırakıyoruz
 
-          // 5. Sayfayı hesaplanan yeni pozisyona pürüzsüzce kaydır.
+          // Sayfayı hesaplanan bu yeni pozisyona pürüzsüzce kaydır
           window.scrollTo({
             top: offsetPosition,
             behavior: "smooth"
