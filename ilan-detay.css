@@ -207,23 +207,26 @@
 
 /* Turuncu Sıralama Bilgi Kutusu */
 /* Turuncu Sıralama Bilgi Kutusu - Düzeltilmiş */
+/* YENİ - PROFESYONEL SIRALAMA BİLGİ KUTUSU */
 .siralama-bilgi-kutusu {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  background-color: #f97316;
-  color: white;
-  padding: 0.75rem 1rem; /* Başlangıç boşluğu */
+  justify-content: flex-start; /* İçeriği sola yasla */
+  gap: 0.6rem; /* İkon ile metin arası boşluk */
+  background-color: #eff6ff; /* Çok açık, profesyonel bir mavi */
+  color: #3730a3; /* Koyu ve okunaklı bir lacivert */
+  border: 1px solid #c7d2fe; /* Arka plana uygun ince bir çerçeve */
+  padding: 0.6rem 1rem; /* İç boşlukları ayarla */
   border-radius: 8px;
   font-weight: 600;
+  font-size: 0.875rem; /* Yazı boyutunu biraz büyüt (14px) */
   margin-top: -0.5rem;
   margin-bottom: 2rem;
-  text-align: right;
-
-  /* MASAÜSTÜ için varsayılan font boyutu (örneğin 14px) */
-  font-size: 0.275rem; 
-  transition: all 0.2s ease-in-out;
+  
+  /* Tek satır olmasını sağlayan sihirli kodlar */
+  white-space: nowrap; /* Metnin alt satıra kaymasını engelle */
+  overflow: hidden; /* Taşan kısmı gizle */
+  text-overflow: ellipsis; /* Taşarsa sonuna "..." ekle */
 }
 
 /* Ortalama m² Fiyatı Bilgi Kutusu */
