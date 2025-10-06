@@ -1,4 +1,4 @@
-// chatbot-ui.js - İLAN GÖSTERİMİ EKLENMİŞ NİHAİ VE TAM KOD
+// chatbot-ui.js - İLAN GÖSTERİM SIRALAMASI DÜZELTİLMİŞ NİHAİ VE TAM KOD
 
 document.addEventListener('DOMContentLoaded', () => {
     // HTML Elementleri
@@ -43,16 +43,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 2. Gelen Yanıtı İşleme
+    // 2. Gelen Yanıtı İşleme (DÜZELTİLMİŞ MANTIK)
     function handleAiResponse(data) {
         lastAiAdim = data.adim;
         currentStrategy = data.arama_stratejisi || currentStrategy;
         
-        // Önce ilanları göster (eğer varsa), sonra cevabı göster. Bu sıralama önemli.
-        if (data.eylem && data.eylem.includes('sunum_yap') && data.ilan_sonuclari) {
+        // DÜZELTME BAŞLANGICI: Artık tüm adımlar sırayla işlenecek.
+        
+        // 1. Adım: İlanlar varsa, HER ZAMAN göster.
+        if (data.ilan_sonuclari && data.ilan_sonuclari.sunum && data.ilan_sonuclari.sunum.length > 0) {
             addListingsToUI(data.ilan_sonuclari);
         }
 
+        // 2. Adım: Cevap metni varsa, HER ZAMAN göster.
         if (data.cevap) {
             addMessageToUI('ai', data.cevap);
             conversationHistory += `Asistan: ${data.cevap}\n`;
@@ -60,15 +63,21 @@ document.addEventListener('DOMContentLoaded', () => {
         
         userInput.value = "";
 
-        if (data.eylem === 'form_goster') { renderMultiChoiceForm(); }
-        else if (data.eylem === 'telefon_formu_goster' || data.adim === 'telefon_formu_goster') { renderPhoneInputForm(); }
-        else if (data.secenekler && data.secenekler.length > 0) { renderButtons(data.secenekler); }
-        else {
+        // 3. Adım: Bir sonraki etkileşim elementini göster. (Form, Buton veya Telefon Formu)
+        if (data.eylem === 'form_goster') {
+            renderMultiChoiceForm();
+        } else if (data.adim === 'telefon_formu_goster') {
+            renderPhoneInputForm();
+        } else if (data.secenekler && data.secenekler.length > 0) {
+            renderButtons(data.secenekler);
+        } else {
+            // Eğer gösterilecek özel bir element yoksa, yazı alanını aktif et.
             userInput.disabled = false;
             sendButton.disabled = false;
             userInput.placeholder = "İsteklerinizi buraya yazın...";
             userInput.focus();
         }
+        // DÜZELTME SONU
     }
 
     // 3. Veriyi E-Tabloya Kaydetme
@@ -82,10 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==================
-    // ETKİLEŞİM YÖNETİCİLERİ
+    // ETKİLEŞİM YÖNETİCİLERİ (Değişiklik yok)
     // ==================
 
-    // Yazılı Giriş Formu (İsim ve Konum için)
     chatForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const message = userInput.value.trim();
@@ -98,12 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
         sendMessage({ message, history: conversationHistory, current_strategy: currentStrategy });
     });
     
-    // Buton ve Form Tıklamaları için Ana Dinleyici
     let formSelections = { amac: null, mulkTipi: null, butce: null, odaSayisi: null };
     messagesContainer.addEventListener('click', async (event) => {
         const target = event.target;
 
-        // Çoktan seçmeli form içindeki seçenek butonları
         if (target.tagName === 'BUTTON' && target.closest('#multi-choice-form')) {
             if (target.parentElement.classList.contains('options')) {
                 const key = target.parentElement.getAttribute('data-key');
@@ -135,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // "Onayla ve İlanları Getir" gibi standart butonlar
         if (target.classList.contains('chat-option-button')) {
              const message = target.textContent;
              addMessageToUI('user', message);
@@ -144,7 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
              sendMessage({ message, history: conversationHistory, current_strategy: currentStrategy });
         }
 
-        // Telefon formu gönderme butonu
         if (target.id === 'phone-submit-btn') {
             const phoneInput = document.getElementById('phone-input');
             const userPhone = phoneInput.value;
@@ -168,16 +172,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==================
-    // ARAYÜZ OLUŞTURMA FONKSİYONLARI (Renderers)
+    // ARAYÜZ OLUŞTURMA FONKSİYONLARI (Renderers) (Değişiklik yok)
     // ==================
     
-    // İlan Kartlarını Arayüze Ekleyen Fonksiyon
     function addListingsToUI(results) {
         if (!results || !results.sunum || results.sunum.length === 0) return;
-
         const listingsContainer = document.createElement('div');
         listingsContainer.className = 'listings-container';
-
         results.sunum.forEach(ilan => {
             const card = document.createElement('a');
             card.href = ilan.link;
@@ -188,16 +189,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="listing-details">
                     <h3 class="listing-title">${ilan.baslik}</h3>
                     <p class="listing-price">${ilan.fiyat}</p>
-                </div>
-            `;
+                </div>`;
             listingsContainer.appendChild(card);
         });
-
         messagesContainer.appendChild(listingsContainer);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    // Mesaj Balonunu Arayüze Ekleyen Fonksiyon
     function addMessageToUI(sender, text) {
         const messageWrapper = document.createElement('div');
         messageWrapper.classList.add('message', `${sender}-message`);
@@ -208,7 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
     
-    // Standart Seçenek Butonlarını Oluşturan Fonksiyon
     function renderButtons(options) {
         const container = document.createElement('div');
         container.id = 'chat-options-container';
@@ -222,7 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    // Çoktan Seçmeli Formu Oluşturan Fonksiyon
     function renderMultiChoiceForm() {
         formSelections = { amac: null, mulkTipi: null, butce: null, odaSayisi: null };
         const formContainer = document.createElement('div');
@@ -237,7 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    // Telefon Numarası Giriş Formunu Oluşturan Fonksiyon
     function renderPhoneInputForm() {
         const formContainer = document.createElement('div');
         formContainer.id = 'phone-input-form';
@@ -246,13 +241,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="country-code">+90</span>
                 <input type="tel" id="phone-input" placeholder="5XX XXX XX XX" maxlength="14">
             </div>
-            <button id="phone-submit-btn" disabled>Onayla ve Bilgileri Gönder</button>
-        `;
+            <button id="phone-submit-btn" disabled>Onayla ve Bilgileri Gönder</button>`;
         messagesContainer.appendChild(formContainer);
-        
         const phoneInput = document.getElementById('phone-input');
         const submitBtn = document.getElementById('phone-submit-btn');
-
         phoneInput.addEventListener('input', (e) => {
             let value = e.target.value.replace(/\D/g, '');
             let formatted = '';
@@ -267,7 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
         phoneInput.focus();
     }
     
-    // "Yazıyor..." Animasyonunu Gösteren Fonksiyon
     function showTypingIndicator() {
         if (document.getElementById('typing-indicator')) return;
         const typingIndicator = document.createElement('div');
@@ -278,7 +269,6 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    // "Yazıyor..." Animasyonunu Gizleyen Fonksiyon
     function hideTypingIndicator() {
         const indicator = document.getElementById('typing-indicator');
         if (indicator) indicator.remove();
