@@ -667,3 +667,9 @@ header.scrolled {
 #chat-overlay.hidden {
     display: none;
 }
+
+
+/* chatbot deactive etme */
+#chatbot-popup {
+  display: none !important;
+}
