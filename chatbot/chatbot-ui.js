@@ -1,4 +1,4 @@
-// chatbot-ui.js - TELEFON FORMATI DÜZELTİLMİŞ NİHAİ VE TAM KOD
+// chatbot-ui.js - FORM HTML HATASI DÜZELTİLMİŞ NİHAİ VE TAM KOD
 
 document.addEventListener('DOMContentLoaded', () => {
     // HTML Elementleri
@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==================
     // ANA FONKSİYONLAR
     // ==================
+
     async function sendMessage(payload) {
         showTypingIndicator();
         userInput.disabled = true;
@@ -152,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 target.disabled = true;
                 target.textContent = "Kaydediliyor...";
                 
-                // <<< EN KRİTİK DEĞİŞİKLİK BURADA! >>>
                 currentStrategy.telefon = `90${userPhoneRaw}`;
                 
                 const finalPayload = {
@@ -225,10 +225,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const formContainer = document.createElement('div');
         formContainer.id = 'multi-choice-form';
         formContainer.innerHTML = `
-            <div class="form-group"><label>Arama Amacınız:</label><div class="options" data-key="amac"><button data-value="Oturum Amaçlı">Oturum Amaçlı</button><button data-value="Yatırım Amaçlı">Yatırım Amaçlı</button></div></div>
-            <div class.form-group"><label>Mülk Tipi:</label><div class="options" data-key="mulkTipi"><button data-value="Daire">Daire</button><button data-value="Müstakil Ev">Müstakil Ev</button><button data-value="Villa">Villa</button></div></div>
-            <div class="form-group"><label>Bütçe Aralığınız:</label><div class="options" data-key="butce"><button data-value="0 - 5.000.000 TL">0-5M</button><button data-value="5.000.000 - 10.000.000 TL">5-10M</button><button data-value="10.000.000 - 20.000.000 TL">10-20M</button><button data-value="20.000.000 TL ve Üzeri">20M+</button></div></div>
-            <div class="form-group"><label>Minimum Oda Sayısı:</label><div class="options" data-key="odaSayisi"><button data-value="1+1">1+1</button><button data-value="2+1">2+1</button><button data-value="3+1">3+1</button><button data-value="4+1 ve üzeri">4+1+</button></div></div>
+            <div class="form-group">
+                <label>Arama Amacınız:</label>
+                <div class="options" data-key="amac">
+                    <button data-value="Oturum Amaçlı">Oturum Amaçlı</button>
+                    <button data-value="Yatırım Amaçlı">Yatırım Amaçlı</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Mülk Tipi:</label>
+                <div class="options" data-key="mulkTipi">
+                    <button data-value="Daire">Daire</button>
+                    <button data-value="Müstakil Ev">Müstakil Ev</button>
+                    <button data-value="Villa">Villa</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Bütçe Aralığınız:</label>
+                <div class="options" data-key="butce">
+                    <button data-value="0 - 5.000.000 TL">0-5M</button>
+                    <button data-value="5.000.000 - 10.000.000 TL">5-10M</button>
+                    <button data-value="10.000.000 - 20.000.000 TL">10-20M</button>
+                    <button data-value="20.000.000 TL ve Üzeri">20M+</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Minimum Oda Sayısı:</label>
+                <div class="options" data-key="odaSayisi">
+                    <button data-value="1+1">1+1</button>
+                    <button data-value="2+1">2+1</button>
+                    <button data-value="3+1">3+1</button>
+                    <button data-value="4+1 ve üzeri">4+1+</button>
+                </div>
+            </div>
             <button id="form-submit-btn" disabled>Tümünü Seçip Onaylayın</button>`;
         messagesContainer.appendChild(formContainer);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
