@@ -11,17 +11,17 @@ const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, serviceAccountAut
 
 exports.handler = async function (event, context) {
   try {
-    // Frontend'den gelen tüm veriyi tek seferde al
     const data = JSON.parse(event.body);
 
     await doc.loadInfo();
-    const sheet = doc.sheetsByIndex[0]; // İlk sayfayı kullan
+    const sheet = doc.sheetsByIndex[0];
 
-    // Yeni bir satır olarak tüm bilgileri ekle
+    // YENİ "Mahalle" alanı eklendi
     await sheet.addRow({
       'Tarih': new Date().toLocaleString('tr-TR'),
       'İsim': data.isim,
       'Konum': data.konum,
+      'Mahalle': data.mahalle, // YENİ EKLENDİ
       'Telefon': data.telefon,
       'Amaç': data.amac,
       'Mülk Tipi': data.mulkTipi,
