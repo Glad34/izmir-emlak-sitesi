@@ -1,4 +1,4 @@
-// netlify/functions/chatbot.js - KULLANICI ETKİLEŞİMİYLE ADIMLARI AYIRAN NİHAİ VE TAM KOD
+// netlify/functions/chatbot.js - KOMUT MANTIĞI DÜZELTİLMİŞ NİHAİ VE TAM KOD
 
 require('dotenv').config();
 const { OpenAI } = require('openai');
@@ -6,7 +6,7 @@ const allListings = require('./ilan-data.js');
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// === YENİ AKIŞA UYGUN SYSTEM PROMPT ===
+// === YENİ AKIŞA UYGUN SYSTEM PROMPT (Değişiklik yok) ===
 const systemPrompt = `
 KİMLİK: Onur Başaran, Yapay Zeka Gayrimenkul Asistanı.
 GÖREV: Müşterinin ihtiyaçlarını adım adım öğrenerek en uygun mülkleri sunmak. Cevapların daima KESİN JSON ÇIKTI FORMATI'nda olmalıdır.
@@ -30,7 +30,7 @@ JSON ÇIKTILARI
     { "adim": "onay_goster", "eylem": "soru_sor", "cevap": "Kriterlerinizi özetliyorum:\\n- Konum: [Konum]\\n- Mahalle: [Mahalle]\\n...vb.\\nOnaylıyor musunuz?", "secenekler": ["Onayla ve İlanları Getir", "Filtreyi Değiştir"] }
 `;
 
-// === FİLTRELEME FONKSİYONU (DEĞİŞİKLİK YOK) ===
+// === FİLTRELEME FONKSİYONU (Değişiklik yok) ===
 function filterListings(strategy) {
   // Bu fonksiyonun içi öncekiyle tamamen aynı kalacak.
   const k = strategy.arama_stratejisi || strategy;
@@ -86,10 +86,10 @@ exports.handler = async function (event, context) {
             let responseBody;
             if (foundListings.length > 0) {
                 responseBody = {
-                    adim: "sunum_sonrasi_onay", // Yeni adım
+                    adim: "sunum_sonrasi_onay",
                     eylem: "sunum_yap_ve_sor",
                     cevap: `Harika! Kriterlerinize uygun ${foundListings.length} ilan arasından öne çıkanlar şunlar.`,
-                    secenekler: ["Devam Et"], // <<< EN KRİTİK DEĞİŞİKLİK
+                    secenekler: ["Devam Et"],
                     ilan_sonuclari: {
                         sunum: foundListings.slice(0, 2).map(ilan => ({
                             baslik: ilan.Başlık, fiyat: new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(ilan.Fiyat), resim: ilan['Görsel Linki'], link: ilan['Detay Linki']
@@ -108,11 +108,11 @@ exports.handler = async function (event, context) {
             return { statusCode: 200, body: JSON.stringify(responseBody) };
         }
 
-        // 2. ADIM: KULLANICI İLANLARI GÖRDÜKTEN SONRA "DEVAM ET" DEDİĞİNDE
+        // 2. ADIM: KULLANICI "DEVAM ET" DEDİĞİNDE
         if (message === "Devam Et") {
             const responseBody = {
                 adim: "telefon_formu_goster",
-                eylem: "form_goster", // Sadece formu göster
+                eylem: "telefon_formu_goster", // <<< EN KRİTİK DEĞİŞİKLİK BURADA!
                 cevap: "Tüm listeyi ve detayları size gönderebilmem için lütfen telefon numaranızı girin."
             };
             return { statusCode: 200, body: JSON.stringify(responseBody) };
