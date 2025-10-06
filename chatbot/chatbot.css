@@ -257,3 +257,53 @@
     background-color: #ccc;
     cursor: not-allowed;
 }
+
+
+
+
+/* Telefon Giriş Formu Stilleri */
+#phone-input-form {
+    background-color: #f0f4f8;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid #dde;
+}
+.phone-group {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 0 10px;
+}
+.phone-group .country-code {
+    font-weight: bold;
+    color: #555;
+    padding-right: 8px;
+    border-right: 1px solid #eee;
+}
+.phone-group input#phone-input {
+    border: none;
+    outline: none;
+    padding: 12px 10px;
+    font-size: 16px;
+    letter-spacing: 1.5px;
+    width: 100%;
+}
+#phone-submit-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background-color: #007bff; /* Mavi */
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+#phone-submit-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}

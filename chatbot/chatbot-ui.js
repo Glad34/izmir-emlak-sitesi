@@ -1,4 +1,4 @@
-// chatbot-ui.js - TOPLU FORM VE VERİ KAYDI İÇİN NİHAİ KOD
+// chatbot-ui.js - YENİ AKIŞ İÇİN NİHAİ VE TAM KOD
 
 document.addEventListener('DOMContentLoaded', () => {
     // HTML Elementleri
@@ -10,9 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Durum Değişkenleri
     let conversationHistory = "";
     let currentStrategy = {};
-    let lastAiAdim = ""; // AI'nın son adımını sakla (örn: 'telefon_sor')
-    const musteriId = `M-${Date.now()}`; // Her konuşma için benzersiz bir ID
-
+    let lastAiAdim = "";
+    
     // ==================
     // ANA FONKSİYONLAR
     // ==================
@@ -25,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
         userInput.placeholder = "Yanıt bekleniyor...";
 
         try {
-            // İsteği chatbot fonksiyonuna gönder
             const response = await fetch('/api/chatbot', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -35,112 +33,56 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const data = await response.json();
             handleAiResponse(data);
-
         } catch (error) {
             console.error("SendMessage Hatası:", error);
             addMessageToUI('ai', 'Üzgünüm, bir sorunla karşılaştım.');
+            userInput.disabled = false;
+            sendButton.disabled = false;
         } finally {
             hideTypingIndicator();
-            // Duruma göre input'u handleAiResponse yönetecek
         }
     }
 
     // 2. Gelen Yanıtı İşleme
     function handleAiResponse(data) {
-        lastAiAdim = data.adim; // Son adımı güncelle
+        lastAiAdim = data.adim;
         currentStrategy = data.arama_stratejisi || currentStrategy;
         
         if (data.cevap) {
             addMessageToUI('ai', data.cevap);
             conversationHistory += `Asistan: ${data.cevap}\n`;
         }
+        
+        userInput.value = "";
 
-        // Arayüzde yapılacak eylemleri belirle
-        if (data.eylem === 'form_goster') {
-            renderMultiChoiceForm();
-        } else if (data.secenekler && data.secenekler.length > 0) {
-            renderButtons(data.secenekler);
-        } else {
-            // Form veya buton yoksa input'u aç
+        if (data.eylem === 'form_goster') { renderMultiChoiceForm(); }
+        else if (data.eylem === 'telefon_formu_goster' || data.adim === 'telefon_formu_goster') { renderPhoneInputForm(); }
+        else if (data.secenekler && data.secenekler.length > 0) { renderButtons(data.secenekler); }
+        else {
             userInput.disabled = false;
             sendButton.disabled = false;
             userInput.placeholder = "İsteklerinizi buraya yazın...";
             userInput.focus();
         }
 
-        if (data.eylem && data.eylem.includes('sunum_yap')) {
-            addListingsToUI(data.ilan_sonuclari);
-        }
+        if (data.eylem && data.eylem.includes('sunum_yap')) { addListingsToUI(data.ilan_sonuclari); }
     }
 
-    // 3. Veriyi E-Tabloya Kaydetme/Güncelleme
-    async function saveData(type, data) {
+    // 3. Veriyi E-Tabloya Kaydetme
+    async function saveData(data) {
         try {
             await fetch('/api/save-data', {
                 method: 'POST',
-                body: JSON.stringify({ type, ...data })
+                body: JSON.stringify(data)
             });
-        } catch (error) {
-            console.error("Veri kaydetme hatası:", error);
-        }
+        } catch (error) { console.error("Veri kaydetme hatası:", error); }
     }
 
     // ==================
-    // FORM VE BUTON ETKİLEŞİMLERİ
+    // ETKİLEŞİM YÖNETİCİLERİ
     // ==================
 
-    let formSelections = { amac: null, mulkTipi: null, butce: null, odaSayisi: null };
-
-    messagesContainer.addEventListener('click', async (event) => {
-        const target = event.target;
-
-        // Çoktan seçmeli form içindeki seçenek butonları
-        if (target.tagName === 'BUTTON' && target.parentElement.classList.contains('options')) {
-            const key = target.parentElement.getAttribute('data-key');
-            const value = target.getAttribute('data-value');
-            formSelections[key] = value;
-            
-            Array.from(target.parentElement.children).forEach(btn => btn.classList.remove('selected'));
-            target.classList.add('selected');
-
-            const allSelected = Object.values(formSelections).every(v => v !== null);
-            document.getElementById('form-submit-btn').disabled = !allSelected;
-        }
-
-        // Formun ana ONAYLA butonu
-        if (target.id === 'form-submit-btn') {
-            target.disabled = true;
-            target.textContent = "Gönderiliyor...";
-
-            // 1. Veriyi e-tabloya ilk kez kaydet
-            await saveData('INITIAL_SUBMIT', { musteriId, isim: currentStrategy.isim, ...formSelections });
-            
-            // 2. Arayüzü güncelle
-            const userMessage = `Seçimlerim: ${formSelections.amac}, ${formSelections.mulkTipi}, ${formSelections.butce}, ${formSelections.odaSayisi}`;
-            addMessageToUI('user', userMessage);
-            conversationHistory += `Kullanıcı: ${userMessage}\n`;
-            document.getElementById('multi-choice-form').remove();
-
-            // 3. AI'a onaya gönder
-            const payload = {
-                message: `Kullanıcı Form Seçimleri: ${userMessage}`,
-                history: conversationHistory,
-                current_strategy: { ...currentStrategy, ...formSelections }
-            };
-            sendMessage(payload);
-        }
-
-        // "Onayla ve İlanları Getir" gibi standart seçenek butonları
-        if (target.classList.contains('chat-option-button')) {
-             const message = target.textContent;
-             addMessageToUI('user', message);
-             conversationHistory += `Kullanıcı: ${message}\n`;
-             document.getElementById('chat-options-container').remove();
-             sendMessage({ message, history: conversationHistory, current_strategy: currentStrategy });
-        }
-    });
-
-    // Yazılı Giriş Formu (İsim ve Telefon Numarası için)
+    // Yazılı Giriş Formu (İsim ve Konum için)
     chatForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const message = userInput.value.trim();
@@ -148,19 +90,77 @@ document.addEventListener('DOMContentLoaded', () => {
 
         addMessageToUI('user', message);
         conversationHistory += `Kullanıcı: ${message}\n`;
-        const tempMessage = userInput.value; // Değeri kaybolmadan sakla
         userInput.value = '';
+        
+        sendMessage({ message, history: conversationHistory, current_strategy: currentStrategy });
+    });
 
-        // Eğer son adım telefon sormaksa, bu girişi telefon olarak kabul et ve kaydet
-        if (lastAiAdim === 'telefon_sor') {
-             await saveData('PHONE_SUBMIT', { musteriId, telefon: tempMessage });
-             addMessageToUI('ai', "Teşekkür ederim. Bilgileriniz alındı, en kısa sürede size dönüş yapacağım.");
-             userInput.disabled = true;
-             sendButton.disabled = true;
-             userInput.placeholder = "Görüşme tamamlandı.";
-        } else {
-            // Diğer durumlar (örn: ilk isim girişi)
-            sendMessage({ message, history: conversationHistory, current_strategy: currentStrategy });
+    // Buton ve Form Tıklamaları için Ana Dinleyici
+    let formSelections = { amac: null, mulkTipi: null, butce: null, odaSayisi: null };
+    messagesContainer.addEventListener('click', async (event) => {
+        const target = event.target;
+
+        // Çoktan seçmeli form içindeki seçenek butonları
+        if (target.tagName === 'BUTTON' && target.closest('#multi-choice-form')) {
+            if (target.parentElement.classList.contains('options')) {
+                const key = target.parentElement.getAttribute('data-key');
+                const value = target.getAttribute('data-value');
+                formSelections[key] = value;
+                
+                Array.from(target.parentElement.children).forEach(btn => btn.classList.remove('selected'));
+                target.classList.add('selected');
+
+                const allSelected = Object.values(formSelections).every(v => v !== null);
+                document.getElementById('form-submit-btn').disabled = !allSelected;
+            }
+            if (target.id === 'form-submit-btn') {
+                target.disabled = true;
+                target.textContent = "Gönderiliyor...";
+
+                const userMessage = `Seçimlerim tamamlandı.`;
+                addMessageToUI('user', userMessage);
+                conversationHistory += `Kullanıcı: ${userMessage}\n`;
+                document.getElementById('multi-choice-form').remove();
+
+                currentStrategy = {...currentStrategy, ...formSelections};
+                const payload = {
+                    message: `Kullanıcı Form Seçimleri: ${JSON.stringify(formSelections)}`,
+                    history: conversationHistory,
+                    current_strategy: currentStrategy
+                };
+                sendMessage(payload);
+            }
+        }
+
+        // "Onayla ve İlanları Getir" gibi standart butonlar
+        if (target.classList.contains('chat-option-button')) {
+             const message = target.textContent;
+             addMessageToUI('user', message);
+             conversationHistory += `Kullanıcı: ${message}\n`;
+             document.getElementById('chat-options-container').remove();
+             sendMessage({ message, history: conversationHistory, current_strategy: currentStrategy });
+        }
+
+        // Telefon formu gönderme butonu
+        if (target.id === 'phone-submit-btn') {
+            const phoneInput = document.getElementById('phone-input');
+            const userPhone = phoneInput.value;
+
+            if (userPhone.replace(/\s/g, '').length === 10) {
+                target.disabled = true;
+                target.textContent = "Kaydediliyor...";
+                
+                currentStrategy.telefon = `+90 ${userPhone}`;
+                await saveData(currentStrategy);
+
+                addMessageToUI('user', `Telefon Numaram: ${userPhone}`);
+                document.getElementById('phone-input-form').remove();
+                addMessageToUI('ai', "Teşekkür ederim! Bilgileriniz başarıyla alındı. En kısa sürede size dönüş yapacağım.");
+                
+                userInput.disabled = true;
+                sendButton.disabled = true;
+                userInput.placeholder = "Görüşme tamamlandı.";
+            }
         }
     });
 
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderMultiChoiceForm() {
-        formSelections = { amac: null, mulkTipi: null, butce: null, odaSayisi: null }; // Formu sıfırla
+        formSelections = { amac: null, mulkTipi: null, butce: null, odaSayisi: null };
         const formContainer = document.createElement('div');
         formContainer.id = 'multi-choice-form';
         formContainer.innerHTML = `
@@ -204,11 +204,53 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesContainer.appendChild(formContainer);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
+
+    function renderPhoneInputForm() {
+        const formContainer = document.createElement('div');
+        formContainer.id = 'phone-input-form';
+        formContainer.innerHTML = `
+            <div class="phone-group">
+                <span class="country-code">+90</span>
+                <input type="tel" id="phone-input" placeholder="5XX XXX XX XX" maxlength="14">
+            </div>
+            <button id="phone-submit-btn" disabled>Onayla ve Bilgileri Gönder</button>
+        `;
+        messagesContainer.appendChild(formContainer);
+        
+        const phoneInput = document.getElementById('phone-input');
+        const submitBtn = document.getElementById('phone-submit-btn');
+
+        phoneInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            let formatted = '';
+            if (value.length > 0) { formatted += value.substring(0, 3); }
+            if (value.length > 3) { formatted += ' ' + value.substring(3, 6); }
+            if (value.length > 6) { formatted += ' ' + value.substring(6, 8); }
+            if (value.length > 8) { formatted += ' ' + value.substring(8, 10); }
+            e.target.value = formatted;
+            submitBtn.disabled = value.length !== 10;
+        });
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        phoneInput.focus();
+    }
     
     function addListingsToUI(results) { /* Bu fonksiyon aynı kalabilir */ }
-    function showTypingIndicator() { /* Bu fonksiyon aynı kalabilir */ }
-    function hideTypingIndicator() { /* Bu fonksiyon aynı kalabilir */ }
+    
+    function showTypingIndicator() {
+        if (document.getElementById('typing-indicator')) return;
+        const typingIndicator = document.createElement('div');
+        typingIndicator.id = 'typing-indicator';
+        typingIndicator.classList.add('message', 'ai-message');
+        typingIndicator.innerHTML = `<p><span>.</span><span>.</span><span>.</span></p>`;
+        messagesContainer.appendChild(typingIndicator);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
 
-    // Chatbot'u başlat
+    function hideTypingIndicator() {
+        const indicator = document.getElementById('typing-indicator');
+        if (indicator) indicator.remove();
+    }
+
+    // Chatbot'u Başlat
     sendMessage({ message: "Yeni bir konuşma başlat.", history: "" });
 });
