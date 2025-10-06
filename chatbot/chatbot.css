@@ -201,65 +201,163 @@
 
 
 
+/* ==================================
+   GELİŞTİRİLMİŞ FORM STİLLERİ
+   ================================== */
 
-
-
-
-/* Çoktan Seçmeli Form Stilleri */
+/* Ana Form Konteyneri (Kart Görünümü) */
 #multi-choice-form {
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    padding: 15px;
+    background-color: #f7f9fc;
+    border-radius: 12px;
+    padding: 20px;
     margin: 10px 0;
-    border: 1px solid #eee;
+    border: 1px solid #e1e8ed;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
+
+/* Her bir soru grubu (Başlık + Seçenekler) */
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    align-items: center;
+    gap: 15px;
 }
+
+/* Soru Başlıkları */
 .form-group label {
-    font-weight: bold;
-    color: #333;
-    display: block;
-    margin-bottom: 8px;
+    font-weight: 600;
+    color: #14171a;
+    font-size: 15px;
 }
+
+/* Seçenek butonlarının olduğu alan */
 .form-group .options {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
 }
+
+/* Seçenek Butonları */
 .form-group .options button {
-    background-color: #fff;
-    border: 1px solid #ccc;
+    background-color: #ffffff;
+    border: 1px solid #ccd6dd;
     border-radius: 20px;
-    padding: 8px 15px;
+    padding: 8px 16px;
     cursor: pointer;
     font-size: 14px;
-    transition: all 0.2s ease;
+    font-weight: 500;
+    color: #333;
+    transition: all 0.2s ease-in-out;
 }
+
+/* Butonların üzerine gelince */
+.form-group .options button:hover {
+    border-color: #0055a5;
+    color: #0055a5;
+}
+
+/* Seçilmiş Buton */
 .form-group .options button.selected {
-    background-color: #0055a5; /* RE/MAX Mavisi */
+    background-color: #0055a5;
     color: white;
     border-color: #0055a5;
+    box-shadow: 0 2px 4px rgba(0, 85, 165, 0.2);
 }
+
+/* Ana Onay Butonu */
 #form-submit-btn {
     width: 100%;
-    padding: 12px;
+    grid-column: 1 / -1;
+    padding: 14px;
     border: none;
     border-radius: 8px;
-    background-color: #4CAF50; /* Yeşil */
+    background-color: #d11242;
     color: white;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     margin-top: 10px;
+    transition: background-color 0.2s ease;
 }
+
+#form-submit-btn:hover {
+    background-color: #a70f35;
+}
+
+/* Devre Dışı Bırakılmış Onay Butonu */
 #form-submit-btn:disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
 
+#form-submit-btn:disabled:hover {
+    background-color: #ccc;
+}
 
+/* ==================================
+   DİĞER CHATBOT STİLLERİ
+   (İlan kartları, telefon formu vb.)
+   ================================== */
 
+/* İlan Kartları Önizleme Stilleri */
+.listings-container {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 0;
+}
+
+.listing-card {
+    display: block;
+    flex-shrink: 0;
+    width: 220px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.listing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.listing-image {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    display: block;
+}
+
+.listing-details {
+    padding: 12px;
+}
+
+.listing-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    min-height: 40px; /* İki satırlık başlık için alan ayırır */
+    
+    /* Uzun başlıkların iki satırda kalıp kesilmesini sağlar */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2; /* Eski tarayıcılar için */
+    line-clamp: 2;          /* <<< YENİ EKLENEN STANDART ÖZELLİK */
+}
+
+.listing-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #0055a5;
+    margin: 0;
+}
 
 /* Telefon Giriş Formu Stilleri */
 #phone-input-form {
@@ -296,7 +394,7 @@
     padding: 12px;
     border: none;
     border-radius: 8px;
-    background-color: #007bff; /* Mavi */
+    background-color: #007bff;
     color: white;
     font-size: 16px;
     font-weight: bold;
@@ -308,57 +406,23 @@
     cursor: not-allowed;
 }
 
-.listings-container {
+/* Standart Seçenek Butonları */
+#chat-options-container {
     display: flex;
-    gap: 10px; /* Kartlar arası boşluk */
-    overflow-x: auto; /* Yatayda kaydırma (eğer sığmazsa) */
+    flex-wrap: wrap;
+    gap: 10px;
     padding: 10px 0;
 }
-
-.listing-card {
-    display: block;
-    flex-shrink: 0;
-    width: 220px; /* Kart genişliği */
-    border-radius: 12px;
-    overflow: hidden;
+.chat-option-button {
     background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-decoration: none;
-    color: inherit;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #0055a5;
+    color: #0055a5;
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
 }
-
-.listing-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.listing-image {
-    width: 100%;
-    height: 140px;
-    object-fit: cover; /* Resmi kırparak sığdırır */
-    display: block;
-}
-
-.listing-details {
-    padding: 12px;
-}
-
-.listing-title {
-    font-size: 15px;
-    font-weight: 600;
-    margin: 0 0 8px 0;
-    /* Uzun başlıkların iki satırda kalıp kesilmesini sağlar */
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-height: 40px; /* İki satırlık başlık için alan ayırır */
-}
-
-.listing-price {
-    font-size: 18px;
-    font-weight: bold;
-    color: #0055a5; /* RE/MAX Mavisi */
-    margin: 0;
+.chat-option-button:hover {
+    background-color: #f0f4f8;
 }
