@@ -307,3 +307,58 @@
     background-color: #ccc;
     cursor: not-allowed;
 }
+
+.listings-container {
+    display: flex;
+    gap: 10px; /* Kartlar arası boşluk */
+    overflow-x: auto; /* Yatayda kaydırma (eğer sığmazsa) */
+    padding: 10px 0;
+}
+
+.listing-card {
+    display: block;
+    flex-shrink: 0;
+    width: 220px; /* Kart genişliği */
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.listing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.listing-image {
+    width: 100%;
+    height: 140px;
+    object-fit: cover; /* Resmi kırparak sığdırır */
+    display: block;
+}
+
+.listing-details {
+    padding: 12px;
+}
+
+.listing-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    /* Uzun başlıkların iki satırda kalıp kesilmesini sağlar */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 40px; /* İki satırlık başlık için alan ayırır */
+}
+
+.listing-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #0055a5; /* RE/MAX Mavisi */
+    margin: 0;
+}
