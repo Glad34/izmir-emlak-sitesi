@@ -1,4 +1,4 @@
-// chatbot-ui.js - SIRALAMA MANTIĞI DÜZELTİLMİŞ NİHAİ VE TAM KOD
+// chatbot-ui.js - TELEFON FORMATI DÜZELTİLMİŞ NİHAİ VE TAM KOD
 
 document.addEventListener('DOMContentLoaded', () => {
     // HTML Elementleri
@@ -11,12 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let conversationHistory = "";
     let currentStrategy = {};
     let lastAiAdim = "";
-    let foundListingsData = []; // Bulunan tüm ilanları geçici olarak saklamak için
+    let foundListingsData = [];
 
     // ==================
     // ANA FONKSİYONLAR
     // ==================
-
     async function sendMessage(payload) {
         showTypingIndicator();
         userInput.disabled = true;
@@ -43,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Gelen Yanıtı İşleme (DÜZELTİLMİŞ MANTIK)
     function handleAiResponse(data) {
         lastAiAdim = data.adim;
         currentStrategy = data.arama_stratejisi || currentStrategy;
@@ -52,12 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
             foundListingsData = data.tum_ilanlar;
         }
         
-        // 1. Adım: İlan önizlemesi varsa, göster.
         if (data.ilan_sonuclari && data.ilan_sonuclari.sunum && data.ilan_sonuclari.sunum.length > 0) {
             addListingsToUI(data.ilan_sonuclari);
         }
 
-        // 2. Adım: Cevap metni varsa, göster.
         if (data.cevap) {
             addMessageToUI('ai', data.cevap);
             conversationHistory += `Asistan: ${data.cevap}\n`;
@@ -65,10 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         userInput.value = "";
 
-        // 3. Adım: Bir sonraki etkileşim elementini göster.
         if (data.eylem === 'form_goster') {
             renderMultiChoiceForm();
-        } else if (data.adim === 'telefon_formu_goster') {
+        } else if (data.adim === 'telefon_formu_goster' || data.eylem === 'telefon_formu_goster') {
             renderPhoneInputForm();
         } else if (data.secenekler && data.secenekler.length > 0) {
             renderButtons(data.secenekler);
@@ -107,10 +102,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let formSelections = { amac: null, mulkTipi: null, butce: null, odaSayisi: null };
     messagesContainer.addEventListener('click', async (event) => {
-        const target = event.target.closest('button'); // Tıklanan elementin kendisi veya üstündeki button'u bul
-        if (!target) return; // Eğer bir butona tıklanmadıysa devam etme
+        const target = event.target.closest('button');
+        if (!target) return;
 
-        // Çoktan seçmeli form içindeki seçenek butonları
         if (target.closest('#multi-choice-form')) {
             if (target.parentElement.classList.contains('options')) {
                 const key = target.parentElement.getAttribute('data-key');
@@ -142,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // "Onayla ve İlanları Getir" gibi standart butonlar
         if (target.classList.contains('chat-option-button')) {
              const message = target.textContent;
              addMessageToUI('user', message);
@@ -151,16 +144,16 @@ document.addEventListener('DOMContentLoaded', () => {
              sendMessage({ message, history: conversationHistory, current_strategy: currentStrategy });
         }
 
-        // Telefon formu gönderme butonu
         if (target.id === 'phone-submit-btn') {
             const phoneInput = document.getElementById('phone-input');
-            const userPhone = phoneInput.value;
+            const userPhoneRaw = phoneInput.value.replace(/\s/g, '');
 
-            if (userPhone.replace(/\s/g, '').length === 10) {
+            if (userPhoneRaw.length === 10) {
                 target.disabled = true;
                 target.textContent = "Kaydediliyor...";
                 
-                currentStrategy.telefon = `+90 ${userPhone}`;
+                // <<< EN KRİTİK DEĞİŞİKLİK BURADA! >>>
+                currentStrategy.telefon = `90${userPhoneRaw}`;
                 
                 const finalPayload = {
                     ...currentStrategy,
@@ -168,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 await saveData(finalPayload);
 
-                addMessageToUI('user', `Telefon Numaram: ${userPhone}`);
+                addMessageToUI('user', `Telefon Numaram: ${phoneInput.value}`);
                 document.getElementById('phone-input-form').remove();
                 addMessageToUI('ai', "Teşekkür ederim! Bilgileriniz başarıyla alındı. En kısa sürede size dönüş yapacağım.");
                 
@@ -233,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formContainer.id = 'multi-choice-form';
         formContainer.innerHTML = `
             <div class="form-group"><label>Arama Amacınız:</label><div class="options" data-key="amac"><button data-value="Oturum Amaçlı">Oturum Amaçlı</button><button data-value="Yatırım Amaçlı">Yatırım Amaçlı</button></div></div>
-            <div class="form-group"><label>Mülk Tipi:</label><div class="options" data-key="mulkTipi"><button data-value="Daire">Daire</button><button data-value="Müstakil Ev">Müstakil Ev</button><button data-value="Villa">Villa</button></div></div>
+            <div class.form-group"><label>Mülk Tipi:</label><div class="options" data-key="mulkTipi"><button data-value="Daire">Daire</button><button data-value="Müstakil Ev">Müstakil Ev</button><button data-value="Villa">Villa</button></div></div>
             <div class="form-group"><label>Bütçe Aralığınız:</label><div class="options" data-key="butce"><button data-value="0 - 5.000.000 TL">0-5M</button><button data-value="5.000.000 - 10.000.000 TL">5-10M</button><button data-value="10.000.000 - 20.000.000 TL">10-20M</button><button data-value="20.000.000 TL ve Üzeri">20M+</button></div></div>
             <div class="form-group"><label>Minimum Oda Sayısı:</label><div class="options" data-key="odaSayisi"><button data-value="1+1">1+1</button><button data-value="2+1">2+1</button><button data-value="3+1">3+1</button><button data-value="4+1 ve üzeri">4+1+</button></div></div>
             <button id="form-submit-btn" disabled>Tümünü Seçip Onaylayın</button>`;

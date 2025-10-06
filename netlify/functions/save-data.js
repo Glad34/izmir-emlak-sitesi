@@ -34,7 +34,7 @@ exports.handler = async function (event, context) {
         const ilanlarSheet = doc.sheetsByTitle['İlanlar']; // Sekme adına göre seç
         const rowsToAdd = data.foundListings.map(ilan => {
             // Müşteri ismini her ilana ekleyerek ilişki kur
-            return { 'İsim': data.isim, ...ilan };
+            return { 'İsim': data.isim,'Telefon': data.telefon, ...ilan };
         });
         await ilanlarSheet.addRows(rowsToAdd);
     }

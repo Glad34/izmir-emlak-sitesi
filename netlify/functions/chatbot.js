@@ -1,4 +1,4 @@
-// netlify/functions/chatbot.js - KOMUT MANTIĞI DÜZELTİLMİŞ NİHAİ VE TAM KOD
+// netlify/functions/chatbot.js - ESNEK BÜTÇE FİLTRESİ EKLENMİŞ NİHAİ VE TAM KOD
 
 require('dotenv').config();
 const { OpenAI } = require('openai');
@@ -6,7 +6,7 @@ const allListings = require('./ilan-data.js');
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// === YENİ AKIŞA UYGUN SYSTEM PROMPT (Değişiklik yok) ===
+// === SYSTEM PROMPT (Değişiklik yok) ===
 const systemPrompt = `
 KİMLİK: Onur Başaran, Yapay Zeka Gayrimenkul Asistanı.
 GÖREV: Müşterinin ihtiyaçlarını adım adım öğrenerek en uygun mülkleri sunmak. Cevapların daima KESİN JSON ÇIKTI FORMATI'nda olmalıdır.
@@ -30,23 +30,41 @@ JSON ÇIKTILARI
     { "adim": "onay_goster", "eylem": "soru_sor", "cevap": "Kriterlerinizi özetliyorum:\\n- Konum: [Konum]\\n- Mahalle: [Mahalle]\\n...vb.\\nOnaylıyor musunuz?", "secenekler": ["Onayla ve İlanları Getir", "Filtreyi Değiştir"] }
 `;
 
-// === FİLTRELEME FONKSİYONU (Değişiklik yok) ===
+// === FİLTRELEME FONKSİYONU (YENİ ESNEK BÜTÇE MANTIĞI EKLENDİ) ===
 function filterListings(strategy) {
-  // Bu fonksiyonun içi öncekiyle tamamen aynı kalacak.
   const k = strategy.arama_stratejisi || strategy;
   const ODA_SAYISI_HIYERARSISI = ["1+1", "2+1", "2.5+1", "3+1", "3.5+1", "3+2", "4+1", "4+2", "4.5+1", "5+1", "5+2", "6+2", "7+1", "7+2", "8+1", "10+1"];
   const DAIRE_TIPLERI = ["daire", "rezidans"];
   const MUSTAKIL_TIPLERI = ["villa", "müstakil ev", "köşk & konak", "yazlık", "yalı dairesi", "çiftlik evi"];
+
   return allListings.filter(ilan => {
+    // YENİ ESNEK BÜTÇE FİLTRESİ
     const butceStr = (k.butce || "");
     if (butceStr) {
-        const sayilar = butceStr.match(/\d{1,3}(?:\.\d{3})*/g)?.map(s => s.replace(/\./g, '')) || [];
-        let minButce = 0, maxButce = 0;
-        if (butceStr.includes('Üzeri')) { minButce = parseInt(sayilar[0]); maxButce = Infinity; }
-        else if (sayilar.length > 1) { minButce = parseInt(sayilar[0]); maxButce = parseInt(sayilar[1]); }
-        else if (sayilar.length === 1) { minButce = 0; maxButce = parseInt(sayilar[0]); }
-        if (parseInt(ilan.Fiyat) > maxButce || parseInt(ilan.Fiyat) < minButce) return false;
+        let minButce = 0;
+        let maxButce = Infinity;
+
+        if (butceStr.includes("0 - 5.000.000")) {
+            minButce = 0;
+            maxButce = 6000000; // 0-6 Milyon arası arama yap
+        } else if (butceStr.includes("5.000.000 - 10.000.000")) {
+            minButce = 0; // Alt limiti kaldırarak daha fazla sonuç bul
+            maxButce = 11000000; // 0-11 Milyon arası arama yap
+        } else if (butceStr.includes("10.000.000 - 20.000.000")) {
+            minButce = 0; // Alt limiti kaldır
+            maxButce = 21000000; // 0-21 Milyon arası arama yap
+        } else if (butceStr.includes("20.000.000 TL ve Üzeri")) {
+            minButce = 20000000; // 20 Milyon'dan başla
+            maxButce = Infinity; // Üst limit yok
+        }
+        
+        const ilanFiyati = parseInt(ilan.Fiyat);
+        if (ilanFiyati < minButce || ilanFiyati > maxButce) {
+            return false;
+        }
     }
+    
+    // Diğer filtreler (Oda Sayısı, Mülk Tipi, Konum) aynı kalabilir
     const minOdaSayisi = (k.odaSayisi || "").replace(' ve üzeri', '');
     if (minOdaSayisi) {
       const startIndex = ODA_SAYISI_HIYERARSISI.indexOf(minOdaSayisi);
@@ -71,16 +89,16 @@ function filterListings(strategy) {
         const ilanMahalle = (ilan.Mahalle || "").toLowerCase().trim();
         if (!ilanMahalle.includes(arananMahalle)) return false;
     }
+    
     return true;
   });
 }
 
-// === ANA HANDLER (YENİ MANTIKLA GÜNCELLENDİ) ===
+// === ANA HANDLER (Değişiklik yok) ===
 exports.handler = async function (event, context) {
     try {
         const { message, history, current_strategy } = JSON.parse(event.body);
         
-        // 1. ADIM: KULLANICI İLANLARI İSTEDİĞİNDE
         if (message === "Onayla ve İlanları Getir") {
             const foundListings = filterListings(current_strategy);
             let responseBody;
@@ -108,17 +126,15 @@ exports.handler = async function (event, context) {
             return { statusCode: 200, body: JSON.stringify(responseBody) };
         }
 
-        // 2. ADIM: KULLANICI "DEVAM ET" DEDİĞİNDE
         if (message === "Devam Et") {
             const responseBody = {
                 adim: "telefon_formu_goster",
-                eylem: "telefon_formu_goster", // <<< EN KRİTİK DEĞİŞİKLİK BURADA!
+                eylem: "telefon_formu_goster",
                 cevap: "Tüm listeyi ve detayları size gönderebilmem için lütfen telefon numaranızı girin."
             };
             return { statusCode: 200, body: JSON.stringify(responseBody) };
         }
 
-        // DİĞER TÜM DURUMLARDA OpenAI'ye DANIŞ
         const response = await openai.chat.completions.create({
             model: "gpt-4-turbo",
             messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `KONUŞMA GEÇMİŞİ:${history}\n\nKULLANICI MESAJI:${message}` }],
