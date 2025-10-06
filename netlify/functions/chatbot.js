@@ -1,4 +1,4 @@
-// netlify/functions/chatbot.js - İLÇE/MAHALLE AYRIŞTIRMALI NİHAİ VE TAM KOD
+// netlify/functions/chatbot.js - TÜM İLAN KAYDI VE GÖSTERİMİ İÇİN NİHAİ VE TAM KOD
 
 require('dotenv').config();
 const { OpenAI } = require('openai');
@@ -9,7 +9,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 // === İLÇE/MAHALLE TESPİTİ İÇİN GÜNCELLENMİŞ SYSTEM PROMPT ===
 const systemPrompt = `
 KİMLİK: Onur Başaran, Yapay Zeka Gayrimenkul Asistanı.
-GÖREV: Müşterinin ihtiyaçlarını adım adım öğrenerek en uygun mülkleri sunmak. Cevapların daima KESİN JSON ÇIKTI FORMATI'nda olmalıdır.
+GÖREV: Müşterinin ihtiyaçlarını adım adım öğrenerek en uygun mülkleri sunmak. Cevapların daima KESİN JSON ÇİKTİ FORMATI'nda olmalıdır.
 
 GÖREV AKIŞI
 1.  **isim_sor (Başlangıç):** Sadece müşterinin ismini sor.
@@ -36,7 +36,6 @@ function filterListings(strategy) {
   const MUSTAKIL_TIPLERI = ["villa", "müstakil ev", "köşk & konak", "yazlık", "yalı dairesi", "çiftlik evi"];
 
   return allListings.filter(ilan => {
-    // Bütçe Filtresi
     const butceStr = (k.butce || "");
     if (butceStr) {
         const sayilar = butceStr.match(/\d{1,3}(?:\.\d{3})*/g)?.map(s => s.replace(/\./g, '')) || [];
@@ -50,15 +49,11 @@ function filterListings(strategy) {
         }
         if (parseInt(ilan.Fiyat) > maxButce || parseInt(ilan.Fiyat) < minButce) return false;
     }
-    
-    // Oda Sayısı Filtresi
     const minOdaSayisi = (k.odaSayisi || "").replace(' ve üzeri', '');
     if (minOdaSayisi) {
       const startIndex = ODA_SAYISI_HIYERARSISI.indexOf(minOdaSayisi);
       if (startIndex > -1 && !ODA_SAYISI_HIYERARSISI.slice(startIndex).includes(ilan['Oda Sayısı'])) return false;
     }
-
-    // Mülk Tipi Filtresi
     const konutTipi = (k.mulkTipi || "").toLowerCase();
     if (konutTipi) {
         const ilanTipi = (ilan['Konut Tipi'] || "").toLowerCase();
@@ -68,30 +63,25 @@ function filterListings(strategy) {
         else if (konutTipi === 'villa' && ilanTipi === 'villa') tipUygun = true;
         if (!tipUygun) return false;
     }
-
-    // GÜNCELLENDİ: Büyük/küçük harfe duyarsız ilçe ve mahalle filtreleme
     const arananIlce = (k.konum || "").toLowerCase().trim();
     if (arananIlce) {
         const ilanIlce = (ilan.Konum || "").toLowerCase().trim();
         if (!ilanIlce.includes(arananIlce)) return false;
     }
-
     const arananMahalle = (k.mahalle || "").toLowerCase().trim();
     if (arananMahalle && arananMahalle !== 'tümü') {
         const ilanMahalle = (ilan.Mahalle || "").toLowerCase().trim();
         if (!ilanMahalle.includes(arananMahalle)) return false;
     }
-
     return true;
   });
 }
 
-// === ANA HANDLER FONKSİYONU (DEĞİŞİKLİK YOK) ===
+// === ANA HANDLER FONKSİYONU (GÜNCELLENDİ) ===
 exports.handler = async function (event, context) {
     try {
         const { message, history, current_strategy } = JSON.parse(event.body);
         
-        // Kullanıcı onayı geldiyse, OpenAI'ye tekrar sormadan direkt ilanları filtrele
         if (message === "Onayla ve İlanları Getir") {
             const foundListings = filterListings(current_strategy);
             let responseBody;
@@ -101,12 +91,17 @@ exports.handler = async function (event, context) {
                     adim: "telefon_formu_goster",
                     eylem: "sunum_yap_ve_form_goster",
                     cevap: `Harika! Kriterlerinize uygun ${foundListings.length} ilan arasından öne çıkanlar şunlar.`,
+                    // ÖNİZLEME İÇİN 2 İLAN
                     ilan_sonuclari: {
-                        toplam_sayi: foundListings.length,
                         sunum: foundListings.slice(0, 2).map(ilan => ({
-                            id: ilan['İlan ID'], baslik: ilan.Başlık, fiyat: new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(ilan.Fiyat), resim: ilan['Görsel Linki'], link: `ilan-detay.html?id=${ilan['İlan ID']}`
+                            baslik: ilan.Başlık, 
+                            fiyat: new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(ilan.Fiyat), 
+                            resim: ilan['Görsel Linki'], 
+                            link: ilan['Detay Linki']
                         }))
-                    }
+                    },
+                    // KAYDETMEK İÇİN TÜM İLANLAR
+                    tum_ilanlar: foundListings 
                 };
             } else {
                 responseBody = {
@@ -119,7 +114,6 @@ exports.handler = async function (event, context) {
             return { statusCode: 200, body: JSON.stringify(responseBody) };
         }
 
-        // Diğer tüm durumlarda OpenAI'ye danış
         const response = await openai.chat.completions.create({
             model: "gpt-4-turbo",
             messages: [

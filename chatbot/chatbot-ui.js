@@ -1,4 +1,4 @@
-// chatbot-ui.js - İLAN GÖSTERİM SIRALAMASI DÜZELTİLMİŞ NİHAİ VE TAM KOD
+// chatbot-ui.js - SIRALAMA MANTIĞI DÜZELTİLMİŞ NİHAİ VE TAM KOD
 
 document.addEventListener('DOMContentLoaded', () => {
     // HTML Elementleri
@@ -11,7 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let conversationHistory = "";
     let currentStrategy = {};
     let lastAiAdim = "";
-    
+    let foundListingsData = []; // Bulunan tüm ilanları geçici olarak saklamak için
+
     // ==================
     // ANA FONKSİYONLAR
     // ==================
@@ -47,9 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
         lastAiAdim = data.adim;
         currentStrategy = data.arama_stratejisi || currentStrategy;
         
-        // DÜZELTME BAŞLANGICI: Artık tüm adımlar birbirinden bağımsız olarak kontrol edilecek.
+        if (data.tum_ilanlar) {
+            foundListingsData = data.tum_ilanlar;
+        }
         
-        // 1. Adım: İlanlar varsa, göster.
+        // 1. Adım: İlan önizlemesi varsa, göster.
         if (data.ilan_sonuclari && data.ilan_sonuclari.sunum && data.ilan_sonuclari.sunum.length > 0) {
             addListingsToUI(data.ilan_sonuclari);
         }
@@ -62,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         userInput.value = "";
 
-        // 3. Adım: Bir sonraki etkileşim elementini göster. Burası "if/else if" olmalı çünkü aynı anda sadece bir tip etkileşim olabilir.
+        // 3. Adım: Bir sonraki etkileşim elementini göster.
         if (data.eylem === 'form_goster') {
             renderMultiChoiceForm();
         } else if (data.adim === 'telefon_formu_goster') {
@@ -70,13 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (data.secenekler && data.secenekler.length > 0) {
             renderButtons(data.secenekler);
         } else {
-            // Eğer gösterilecek özel bir element yoksa, yazı alanını aktif et.
             userInput.disabled = false;
             sendButton.disabled = false;
             userInput.placeholder = "İsteklerinizi buraya yazın...";
             userInput.focus();
         }
-        // DÜZELTME SONU
     }
 
     async function saveData(data) {
@@ -89,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==================
-    // ETKİLEŞİM YÖNETİCİLERİ (Değişiklik yok)
+    // ETKİLEŞİM YÖNETİCİLERİ
     // ==================
 
     chatForm.addEventListener('submit', async (event) => {
@@ -106,9 +107,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let formSelections = { amac: null, mulkTipi: null, butce: null, odaSayisi: null };
     messagesContainer.addEventListener('click', async (event) => {
-        const target = event.target;
+        const target = event.target.closest('button'); // Tıklanan elementin kendisi veya üstündeki button'u bul
+        if (!target) return; // Eğer bir butona tıklanmadıysa devam etme
 
-        if (target.tagName === 'BUTTON' && target.closest('#multi-choice-form')) {
+        // Çoktan seçmeli form içindeki seçenek butonları
+        if (target.closest('#multi-choice-form')) {
             if (target.parentElement.classList.contains('options')) {
                 const key = target.parentElement.getAttribute('data-key');
                 const value = target.getAttribute('data-value');
@@ -139,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // "Onayla ve İlanları Getir" gibi standart butonlar
         if (target.classList.contains('chat-option-button')) {
              const message = target.textContent;
              addMessageToUI('user', message);
@@ -147,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
              sendMessage({ message, history: conversationHistory, current_strategy: currentStrategy });
         }
 
+        // Telefon formu gönderme butonu
         if (target.id === 'phone-submit-btn') {
             const phoneInput = document.getElementById('phone-input');
             const userPhone = phoneInput.value;
@@ -156,7 +161,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 target.textContent = "Kaydediliyor...";
                 
                 currentStrategy.telefon = `+90 ${userPhone}`;
-                await saveData(currentStrategy);
+                
+                const finalPayload = {
+                    ...currentStrategy,
+                    foundListings: foundListingsData
+                };
+                await saveData(finalPayload);
 
                 addMessageToUI('user', `Telefon Numaram: ${userPhone}`);
                 document.getElementById('phone-input-form').remove();
@@ -170,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==================
-    // ARAYÜZ OLUŞTURMA FONKSİYONLARI (Renderers) (Değişiklik yok)
+    // ARAYÜZ OLUŞTURMA FONKSİYONLARI (Renderers)
     // ==================
     
     function addListingsToUI(results) {

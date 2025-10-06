@@ -14,14 +14,14 @@ exports.handler = async function (event, context) {
     const data = JSON.parse(event.body);
 
     await doc.loadInfo();
-    const sheet = doc.sheetsByIndex[0];
-
-    // YENİ "Mahalle" alanı eklendi
-    await sheet.addRow({
+    
+    // 1. "chatbot" sekmesine müşteri bilgilerini yaz
+    const chatbotSheet = doc.sheetsByTitle['chatbot']; // Sekme adına göre seç
+    await chatbotSheet.addRow({
       'Tarih': new Date().toLocaleString('tr-TR'),
       'İsim': data.isim,
       'Konum': data.konum,
-      'Mahalle': data.mahalle, // YENİ EKLENDİ
+      'Mahalle': data.mahalle,
       'Telefon': data.telefon,
       'Amaç': data.amac,
       'Mülk Tipi': data.mulkTipi,
@@ -29,7 +29,17 @@ exports.handler = async function (event, context) {
       'Oda Sayısı': data.odaSayisi,
     });
 
-    return { statusCode: 200, body: JSON.stringify({ message: "Veri başarıyla eklendi." }) };
+    // 2. "İlanlar" sekmesine bulunan ilanları yaz
+    if (data.foundListings && data.foundListings.length > 0) {
+        const ilanlarSheet = doc.sheetsByTitle['İlanlar']; // Sekme adına göre seç
+        const rowsToAdd = data.foundListings.map(ilan => {
+            // Müşteri ismini her ilana ekleyerek ilişki kur
+            return { 'İsim': data.isim, ...ilan };
+        });
+        await ilanlarSheet.addRows(rowsToAdd);
+    }
+
+    return { statusCode: 200, body: JSON.stringify({ message: "Tüm veriler başarıyla eklendi." }) };
 
   } catch (error) {
     console.error("E-tabloya yazma hatası:", error);
