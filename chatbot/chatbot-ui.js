@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ANA FONKSİYONLAR
     // ==================
 
-    // 1. Backend'e Mesaj Gönderme
     async function sendMessage(payload) {
         showTypingIndicator();
         userInput.disabled = true;
@@ -43,19 +42,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 2. Gelen Yanıtı İşleme (DÜZELTİLMİŞ MANTIK)
+    // Gelen Yanıtı İşleme (DÜZELTİLMİŞ MANTIK)
     function handleAiResponse(data) {
         lastAiAdim = data.adim;
         currentStrategy = data.arama_stratejisi || currentStrategy;
         
-        // DÜZELTME BAŞLANGICI: Artık tüm adımlar sırayla işlenecek.
+        // DÜZELTME BAŞLANGICI: Artık tüm adımlar birbirinden bağımsız olarak kontrol edilecek.
         
-        // 1. Adım: İlanlar varsa, HER ZAMAN göster.
+        // 1. Adım: İlanlar varsa, göster.
         if (data.ilan_sonuclari && data.ilan_sonuclari.sunum && data.ilan_sonuclari.sunum.length > 0) {
             addListingsToUI(data.ilan_sonuclari);
         }
 
-        // 2. Adım: Cevap metni varsa, HER ZAMAN göster.
+        // 2. Adım: Cevap metni varsa, göster.
         if (data.cevap) {
             addMessageToUI('ai', data.cevap);
             conversationHistory += `Asistan: ${data.cevap}\n`;
@@ -63,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         userInput.value = "";
 
-        // 3. Adım: Bir sonraki etkileşim elementini göster. (Form, Buton veya Telefon Formu)
+        // 3. Adım: Bir sonraki etkileşim elementini göster. Burası "if/else if" olmalı çünkü aynı anda sadece bir tip etkileşim olabilir.
         if (data.eylem === 'form_goster') {
             renderMultiChoiceForm();
         } else if (data.adim === 'telefon_formu_goster') {
@@ -80,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // DÜZELTME SONU
     }
 
-    // 3. Veriyi E-Tabloya Kaydetme
     async function saveData(data) {
         try {
             await fetch('/api/save-data', {
