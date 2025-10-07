@@ -98160,7 +98160,7 @@ module.exports = [
    "Havuz": "Yok"
  },
  {
-   "İlan ID": 1274363479,
+   "İlan ID": "1274363479",
    "Başlık": "Remax Arma'dan Buca Yıldız'da Üniversiteye Yakın Satılık 1+1",
    "Detay Linki": "https://www.sahibinden.com/ilan/emlak-konut-satilik-remax-arma-dan-buca-yildiz-da-universiteye-yakin-satilik-1-plus1-1274363479/detay",
    "Görsel Linki": "https://i0.shbdn.com/photos/36/34/79/x16_12743634796om.jpg",
@@ -98220,7 +98220,7 @@ module.exports = [
    "Havuz": "Yok"
  },
  {
-   "İlan ID": 1241012044,
+   "İlan ID": "1241012044",
    "Başlık": "REMAX MODEL DEN TINAZTEPE KAMPÜS CİVARI ASANSÖRLÜ KLİMALI 1+1",
    "Detay Linki": "https://www.sahibinden.com/ilan/emlak-konut-satilik-remax-model-den-tinaztepe-kampus-civari-asansorlu-klimali-1-plus1-1241012044/detay",
    "Görsel Linki": "https://i0.shbdn.com/photos/01/20/44/x16_124101204412j.jpg",
@@ -98280,7 +98280,7 @@ module.exports = [
    "Havuz": "Yok"
  },
  {
-   "İlan ID": 1114919655,
+   "İlan ID": "1114919655",
    "Başlık": "REMAX MODEL DEN TINAZTEPE KAMPÜS CİVARI EŞYALI KLİMALI 1+1",
    "Detay Linki": "https://www.sahibinden.com/ilan/emlak-konut-satilik-remax-model-den-tinaztepe-kampus-civari-esyali-klimali-1-plus1-1114919655/detay",
    "Görsel Linki": "https://i0.shbdn.com/photos/91/96/55/x16_11149196553zh.jpg",
@@ -98340,7 +98340,7 @@ module.exports = [
    "Havuz": "Yok"
  },
  {
-   "İlan ID": 1274146665,
+   "İlan ID": "1274146665",
    "Başlık": "Remax Arma'dan Buca Kuruçeşme Mh.de 1+1_45 M² Satılık Daire",
    "Detay Linki": "https://www.sahibinden.com/ilan/emlak-konut-satilik-remax-arma-dan-buca-kurucesme-mh.de-1-plus1_45-m-satilik-daire-1274146665/detay",
    "Görsel Linki": "https://i0.shbdn.com/photos/14/66/65/x16_1274146665z9e.jpg",
@@ -98400,7 +98400,7 @@ module.exports = [
    "Havuz": "Yok"
  },
  {
-   "İlan ID": 1253648968,
+   "İlan ID": "1253648968",
    "Başlık": "ATATÜRK MAHALLESINDE KAMPÜSE YÜRÜME MESAFESİ SATILIK 1+1 DAİRE",
    "Detay Linki": "https://www.sahibinden.com/ilan/emlak-konut-satilik-ataturk-mahallesinde-kampuse-yurume-mesafesi-satilik-1-plus1-daire-1253648968/detay",
    "Görsel Linki": "https://i0.shbdn.com/photos/64/89/68/x16_1253648968tz7.jpg",
@@ -98460,7 +98460,7 @@ module.exports = [
    "Havuz": "Yok"
  },
  {
-   "İlan ID": 1271799232,
+   "İlan ID": "1271799232",
    "Başlık": "REMAX ARMA'DAN KIRA GARANTILI APART OTEL DAİRESİ",
    "Detay Linki": "https://www.sahibinden.com/ilan/emlak-konut-satilik-remax-arma-dan-kira-garantili-apart-otel-dairesi-1271799232/detay",
    "Görsel Linki": "https://i0.shbdn.com/photos/79/92/32/x16_1271799232d27.jpg",
@@ -98520,7 +98520,7 @@ module.exports = [
    "Havuz": "Yok"
  },
  {
-   "İlan ID": 1272125644,
+   "İlan ID": "1272125644",
    "Başlık": "Remax Armadan İzmir Buca Kuruçeşmede,1+1, Eşyalı Satılık Daire",
    "Detay Linki": "https://www.sahibinden.com/ilan/emlak-konut-satilik-remax-armadan-izmir-buca-kurucesmede,1-plus1-esyali-satilik-daire-1272125644/detay",
    "Görsel Linki": "https://i0.shbdn.com/photos/12/56/44/x16_1272125644pdf.jpg",
