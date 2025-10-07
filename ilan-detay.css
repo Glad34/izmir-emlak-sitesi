@@ -208,25 +208,50 @@
 /* Turuncu Sıralama Bilgi Kutusu */
 /* Turuncu Sıralama Bilgi Kutusu - Düzeltilmiş */
 /* YENİ - PROFESYONEL SIRALAMA BİLGİ KUTUSU */
+/* YENİ - TIKLANABİLİR PROFESYONEL SIRALAMA BUTONU */
 .siralama-bilgi-kutusu {
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* İçeriği sola yasla */
-  gap: 0.6rem; /* İkon ile metin arası boşluk */
-  background-color: #eff6ff; /* Çok açık, profesyonel bir mavi */
-  color: #3730a3; /* Koyu ve okunaklı bir lacivert */
-  border: 1px solid #c7d2fe; /* Arka plana uygun ince bir çerçeve */
-  padding: 0.6rem 1rem; /* İç boşlukları ayarla */
-  border-radius: 8px;
+  justify-content: space-between; /* İçeriği iki yana yasla (metin sola, ok sağa) */
+  text-decoration: none; /* Link alt çizgisini kaldır */
+  
+  /* Yeni Stil */
+  background-color: #fffaf0; /* Kirli Beyaz / Çok Açık Bej Arka Plan */
+  color: #f97316; /* Turuncu Yazı Rengi */
+  border: 1px solid #fed7aa; /* Turuncuya uygun ince bir çerçeve */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* İnce gölge */
+  
+  padding: 0.75rem 1rem; /* İç boşluklar (12px 16px) */
+  border-radius: 999px; /* Tamamen oval kenarlar */
   font-weight: 600;
-  font-size: 0.875rem; /* Yazı boyutunu biraz büyüt (14px) */
+  font-size: 0.875rem; /* 14px */
   margin-top: -0.5rem;
   margin-bottom: 2rem;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Fare ile üzerine gelince hafifçe büyüme efekti */
+.siralama-bilgi-kutusu:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Butonun içindeki sol taraf (ikon ve metin) */
+.siralama-sol-taraf {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* ikon ve metin arası boşluk */
   
-  /* Tek satır olmasını sağlayan sihirli kodlar */
-  white-space: nowrap; /* Metnin alt satıra kaymasını engelle */
-  overflow: hidden; /* Taşan kısmı gizle */
-  text-overflow: ellipsis; /* Taşarsa sonuna "..." ekle */
+  /* Taşmayı önlemek için */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Sağdaki ok ikonu için ek stil */
+.siralama-ok {
+  color: #fb923c; /* Daha açık bir turuncu */
+  flex-shrink: 0; /* Küçülmesini engelle */
 }
 
 /* Ortalama m² Fiyatı Bilgi Kutusu */

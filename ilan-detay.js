@@ -85,15 +85,13 @@ function populatePage(data, isLoggedIn, token) {
   document.getElementById('ilan-baslik').textContent = ilan['Başlık'];
   document.getElementById('ilan-konum').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${ilan['Konum']}`;
   
-  // Fiyatı hesapla (diğer bölümlerde kullanmak için)
   const fiyatSayisi = parseInt(String(ilan['Fiyat']).replace(/[^\d]/g, ''));
   
   document.getElementById('ilan-aciklama').innerHTML = ilan['Açıklama'].replace(/\n/g, '<br>');
 
-  // İLAN BİLGİLERİ SEKMESİNİ DOLDURMA (FİYAT DAHİL)
   const ozellikler = { "İlan Tipi": ilan['İlan Tipi'], "Oda Sayısı": ilan['Oda Sayısı'], "m² (Brüt)": ilan['m² (Brüt)'], "Bina Yaşı": ilan['Bina Yaşı'], "Isıtma": ilan['Isıtma'], "Banyo Sayısı": ilan['Banyo Sayısı'], "Balkon": ilan['Balkon'], "Eşyalı": ilan['Eşyalı'], "Site İçerisinde": ilan['Site İçerisinde'],"Havuz": ilan['Havuz'], "Krediye Uygun": ilan['Krediye Uygun'], "Aidat (TL)": ilan['Aidat (TL)'], "Bulunduğu Kat": ilan['Bulunduğu Kat'] };
   const ozelliklerListesiTab = document.getElementById('ilan-ozellikler-tab');
-  ozelliklerListesiTab.innerHTML = ''; // Listeyi temizle
+  ozelliklerListesiTab.innerHTML = ''; 
 
   const fiyatDegeri = !isNaN(fiyatSayisi) ? `${fiyatSayisi.toLocaleString('tr-TR')} TL` : "Belirtilmemiş";
   ozelliklerListesiTab.innerHTML += `<li class="flex justify-between items-center text-sm py-3 border-b border-gray-200"><span class="text-gray-600">Fiyat</span><span class="font-bold text-gray-900">${fiyatDegeri}</span></li>`;
@@ -129,8 +127,6 @@ function populatePage(data, isLoggedIn, token) {
   const siralamaMetni = document.getElementById('siralama-metni');
   const ortalamaFiyatKutusu = document.getElementById('ortalama-fiyat-kutusu');
 
-  // 1. ADIM: ÖNCE TÜM İLGİLİ İLANLARI VE ORTALAMA FİYATI HESAPLA
-  // ---------------------------------------------------------------
   let ortalamaEndeksM2Fiyati = 0;
   const anaIlanNetM2 = parseInt(ilan['m² (Net)']);
   const anaIlanFiyat = parseInt(String(ilan.Fiyat).replace(/[^\d]/g, ''));
@@ -151,8 +147,6 @@ function populatePage(data, isLoggedIn, token) {
     }
   }
 
-  // 2. ADIM: DEĞER ANALİZİ KARTINI YENİ MANTIKLA DOLDUR
-  // ---------------------------------------------------------------
   if (ortalamaEndeksM2Fiyati > 0 && anaIlanGercekM2Fiyati > 0) {
       const farkYuzdesi = Math.round(((anaIlanGercekM2Fiyati - ortalamaEndeksM2Fiyati) / ortalamaEndeksM2Fiyati) * 100);
       const firsatGostergesi = document.getElementById('firsat-gostergesi');
@@ -183,9 +177,6 @@ function populatePage(data, isLoggedIn, token) {
       degerKarti.classList.remove('hidden');
   }
 
-
-  // 3. ADIM: DİĞER İLANLAR LİSTESİNİ YENİ MANTIKLA OLUŞTUR
-  // ---------------------------------------------------------------
   if (digerIlanlar && digerIlanlar.length > 0 && ortalamaEndeksM2Fiyati > 0) {
     const tumIlanlar = [ ...digerIlanlar, ilan ];
     
@@ -221,13 +212,21 @@ function populatePage(data, isLoggedIn, token) {
     });
 
     if (anaIlaninSirasi !== -1 && siralamaMetni && siralamaPlaceholder) {
-        siralamaMetni.textContent = `${ilan['Mahalle']} mahallesindeki en uygun ${anaIlaninSirasi}. fırsattır.`;
+        siralamaMetni.textContent = `${ilan['Mahalle']} Mah. En Uygun #${anaIlaninSirasi}`;
         siralamaPlaceholder.classList.remove('hidden');
+
+        siralamaPlaceholder.addEventListener('click', function(e) {
+          e.preventDefault(); 
+          const hedefBolum = document.getElementById('diger-firsatlar-baslik');
+          if (hedefBolum) {
+            hedefBolum.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
     }
+    
     digerIlanlarBolumu.classList.remove('hidden');
   }
   
-  // --- Favori Butonu Mantığı ---
   const favoriBtn = document.getElementById('favori-ekle-btn');
   if (isLoggedIn && favoriBtn) { favoriBtn.classList.remove('hidden'); }
   if (favoriBtn && isLoggedIn) {
@@ -266,7 +265,6 @@ function initializePlugins() {
       const activePane = document.getElementById(tabId);
       if (activePane) activePane.classList.add('active');
 
-      // --- AKILLI KAYDIRMA KODU (HEADER HESAPLAMALI) ---
       if (tabId === 'tab-aciklama' || tabId === 'tab-konum') {
         const sekmeliBolum = document.getElementById('sekmeli-bolum');
         const header = document.getElementById('header-placeholder'); 
