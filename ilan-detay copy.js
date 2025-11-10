@@ -90,26 +90,11 @@ function populatePage(data, isLoggedIn, token) {
   document.getElementById('ilan-aciklama').innerHTML = ilan['Açıklama'].replace(/\n/g, '<br>');
 
   const ozellikler = { "İlan Tipi": ilan['İlan Tipi'], "Oda Sayısı": ilan['Oda Sayısı'], "m² (Brüt)": ilan['m² (Brüt)'], "Bina Yaşı": ilan['Bina Yaşı'], "Isıtma": ilan['Isıtma'], "Banyo Sayısı": ilan['Banyo Sayısı'], "Balkon": ilan['Balkon'], "Eşyalı": ilan['Eşyalı'], "Site İçerisinde": ilan['Site İçerisinde'],"Havuz": ilan['Havuz'], "Krediye Uygun": ilan['Krediye Uygun'], "Aidat (TL)": ilan['Aidat (TL)'], "Bulunduğu Kat": ilan['Bulunduğu Kat'] };
-
-   // --- İLAN BİLGİLERİ FİYAT BÖLÜMÜ ---
   const ozelliklerListesiTab = document.getElementById('ilan-ozellikler-tab');
-ozelliklerListesiTab.innerHTML = ''; 
+  ozelliklerListesiTab.innerHTML = ''; 
 
-// 💡 Fiyat satırını aç/kapa kontrolü
-const FIYAT_SATIRINI_GOSTER = false; // Sonra tekrar göstermek istersen bunu true yapman yeterli
-
-if (FIYAT_SATIRINI_GOSTER) {
-  const fiyatDegeri = !isNaN(fiyatSayisi)
-    ? `${fiyatSayisi.toLocaleString('tr-TR')} TL`
-    : "Belirtilmemiş";
-
-  ozelliklerListesiTab.innerHTML += `
-    <li class="flex justify-between items-center text-sm py-3 border-b border-gray-200">
-      <span class="text-gray-600">Fiyat</span>
-      <span class="font-bold text-gray-900">${fiyatDegeri}</span>
-    </li>`;
-}
-
+  const fiyatDegeri = !isNaN(fiyatSayisi) ? `${fiyatSayisi.toLocaleString('tr-TR')} TL` : "Belirtilmemiş";
+  ozelliklerListesiTab.innerHTML += `<li class="flex justify-between items-center text-sm py-3 border-b border-gray-200"><span class="text-gray-600">Fiyat</span><span class="font-bold text-gray-900">${fiyatDegeri}</span></li>`;
 
   Object.entries(ozellikler).forEach(([key, value]) => { 
       if (value && String(value).trim() !== "") { 
