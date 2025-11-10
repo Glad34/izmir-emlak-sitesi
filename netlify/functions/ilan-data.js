@@ -98616,7 +98616,7 @@ module.exports = [
    "Takas": "N/A",
    "Danışman Adı": "Hilal K.",
    "Danışman Cep": "0 (544) 434 00 32",
-   "Açıklama": "Tanınmış kolejlere yürüme mesafesinde, site içerisinde villamız tek müstakildir. İki araçlık park yeri mevcuttur.\nBütün odalarda gömme dolap ve kapalı balkon bulunmaktadır.\n\n Daha detaylı bilgilendirme için  arayınız. \n\n\n\n\nHilal Ayvalık\n\nGayrimenkul Danışmanı",
+   "Açıklama": "Tanınmış kolejlere yürüme mesafesinde, site içerisinde villamız tek müstakildir. İki araçlık park yeri mevcuttur.\nBütün odalarda gömme dolap ve kapalı balkon bulunmaktadır.\n\n Daha detaylı bilgilendirme için  arayınız.",
    "Harita Linki": "https://www.google.com/maps?q=38.34673342153849,26.869035698394804&z=15&output=embed",
    "Endeks m² Fiyatı": 0,
    "Endeks 1 Yıllık Değişim": "% -",
